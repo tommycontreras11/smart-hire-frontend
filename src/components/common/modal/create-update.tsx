@@ -115,38 +115,6 @@ export function CreateUpdateForm<T extends FieldValues>({
                         </FormControl>
                       )}
 
-                      {/* {fieldInput.type === "date" && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full justify-start pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "yyyy-MM-dd")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              key={form.watch(field.name)}
-                              mode="single"
-                              selected={field.value ?? undefined}
-                              onSelect={field.onChange}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      )} */}
-
                       {fieldInput.type === "date" && (
                         <FormControl>
                           <DatePicker
