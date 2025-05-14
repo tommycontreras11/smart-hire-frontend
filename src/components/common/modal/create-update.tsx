@@ -69,6 +69,8 @@ export function CreateUpdateForm<T extends FieldValues>({
   isOpen,
   onClose,
 }: CreateUpdateFormProps<T>) {
+  console.log(form.getValues())
+  console.log(form.formState.errors)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTrigger asChild></DialogTrigger>
@@ -142,8 +144,8 @@ export function CreateUpdateForm<T extends FieldValues>({
                           <Input
                             placeholder={`Type your ${field.name}`}
                             {...field}
-                            type="password"
                             className="w-full"
+                            type="password"
                           />
                         </FormControl>
                       )}
@@ -170,9 +172,10 @@ export function CreateUpdateForm<T extends FieldValues>({
                       {fieldInput.type === "number" && (
                         <FormControl>
                           <Input
-                            placeholder={`Type your ${field.name}`}
+                            placeholder={`Type your ${field.name.replace('_', ' ')}`}
                             {...field}
                             className="w-full"
+                            type="number"
                           />
                         </FormControl>
                       )}
