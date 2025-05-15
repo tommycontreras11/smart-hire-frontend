@@ -10,3 +10,9 @@ export interface IRecruiter {
   institution: IInstitution;
   status: StatusEnum;
 }
+
+export interface ICreateRecruiter extends Partial<Omit<IRecruiter, "uuid" | "institution" | "status">> {
+  institution: string
+}
+
+export interface IUpdateRecruiter extends Partial<ICreateRecruiter> {}

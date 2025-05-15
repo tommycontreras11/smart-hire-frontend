@@ -13,3 +13,17 @@ export function useGetAllRecruiter() {
     data: query.data?.data,
   };
 }
+
+export function useGetOneRecruiter(uuid: string) {
+  const query = useQuery({
+    queryKey: ["recruiter", uuid],
+    retry: 1,
+    queryFn: () => recruitersProvider.getOne(uuid),
+    enabled: !!uuid,
+  });
+
+  return {
+    ...query,
+    data: query.data?.data,
+  };
+}
