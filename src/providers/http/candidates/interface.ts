@@ -8,7 +8,7 @@ export interface ICandidate {
   name: string;
   password: string;
   desired_salary: string;
-  desired_position: IPositionType;
+  desiredPosition: IPositionType;
   department: IDepartment;
   url: string;
   status: StatusEnum;
@@ -16,9 +16,9 @@ export interface ICandidate {
 
 export interface ICreateCandidate
   extends Partial<
-    Omit<ICandidate, "uuid" | "desired_position" | "department" | "status">
+    Omit<ICandidate, "uuid" | "desiredPosition" | "department" | "status">
   > {
-  desiredPositionUUID: string;
+  positionUUID: string;
   departmentUUID: string;
 }
 

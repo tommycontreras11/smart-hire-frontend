@@ -4,7 +4,7 @@ import {
 } from "@/enums/job-position.enum";
 import { z } from "zod";
 
-const salaryRegex = /^\d{1,8}(\.\d{0,2})?$/;
+export const salaryRegex = /^\d{1,8}(\.\d{0,2})?$/;
 
 export const jobPositionCreateFormSchema = z.object({
   name: z
