@@ -1,6 +1,9 @@
 "use client";
 
-import { CreateUpdateForm, IFormField } from "@/components/common/modal/create-update";
+import {
+  CreateUpdateForm,
+  IFormField,
+} from "@/components/common/modal/create-update";
 import DataTable from "@/components/common/table/data-table";
 import { commonStatusTableDefinitions } from "@/definitions/common.definition";
 import {
@@ -15,7 +18,6 @@ import {
 import { useGetAllLanguage } from "@/hooks/api/language.hook";
 import { useGetAllRecruiter } from "@/hooks/api/recruiter.hook";
 import {
-  useCreateJobPosition,
   useDeleteJobPosition,
   useUpdateJobPosition,
 } from "@/mutations/api/job-positions";
@@ -23,7 +25,9 @@ import {
   ICreateJobPosition,
   IUpdateJobPosition,
 } from "@/providers/http/job-positions/interface";
-import { jobPositionCreateFormSchema, jobPositionUpdateFormSchema } from "@/schema/job-position.schema";
+import {
+  jobPositionUpdateFormSchema
+} from "@/schema/job-position.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -60,10 +64,8 @@ export default function JobPosition() {
     },
   ]);
 
-  const form = useForm<ICreateJobPosition | IUpdateJobPosition>({
-    resolver: zodResolver(
-      isEditable ? jobPositionUpdateFormSchema : jobPositionCreateFormSchema
-    ),
+  const form = useForm<IUpdateJobPosition>({
+    resolver: zodResolver(jobPositionUpdateFormSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -85,10 +87,6 @@ export default function JobPosition() {
     useGetAllLanguage();
   const { data: recruiters, isLoading: isLoadingRecruiters } =
     useGetAllRecruiter();
-
-  const { mutate: createJobPosition } = useCreateJobPosition(() => {
-    clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
-  });
 
   const { mutate: updateJobPosition } = useUpdateJobPosition(() => {
     clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
@@ -172,8 +170,14 @@ export default function JobPosition() {
       fillFormInput(form, [
         { property: "name", value: jobPosition.name },
         { property: "description", value: jobPosition.description },
-        { property: "minimum_salary", value: jobPosition.minimum_salary.toString() },
-        { property: "maximum_salary", value: jobPosition.maximum_salary.toString() },
+        {
+          property: "minimum_salary",
+          value: jobPosition.minimum_salary.toString(),
+        },
+        {
+          property: "maximum_salary",
+          value: jobPosition.maximum_salary.toString(),
+        },
         { property: "risk_level", value: jobPosition.risk_level },
         { property: "contract_type", value: jobPosition.contract_type },
         { property: "countryUUID", value: jobPosition.country.uuid },
@@ -206,27 +210,18 @@ export default function JobPosition() {
   const handleSubmit = (data: ICreateJobPosition | IUpdateJobPosition) => {
     if (uuid) {
       modifyJobPosition(data);
-    } else {
-      console.log(data);
-      createJobPosition(data as ICreateJobPosition);
     }
   };
 
   return (
     <div className="mx-auto w-full overflow-x-auto">
-      <button
-        className="bg-sky-700 hover:bg-sky-800 text-white font-bold py-2 px-4 rounded mb-4"
-        onClick={() => setIsModalOpen(true)}
-      >
-        Create
-      </button>
       <DataTable
         data={jobPositions || []}
         columns={columns({ handleUpdate, handleDelete })}
         definitions={commonStatusTableDefinitions}
       />
 
-      <CreateUpdateForm<ICreateJobPosition | IUpdateJobPosition>
+      <CreateUpdateForm<IUpdateJobPosition>
         isEditable={isEditable}
         entityName="Job Position"
         fields={jobPositionFields}
