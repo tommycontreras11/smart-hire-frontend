@@ -2,7 +2,12 @@
 declare global {
 	interface IResponse<T> {
 		data: T;
-        message?:string
+        message?: string
+	}
+
+	interface ISignInResponse {
+		token: string;
+        message?: string
 	}
 
 	interface IErrorResponse {

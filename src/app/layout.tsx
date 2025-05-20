@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type { Metadata } from "next";
+import { AuthProvider } from "@/contexts/auth-context";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { QueryClient, QueryClientProvider } from "react-query";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +26,7 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 60 * 24,
     },
   },
-})
+});
 
 export default function RootLayout({
   children,
@@ -39,7 +39,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryClientProvider client={queryClient}>
-        {children}
+          <AuthProvider>{children}</AuthProvider>
         </QueryClientProvider>
       </body>
     </html>
