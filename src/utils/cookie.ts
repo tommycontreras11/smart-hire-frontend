@@ -12,19 +12,19 @@ const configCookie = {
 
 export const saveCookie = async (token: string) => {
   const cookieStore = await cookies();
-  cookieStore.set("jwt", token, configCookie);
+  cookieStore.set("access_token", token, configCookie);
 };
 
 export const getCookie = async () => {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = cookieStore.get("access_token")?.value;
 
   return token;
 };
 
 export const deleteCookie = async (): Promise<void> => {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = cookieStore.get("access_token")?.value;
 
-  token && cookieStore.delete("jwt");
+  token && cookieStore.delete("access_token");
 };
