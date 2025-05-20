@@ -8,7 +8,6 @@ import DataTable from "@/components/common/table/data-table";
 import { commonStatusTableDefinitions } from "@/definitions/common.definition";
 import {
   JobPositionContractTypeEnum,
-  JobPositionRiskLevelEnum,
 } from "@/enums/job-position.enum";
 import { useGetAllCountry } from "@/hooks/api/country.hook";
 import {
@@ -33,6 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { columns } from "./table/column";
+import { useGetAllCompetency } from "@/hooks/api/competency.hook";
 
 export default function JobPosition() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,15 +44,6 @@ export default function JobPosition() {
     { name: "description", label: "Description", type: "text" },
     { name: "minimum_salary", label: "Minimum Salary", type: "number" },
     { name: "maximum_salary", label: "Maximum Salary", type: "number" },
-    {
-      name: "risk_level",
-      label: "Risk Level",
-      type: "select",
-      options: Object.values(JobPositionRiskLevelEnum).map((level) => ({
-        label: level,
-        value: level,
-      })),
-    },
     {
       name: "contract_type",
       label: "Contract Type",
@@ -71,11 +62,11 @@ export default function JobPosition() {
       description: "",
       minimum_salary: "0",
       maximum_salary: "0",
-      risk_level: "",
       contract_type: "",
       countryUUID: "",
       languageUUID: "",
       recruiterUUID: "",
+      competencyUUIDs: [],
     },
   });
 
@@ -87,6 +78,7 @@ export default function JobPosition() {
     useGetAllLanguage();
   const { data: recruiters, isLoading: isLoadingRecruiters } =
     useGetAllRecruiter();
+  const { data: competencies, isLoading: isLoadingCompetencies } =  useGetAllCompetency()
 
   const { mutate: updateJobPosition } = useUpdateJobPosition(() => {
     clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
@@ -101,10 +93,12 @@ export default function JobPosition() {
       isLoadingCountries ||
       isLoadingLanguages ||
       isLoadingRecruiters ||
+      isLoadingCompetencies ||
       !jobPositions ||
       !countries ||
       !languages ||
-      !recruiters
+      !recruiters ||
+      !competencies
     )
       return;
 
@@ -161,7 +155,25 @@ export default function JobPosition() {
       }
       return prev;
     });
-  }, [isLoadingCountries, isLoadingLanguages, isLoadingRecruiters]);
+
+    setJobPositionFields((prev) => {
+      if (!prev.find((field) => field.name === "competencyUUIDs")) {
+        return [
+          ...prev,
+          {
+            name: "competencyUUIDs",
+            label: "Competencies",
+            type: "multi-select",
+            options: competencies.map((competency) => ({
+              label: competency.name,
+              value: competency.uuid,
+            })),
+          },
+        ];
+      }
+      return prev;
+    });
+  }, [isLoadingCountries, isLoadingLanguages, isLoadingRecruiters, isLoadingCompetencies]);
 
   useEffect(() => {
     if (!jobPosition) return;
@@ -178,11 +190,14 @@ export default function JobPosition() {
           property: "maximum_salary",
           value: jobPosition.maximum_salary.toString(),
         },
-        { property: "risk_level", value: jobPosition.risk_level },
         { property: "contract_type", value: jobPosition.contract_type },
         { property: "countryUUID", value: jobPosition.country.uuid },
         { property: "languageUUID", value: jobPosition.language.uuid },
         { property: "recruiterUUID", value: jobPosition.recruiter.uuid },
+        {
+          property: "competencyUUIDs",
+          value: jobPosition.competencies.map((competency) => competency.uuid),
+        },
       ]);
     }
 

@@ -1,6 +1,5 @@
 import {
-  JobPositionContractTypeEnum,
-  JobPositionRiskLevelEnum,
+  JobPositionContractTypeEnum
 } from "@/enums/job-position.enum";
 import { z } from "zod";
 
@@ -31,12 +30,7 @@ export const jobPositionCreateFormSchema = z.object({
     .refine((val) => parseFloat(val) > 0, {
       message: "Maximum salary must be greater than 0",
     }),
-  risk_level: z.enum(
-    Object.values(JobPositionRiskLevelEnum) as [string, ...string[]],
-    {
-      required_error: "Risk level is required",
-    }
-  ),
+
   contract_type: z.enum(
     Object.values(JobPositionContractTypeEnum) as [string, ...string[]],
     {
@@ -46,6 +40,9 @@ export const jobPositionCreateFormSchema = z.object({
   countryUUID: z.string().uuid("Country must be a valid UUID"),
   languageUUID: z.string().uuid("Language must be a valid UUID"),
   recruiterUUID: z.string().uuid("Recruiter must be a valid UUID"),
+  competencyUUIDs: z
+    .array(z.string().uuid("Competency must be a valid UUID"))
+    .min(1, "At least one competency is required"),
 });
 
 export const jobPositionUpdateFormSchema = jobPositionCreateFormSchema.partial();
