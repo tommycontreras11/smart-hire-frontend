@@ -34,6 +34,7 @@ export interface IFormField {
   label: string;
   type?:
     | "text"
+    | "email"
     | "password"
     | "date"
     | "number"
@@ -111,6 +112,17 @@ export function CreateUpdateForm<T extends FieldValues>({
                             placeholder={`Type your ${field.name}`}
                             {...field}
                             className="w-full"
+                          />
+                        </FormControl>
+                      )}
+
+                      {fieldInput.type === "email" && (
+                        <FormControl>
+                          <Input
+                            placeholder={`Type your ${field.name}`}
+                            {...field}
+                            className="w-full"
+                            type="email"
                           />
                         </FormControl>
                       )}
