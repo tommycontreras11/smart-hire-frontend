@@ -1,12 +1,9 @@
 import { StatusEnum } from "@/enums/common.enum";
 import { IDepartment } from "../departments/interface";
 import { IJobPosition } from "../job-positions/interface";
+import { IPersonBase } from "@/interfaces/common.interface";
 
-export interface IEmployee {
-  uuid: string;
-  identification: string;
-  name: string;
-  password: string;
+export interface IEmployee extends IPersonBase {
   monthly_salary: string;
   entry_date: Date;
   department: IDepartment;
@@ -17,6 +14,7 @@ export interface IEmployee {
 
 export interface IUpdateEmployee  {
   identification: string;
+  email: string;
   name: string;
   password: string;
   monthly_salary: string;
