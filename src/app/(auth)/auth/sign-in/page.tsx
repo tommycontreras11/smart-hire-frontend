@@ -29,7 +29,7 @@ export default function SignIn() {
   const form = useForm<IAuth>({
     resolver: zodResolver(authSignInFormSchema),
     defaultValues: {
-      identification: "",
+      email: "",
       password: "",
     },
   });
@@ -58,7 +58,7 @@ export default function SignIn() {
                   <div className="grid gap-2">
                     <FormField
                       control={form.control}
-                      name="identification"
+                      name="email"
                       render={({ field, fieldState }) => (
                         <FormItem>
                           <FormLabel
@@ -66,10 +66,10 @@ export default function SignIn() {
                               fieldState?.error?.message && "text-red-500"
                             }
                           >
-                            Identification
+                            Email
                           </FormLabel>
                           <FormControl>
-                            <Input placeholder="Type your identification" {...field} />
+                            <Input placeholder="Type your email" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
