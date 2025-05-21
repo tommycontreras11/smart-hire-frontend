@@ -29,6 +29,12 @@ export const columns = ({
     },
   },
   {
+    accessorKey: "email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Email"} />
+    ),
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Name"} />

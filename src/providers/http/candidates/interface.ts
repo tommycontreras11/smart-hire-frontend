@@ -1,12 +1,9 @@
 import { StatusEnum } from "@/enums/common.enum";
 import { IPositionType } from "../position-types/interface";
 import { IDepartment } from "../departments/interface";
+import { IPersonBase } from "@/interfaces/common.interface";
 
-export interface ICandidate {
-  uuid: string;
-  identification: string;
-  name: string;
-  password: string;
+export interface ICandidate extends IPersonBase {
   desired_salary: string;
   desiredPosition: IPositionType;
   department: IDepartment;

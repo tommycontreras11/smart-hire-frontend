@@ -37,6 +37,7 @@ export default function Candidate() {
   const [uuid, setUUID] = useState<string | null>("");
   const [candidateFields, setCandidateFields] = useState<IFormField[]>([
     { name: "identification", label: "Identification", type: "text" },
+    { name: "email", label: "Email", type: "email" },
     { name: "name", label: "Name", type: "text" },
     { name: "password", label: "Password", type: "password" },
     { name: "desired_salary", label: "Desired Salary", type: "number" },
@@ -48,6 +49,7 @@ export default function Candidate() {
     ),
     defaultValues: {
       identification: "",
+      email: "",
       name: "",
       password: "",
       desired_salary: "0",
@@ -130,6 +132,10 @@ export default function Candidate() {
         {
           property: "identification",
           value: candidate.identification,
+        },
+        {
+          property: "email",
+          value: candidate.email,
         },
         {
           property: "name",
