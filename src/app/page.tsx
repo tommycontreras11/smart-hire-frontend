@@ -1,29 +1,28 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
-import { motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  Briefcase,
-  Building2,
-  Clock,
-  DollarSign,
-  MapPin,
-  Search,
-  Sparkles,
-} from "lucide-react";
-import { useGetAllJobPosition } from "@/hooks/api/job-position.hook";
-import { useGetAllCountry } from "@/hooks/api/country.hook";
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
+import { useGetAllCountry } from "@/hooks/api/country.hook";
+import { useGetAllJobPosition } from "@/hooks/api/job-position.hook";
+import { motion } from "framer-motion";
+import {
+    Briefcase,
+    Building2,
+    Clock,
+    DollarSign,
+    MapPin,
+    Search
+} from "lucide-react";
+import { ChangeEvent, useState } from "react";
 
 const jobs = [
   {
@@ -67,7 +66,7 @@ const jobs = [
   },
 ];
 
-export default function JobsPage() {
+export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -194,7 +193,7 @@ export default function JobsPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <DollarSign className="h-4 w-4" />
-                        <span>{`${job.minimum_salary} - ${job.maximum_salary} USD`}</span>
+                        <span>{`${`$${job.minimum_salary}`} -${`$${job.maximum_salary}`} USD`}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
@@ -207,9 +206,9 @@ export default function JobsPage() {
                     </p>
 
                     <div className="flex flex-wrap gap-2">
-                      {job.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
+                      {job.competencies.map((competency) => (
+                        <Badge key={competency.uuid} variant="secondary">
+                          {competency.name}
                         </Badge>
                       ))}
                     </div>
