@@ -1,109 +1,161 @@
 'use client';
 
-import { IVacancy, VacancyCard } from '@/components/common/vacancies/vacancy-card';
+import { CreateUpdateForm, IFormField } from '@/components/common/modal/create-update';
+import { VacancyCard } from '@/components/common/vacancies/vacancy-card';
 import { Button } from '@/components/ui/button';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/auth-context';
+import { StatusEnum, UserRoleEnum } from '@/enums/common.enum';
+import { JobPositionContractTypeEnum } from '@/enums/job-position.enum';
+import { useGetAllCompetency } from '@/hooks/api/competency.hook';
+import { useGetAllCountry } from '@/hooks/api/country.hook';
+import { useGetAllJobPosition } from '@/hooks/api/job-position.hook';
+import { useGetAllLanguage } from '@/hooks/api/language.hook';
+import { useCreateJobPosition } from '@/mutations/api/job-positions';
+import { ICreateJobPosition } from '@/providers/http/job-positions/interface';
+import { jobPositionCreateFormSchema } from '@/schema/job-position.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    Filter,
-    Plus,
-    Search
+  Filter,
+  Plus,
+  Search
 } from 'lucide-react';
-import { useState } from 'react';
-
-// Mock data for vacancies
-const vacancyData: IVacancy[] = [
-  {
-    id: '1',
-    title: 'Desarrollador Full Stack',
-    department: 'Tecnología',
-    location: 'Remoto',
-    type: 'Tiempo Completo',
-    status: 'active',
-    applicants: 24,
-    datePosted: '2025-06-01',
-    deadline: '2025-06-30',
-    salary: '$25,000 - $35,000 MXN',
-    description: 'Buscamos un desarrollador full stack con experiencia en React y Node.js para unirse a nuestro equipo...',
-  },
-  {
-    id: '2',
-    title: 'Diseñador UX/UI Senior',
-    department: 'Diseño',
-    location: 'Ciudad de México',
-    type: 'Tiempo Completo',
-    status: 'active',
-    applicants: 18,
-    datePosted: '2025-06-05',
-    deadline: '2025-07-05',
-    salary: '$30,000 - $40,000 MXN',
-    description: 'Estamos buscando un diseñador UX/UI experimentado para liderar proyectos de diseño de productos...',
-  },
-  {
-    id: '3',
-    title: 'Gerente de Marketing Digital',
-    department: 'Marketing',
-    location: 'Ciudad de México',
-    type: 'Tiempo Completo',
-    status: 'active',
-    applicants: 12,
-    datePosted: '2025-06-10',
-    deadline: '2025-07-10',
-    salary: '$35,000 - $45,000 MXN',
-    description: 'Buscamos un gerente de marketing digital para supervisar nuestras campañas en línea y estrategias de contenido...',
-  },
-  {
-    id: '4',
-    title: 'Especialista en Ventas',
-    department: 'Ventas',
-    location: 'Guadalajara',
-    type: 'Tiempo Completo',
-    status: 'draft',
-    applicants: 0,
-    datePosted: '2025-06-12',
-    deadline: '2025-07-12',
-    salary: '$20,000 - $30,000 MXN + comisiones',
-    description: 'Estamos buscando un especialista en ventas para ampliar nuestra cartera de clientes y aumentar los ingresos...',
-  },
-  {
-    id: '5',
-    title: 'Desarrollador Frontend React',
-    department: 'Tecnología',
-    location: 'Monterrey',
-    type: 'Tiempo Completo',
-    status: 'closed',
-    applicants: 30,
-    datePosted: '2025-05-01',
-    deadline: '2025-06-01',
-    salary: '$22,000 - $32,000 MXN',
-    description: 'Buscamos un desarrollador frontend con experiencia en React para crear interfaces de usuario de alta calidad...',
-  },
-];
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export default function VacanciesPage() {
+  const { user } = useAuth()
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [jobPositionFields, setJobPositionFields] = useState<IFormField[]>([
+    { name: "name", label: "Name", type: "text" },
+    { name: "description", label: "Description", type: "text" },
+    { name: "minimum_salary", label: "Minimum Salary", type: "number" },
+    { name: "maximum_salary", label: "Maximum Salary", type: "number" },
+    {
+      name: "contract_type",
+      label: "Contract Type",
+      type: "select",
+      options: Object.values(JobPositionContractTypeEnum).map((level) => ({
+        label: level,
+        value: level,
+      })),
+    },
+    { name: "due_date", label: "Due Date", type: "date" },
+  ])
+
+  const form = useForm<ICreateJobPosition>({
+    resolver: zodResolver(jobPositionCreateFormSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      minimum_salary: "0",
+      maximum_salary: "0",
+      contract_type: "",
+      due_date: new Date(),
+      countryUUID: "",
+      languageUUID: "",
+      competencyUUIDs: [],
+    }
+  })
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { mutate: createJobPosition } = useCreateJobPosition(() => {
+    form.reset()
+    setIsModalOpen(false)
+  })
+
+  const { data: jobPositions } = useGetAllJobPosition()
+  const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry()
+  const { data: languages, isLoading: isLoadingLanguages } = useGetAllLanguage()
+  const { data: competencies, isLoading: isLoadingCompetencies } = useGetAllCompetency()
+
+  useEffect(() => {
+    if(isLoadingLanguages || isLoadingCountries || isLoadingCompetencies || !countries || !languages || !competencies) return
+
+    setJobPositionFields((prev) => {
+      if(!prev.find((field) => field.name === "countryUUID")) {
+        return [
+          ...prev,
+          {
+            name: "countryUUID",
+            label: "Country",
+            type: "select",
+            options: countries.map((country) => ({
+              label: country.name,
+              value: country.uuid,
+            })),
+          },
+        ]
+      }
+      return prev
+    })
+
+    setJobPositionFields((prev) => {
+      if(!prev.find((field) => field.name === "languageUUID")) {
+        return [
+          ...prev,
+          {
+            name: "languageUUID",
+            label: "Language",
+            type: "select",
+            options: languages.map((language) => ({
+              label: language.name,
+              value: language.uuid,
+            })),
+          },
+        ]
+      }
+      return prev
+    })
+
+    setJobPositionFields((prev) => {
+      if(!prev.find((field) => field.name === "competencyUUIDs")) {
+        return [
+          ...prev,
+          {
+            name: "competencyUUIDs",
+            label: "Competencies",
+            type: "multi-select",
+            options: competencies.map((competency) => ({
+              label: competency.name,
+              value: competency.uuid,
+            })),
+          },
+        ]
+      }
+      return prev
+    })
+
+  }, [isLoadingCountries, isLoadingLanguages, isLoadingCompetencies])
+  
+  const handleSubmit = (data: Partial<ICreateJobPosition>) => {
+    if(!user || user.role !== UserRoleEnum.RECRUITER) return
+    createJobPosition({...data, recruiterUUID: user.uuid } as ICreateJobPosition)
+  }
   
   return (
     <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Vacantes</h1>
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Crear Vacante
         </Button>
@@ -154,52 +206,50 @@ export default function VacanciesPage() {
       <Tabs defaultValue="active">
         <TabsList>
           <TabsTrigger value="active">Activas</TabsTrigger>
-          <TabsTrigger value="draft">Borradores</TabsTrigger>
           <TabsTrigger value="closed">Cerradas</TabsTrigger>
           <TabsTrigger value="all">Todas</TabsTrigger>
         </TabsList>
         <TabsContent value="active" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {vacancyData
-              .filter(vacancy => vacancy.status === 'active')
-              .filter(vacancy => vacancy.title.toLowerCase().includes(searchTerm.toLowerCase()))
+            {jobPositions && jobPositions
+              .filter(vacancy => vacancy.status === StatusEnum.ACTIVE)
+              .filter(vacancy => vacancy.name.toLowerCase().includes(searchTerm.toLowerCase()))
               .map(vacancy => (
-                <VacancyCard key={vacancy.id} vacancy={vacancy} />
-              ))}
-          </div>
-        </TabsContent>
-        <TabsContent value="draft" className="mt-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {vacancyData
-              .filter(vacancy => vacancy.status === 'draft')
-              .filter(vacancy => vacancy.title.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(vacancy => (
-                <VacancyCard key={vacancy.id} vacancy={vacancy} />
+                <VacancyCard key={vacancy.uuid} vacancy={vacancy} />
               ))}
           </div>
         </TabsContent>
         <TabsContent value="closed" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {vacancyData
-              .filter(vacancy => vacancy.status === 'closed')
-              .filter(vacancy => vacancy.title.toLowerCase().includes(searchTerm.toLowerCase()))
+            {jobPositions && jobPositions
+              .filter(vacancy => vacancy.status === StatusEnum.INACTIVE)
+              .filter(vacancy => vacancy.name.toLowerCase().includes(searchTerm.toLowerCase()))
               .map(vacancy => (
-                <VacancyCard key={vacancy.id} vacancy={vacancy} />
+                <VacancyCard key={vacancy.uuid} vacancy={vacancy} />
               ))}
           </div>
         </TabsContent>
         <TabsContent value="all" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {vacancyData
-              .filter(vacancy => vacancy.title.toLowerCase().includes(searchTerm.toLowerCase()))
+            {jobPositions && jobPositions
+              .filter(vacancy => vacancy.name.toLowerCase().includes(searchTerm.toLowerCase()))
               .map(vacancy => (
-                <VacancyCard key={vacancy.id} vacancy={vacancy} />
+                <VacancyCard key={vacancy.uuid} vacancy={vacancy} />
               ))}
           </div>
         </TabsContent>
       </Tabs>
 
       {/* <CreateVacancyDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
+            <CreateUpdateForm<ICreateJobPosition>
+              isEditable={false}
+              entityName="Create Job Position"
+              fields={jobPositionFields}
+              form={form}
+              onSubmit={handleSubmit}
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+            />
     </main>
   );
 }
