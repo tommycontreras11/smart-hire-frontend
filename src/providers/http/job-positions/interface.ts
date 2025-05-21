@@ -11,16 +11,18 @@ export interface IJobPosition {
   minimum_salary: string;
   maximum_salary: string;
   contract_type: string;
+  due_date: Date;
   country: ICountry;
   language: ILanguage;
   recruiter: IRecruiter;
   competencies: ICompetency[]
   status: StatusEnum;
+  posted: string
 }
 
 export interface ICreateJobPosition
   extends Partial<
-    Omit<IJobPosition, "uuid" | "country" | "language" | "recruiter" | "competencies" | "status">
+    Omit<IJobPosition, "uuid" | "country" | "language" | "recruiter" | "competencies" | "posted" | "status">
   > {
   countryUUID: string;
   languageUUID: string;

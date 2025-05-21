@@ -1,6 +1,4 @@
-import {
-  JobPositionContractTypeEnum
-} from "@/enums/job-position.enum";
+import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
 import { z } from "zod";
 
 export const salaryRegex = /^\d{1,8}(\.\d{0,2})?$/;
@@ -37,6 +35,9 @@ export const jobPositionCreateFormSchema = z.object({
       required_error: "Contract type is required",
     }
   ),
+  due_date: z.date().refine((date) => date > new Date(), {
+    message: "Due date must be in the future",
+  }),
   countryUUID: z.string().uuid("Country must be a valid UUID"),
   languageUUID: z.string().uuid("Language must be a valid UUID"),
   recruiterUUID: z.string().uuid("Recruiter must be a valid UUID"),
@@ -45,4 +46,5 @@ export const jobPositionCreateFormSchema = z.object({
     .min(1, "At least one competency is required"),
 });
 
-export const jobPositionUpdateFormSchema = jobPositionCreateFormSchema.partial();
+export const jobPositionUpdateFormSchema =
+  jobPositionCreateFormSchema.partial();
