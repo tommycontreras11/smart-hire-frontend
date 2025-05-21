@@ -40,7 +40,6 @@ export const jobPositionCreateFormSchema = z.object({
   }),
   countryUUID: z.string().uuid("Country must be a valid UUID"),
   languageUUID: z.string().uuid("Language must be a valid UUID"),
-  recruiterUUID: z.string().uuid("Recruiter must be a valid UUID"),
   competencyUUIDs: z
     .array(z.string().uuid("Competency must be a valid UUID"))
     .min(1, "At least one competency is required"),
