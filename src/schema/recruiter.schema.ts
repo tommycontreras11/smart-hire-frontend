@@ -4,6 +4,10 @@ export const recruiterCreateFormSchema = z.object({
   identification: z
     .string()
     .refine((value) => value.trim().length > 0, "Identification is required"),
+  email: z
+    .string()
+    .email("Invalid email")
+    .refine((value) => value.trim().length > 0, "Email is required"),
   name: z
     .string()
     .refine((value) => value.trim().length > 0, "Name is required"),
