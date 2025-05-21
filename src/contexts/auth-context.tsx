@@ -12,6 +12,7 @@ import {
   ReactNode,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -58,6 +59,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.push("/");
     });
   });
+
+  useEffect(() => {
+    const validateUser = async () => {
+      if (data) {
+        setUser(data);
+        setIsLoggedIn(true);
+      } else {
+        setUser(null);      
+        setLoading(false)
+      }
+    };
+
+    validateUser();
+  }, [data]);
 
   const login = (values: IAuth) => {
     signIn(values);

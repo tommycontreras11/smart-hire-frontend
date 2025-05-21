@@ -70,6 +70,7 @@ export function CreateUpdateForm<T extends FieldValues>({
   isOpen,
   onClose,
 }: CreateUpdateFormProps<T>) {
+  console.log(form.formState.errors);
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTrigger asChild></DialogTrigger>

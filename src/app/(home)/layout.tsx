@@ -6,6 +6,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
+import './../globals.css';
+
 export default function HomeLayout({
      children,
    }: Readonly<{
