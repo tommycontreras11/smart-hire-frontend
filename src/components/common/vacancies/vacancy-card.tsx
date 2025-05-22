@@ -19,7 +19,8 @@ interface VacancyCardProps {
 
 function getDaysRemaining(deadline: Date): number {
   const today = new Date();
-  const difference = deadline.getTime() - today.getTime();
+  const deadlineDate = new Date(deadline);
+  const difference = deadlineDate.getTime() - today.getTime();
   return Math.ceil(difference / (1000 * 3600 * 24));
 }
 
@@ -94,7 +95,7 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Fecha límite:</span>
             <span className={isUrgent && !isExpired ? 'text-destructive font-medium' : isExpired ? 'text-destructive/70' : ''}>
-              {isExpired ? 'Expirada' : vacancy.due_date.toLocaleDateString()}
+              {isExpired ? 'Expirada' : new Date(vacancy.due_date).toLocaleDateString()}
             </span>
           </div>
         </div>
@@ -102,7 +103,7 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
       
       <CardFooter className="flex items-center justify-between bg-muted/50 px-6 py-3">
         <div className="text-xs text-muted-foreground">
-          Publicada: {vacancy.date_posted.toLocaleDateString()}
+          Publicada: {new Date(vacancy.date_posted).toLocaleDateString()}
         </div>
         
         <Badge

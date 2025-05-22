@@ -77,12 +77,14 @@ export default function VacanciesPage() {
   
   const [searchTerm, setSearchTerm] = useState('');
 
+  const { data: jobPositions, refetch } = useGetAllJobPosition()
+
   const { mutate: createJobPosition } = useCreateJobPosition(() => {
     form.reset()
     setIsModalOpen(false)
+    refetch()
   })
 
-  const { data: jobPositions } = useGetAllJobPosition()
   const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry()
   const { data: languages, isLoading: isLoadingLanguages } = useGetAllLanguage()
   const { data: competencies, isLoading: isLoadingCompetencies } = useGetAllCompetency()
@@ -155,7 +157,10 @@ export default function VacanciesPage() {
     <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Vacantes</h1>
-        <Button onClick={() => setIsModalOpen(true)}>
+        <Button onClick={() => {
+          setIsModalOpen(true)
+          console.log('sadas')
+        }}>
           <Plus className="mr-2 h-4 w-4" />
           Crear Vacante
         </Button>
@@ -241,15 +246,17 @@ export default function VacanciesPage() {
       </Tabs>
 
       {/* <CreateVacancyDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
-            <CreateUpdateForm<ICreateJobPosition>
-              isEditable={false}
-              entityName="Create Job Position"
-              fields={jobPositionFields}
-              form={form}
-              onSubmit={handleSubmit}
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-            />
+      {!isLoadingLanguages && !isLoadingCountries && !isLoadingCompetencies && (
+          <CreateUpdateForm<ICreateJobPosition>
+          isEditable={false}
+          entityName="Create Job Position"
+          fields={jobPositionFields}
+          form={form}
+          onSubmit={handleSubmit}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </main>
   );
 }
