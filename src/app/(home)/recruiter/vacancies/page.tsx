@@ -1,8 +1,11 @@
-'use client';
+"use client";
 
-import { CreateUpdateForm, IFormField } from '@/components/common/modal/create-update';
-import { VacancyCard } from '@/components/common/vacancies/vacancy-card';
-import { Button } from '@/components/ui/button';
+import {
+  CreateUpdateForm,
+  IFormField,
+} from "@/components/common/modal/create-update";
+import { VacancyCard } from "@/components/common/vacancies/vacancy-card";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,39 +13,55 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/contexts/auth-context';
-import { StatusEnum, UserRoleEnum } from '@/enums/common.enum';
-import { JobPositionContractTypeEnum } from '@/enums/job-position.enum';
-import { useGetAllCompetency } from '@/hooks/api/competency.hook';
-import { useGetAllCountry } from '@/hooks/api/country.hook';
-import { useGetAllJobPosition } from '@/hooks/api/job-position.hook';
-import { useGetAllLanguage } from '@/hooks/api/language.hook';
-import { useCreateJobPosition } from '@/mutations/api/job-positions';
-import { ICreateJobPosition } from '@/providers/http/job-positions/interface';
-import { jobPositionCreateFormSchema } from '@/schema/job-position.schema';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/auth-context";
+import { StatusEnum, UserRoleEnum } from "@/enums/common.enum";
+import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
+import { useGetAllCompetency } from "@/hooks/api/competency.hook";
+import { useGetAllCountry } from "@/hooks/api/country.hook";
 import {
-  Filter,
-  Plus,
-  Search
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+  useGetAllJobPosition,
+  useGetOneJobPosition,
+} from "@/hooks/api/job-position.hook";
+import { useGetAllLanguage } from "@/hooks/api/language.hook";
+import {
+  useCreateJobPosition,
+  useDeleteJobPosition,
+  useUpdateJobPosition,
+} from "@/mutations/api/job-positions";
+import {
+  ICreateJobPosition,
+  IUpdateJobPosition,
+} from "@/providers/http/job-positions/interface";
+import {
+  jobPositionCreateFormSchema,
+  jobPositionUpdateFormSchema,
+} from "@/schema/job-position.schema";
+import { clearForm, fillFormInput } from "@/utils/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Filter, Plus, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function VacanciesPage() {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
+  const [uuid, setUUID] = useState<string | null>(null);
+
+  const isValidUser = useMemo(() => {
+    return user && user.role === UserRoleEnum.RECRUITER;
+  }, [user]);
+
   const [jobPositionFields, setJobPositionFields] = useState<IFormField[]>([
     { name: "name", label: "Name", type: "text" },
     { name: "description", label: "Description", type: "text" },
@@ -58,10 +77,12 @@ export default function VacanciesPage() {
       })),
     },
     { name: "due_date", label: "Due Date", type: "date" },
-  ])
+  ]);
 
-  const form = useForm<ICreateJobPosition>({
-    resolver: zodResolver(jobPositionCreateFormSchema),
+  const form = useForm<ICreateJobPosition | IUpdateJobPosition>({
+    resolver: zodResolver(
+      isEditable ? jobPositionUpdateFormSchema : jobPositionCreateFormSchema
+    ),
     defaultValues: {
       name: "",
       description: "",
@@ -72,28 +93,76 @@ export default function VacanciesPage() {
       countryUUID: "",
       languageUUID: "",
       competencyUUIDs: [],
-    }
-  })
-  
-  const [searchTerm, setSearchTerm] = useState('');
+    },
+  });
 
-  const { data: jobPositions, refetch } = useGetAllJobPosition()
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { data: jobPosition } = useGetOneJobPosition(uuid || "");
+  const { data: jobPositions, refetch } = useGetAllJobPosition();
 
   const { mutate: createJobPosition } = useCreateJobPosition(() => {
-    form.reset()
-    setIsModalOpen(false)
-    refetch()
-  })
+    clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
+  });
 
-  const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry()
-  const { data: languages, isLoading: isLoadingLanguages } = useGetAllLanguage()
-  const { data: competencies, isLoading: isLoadingCompetencies } = useGetAllCompetency()
+  const { mutate: updateJobPosition } = useUpdateJobPosition(() => {
+    clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
+  });
+
+  const { mutate: deleteJobPosition } = useDeleteJobPosition(() => {
+    clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
+  });
+
+  const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry();
+  const { data: languages, isLoading: isLoadingLanguages } =
+    useGetAllLanguage();
+  const { data: competencies, isLoading: isLoadingCompetencies } =
+    useGetAllCompetency();
 
   useEffect(() => {
-    if(isLoadingLanguages || isLoadingCountries || isLoadingCompetencies || !countries || !languages || !competencies) return
+    if (!jobPosition) return;
+
+    if (isModalOpen && isEditable) {
+      fillFormInput(form, [
+        { property: "name", value: jobPosition.name },
+        { property: "description", value: jobPosition.description },
+        {
+          property: "minimum_salary",
+          value: jobPosition.minimum_salary.toString(),
+        },
+        {
+          property: "maximum_salary",
+          value: jobPosition.maximum_salary.toString(),
+        },
+        { property: "contract_type", value: jobPosition.contract_type },
+        { property: "due_date", value: jobPosition.due_date },
+        { property: "countryUUID", value: jobPosition.country.uuid },
+        { property: "languageUUID", value: jobPosition.language.uuid },
+        {
+          property: "competencyUUIDs",
+          value: jobPosition.competencies.map((competency) => competency.uuid),
+        },
+      ]);
+    }
+
+    if (!isModalOpen || !isEditable) {
+      clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
+    }
+  }, [jobPosition, isModalOpen, isEditable]);
+
+  useEffect(() => {
+    if (
+      isLoadingLanguages ||
+      isLoadingCountries ||
+      isLoadingCompetencies ||
+      !countries ||
+      !languages ||
+      !competencies
+    )
+      return;
 
     setJobPositionFields((prev) => {
-      if(!prev.find((field) => field.name === "countryUUID")) {
+      if (!prev.find((field) => field.name === "countryUUID")) {
         return [
           ...prev,
           {
@@ -105,13 +174,13 @@ export default function VacanciesPage() {
               value: country.uuid,
             })),
           },
-        ]
+        ];
       }
-      return prev
-    })
+      return prev;
+    });
 
     setJobPositionFields((prev) => {
-      if(!prev.find((field) => field.name === "languageUUID")) {
+      if (!prev.find((field) => field.name === "languageUUID")) {
         return [
           ...prev,
           {
@@ -123,13 +192,13 @@ export default function VacanciesPage() {
               value: language.uuid,
             })),
           },
-        ]
+        ];
       }
-      return prev
-    })
+      return prev;
+    });
 
     setJobPositionFields((prev) => {
-      if(!prev.find((field) => field.name === "competencyUUIDs")) {
+      if (!prev.find((field) => field.name === "competencyUUIDs")) {
         return [
           ...prev,
           {
@@ -141,26 +210,48 @@ export default function VacanciesPage() {
               value: competency.uuid,
             })),
           },
-        ]
+        ];
       }
-      return prev
-    })
+      return prev;
+    });
+  }, [isLoadingCountries, isLoadingLanguages, isLoadingCompetencies]);
 
-  }, [isLoadingCountries, isLoadingLanguages, isLoadingCompetencies])
-  
-  const handleSubmit = (data: Partial<ICreateJobPosition>) => {
-    if(!user || user.role !== UserRoleEnum.RECRUITER) return
-    createJobPosition({...data, recruiterUUID: user.uuid } as ICreateJobPosition)
-  }
-  
+  const handleDelete = (uuid: string) => {
+    if (!isValidUser) return;
+    deleteJobPosition(uuid);
+  };
+
+  const modifyJobPosition = (uuid: string) => {
+    setIsEditable(true);
+    setIsModalOpen(true);
+    setUUID(uuid);
+  };
+
+  const handleUpdate = (data: IUpdateJobPosition) => {
+    if (!isValidUser || !uuid) return;
+    updateJobPosition({ uuid, data });
+  };
+
+  const handleSubmit = (data: ICreateJobPosition | IUpdateJobPosition) => {
+    if (!isValidUser) return;
+    if (uuid) {
+      handleUpdate({
+        ...data,
+        recruiterUUID: user?.uuid,
+      } as IUpdateJobPosition);
+    } else {
+      createJobPosition({
+        ...data,
+        recruiterUUID: user?.uuid,
+      } as ICreateJobPosition);
+    }
+  };
+
   return (
     <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Vacantes</h1>
-        <Button onClick={() => {
-          setIsModalOpen(true)
-          console.log('sadas')
-        }}>
+        <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Crear Vacante
         </Button>
@@ -216,40 +307,64 @@ export default function VacanciesPage() {
         </TabsList>
         <TabsContent value="active" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {jobPositions && jobPositions
-              .filter(vacancy => vacancy.status === StatusEnum.ACTIVE)
-              .filter(vacancy => vacancy.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(vacancy => (
-                <VacancyCard key={vacancy.uuid} vacancy={vacancy} />
-              ))}
+            {jobPositions &&
+              jobPositions
+                .filter((vacancy) => vacancy.status === StatusEnum.ACTIVE)
+                .filter((vacancy) =>
+                  vacancy.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((vacancy) => (
+                  <VacancyCard
+                    handleUpdate={modifyJobPosition}
+                    handleDelete={handleDelete}
+                    key={vacancy.uuid}
+                    vacancy={vacancy}
+                  />
+                ))}
           </div>
         </TabsContent>
         <TabsContent value="closed" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {jobPositions && jobPositions
-              .filter(vacancy => vacancy.status === StatusEnum.INACTIVE)
-              .filter(vacancy => vacancy.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(vacancy => (
-                <VacancyCard key={vacancy.uuid} vacancy={vacancy} />
-              ))}
+            {jobPositions &&
+              jobPositions
+                .filter((vacancy) => vacancy.status === StatusEnum.INACTIVE)
+                .filter((vacancy) =>
+                  vacancy.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((vacancy) => (
+                  <VacancyCard
+                    handleUpdate={modifyJobPosition}
+                    handleDelete={handleDelete}
+                    key={vacancy.uuid}
+                    vacancy={vacancy}
+                  />
+                ))}
           </div>
         </TabsContent>
         <TabsContent value="all" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {jobPositions && jobPositions
-              .filter(vacancy => vacancy.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(vacancy => (
-                <VacancyCard key={vacancy.uuid} vacancy={vacancy} />
-              ))}
+            {jobPositions &&
+              jobPositions
+                .filter((vacancy) =>
+                  vacancy.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((vacancy) => (
+                  <VacancyCard
+                    handleUpdate={modifyJobPosition}
+                    handleDelete={handleDelete}
+                    key={vacancy.uuid}
+                    vacancy={vacancy}
+                  />
+                ))}
           </div>
         </TabsContent>
       </Tabs>
 
       {/* <CreateVacancyDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
       {!isLoadingLanguages && !isLoadingCountries && !isLoadingCompetencies && (
-          <CreateUpdateForm<ICreateJobPosition>
-          isEditable={false}
-          entityName="Create Job Position"
+        <CreateUpdateForm<ICreateJobPosition | IUpdateJobPosition>
+          isEditable={isEditable}
+          entityName="Job Position"
           fields={jobPositionFields}
           form={form}
           onSubmit={handleSubmit}

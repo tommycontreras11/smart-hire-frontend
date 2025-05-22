@@ -1,6 +1,6 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +9,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Eye, FileEdit, MoreVertical, Trash2, Users } from 'lucide-react';
-import { IJobPosition } from '@/providers/http/job-positions/interface';
 import { StatusEnum } from '@/enums/common.enum';
+import { IJobPosition } from '@/providers/http/job-positions/interface';
+import { FileEdit, MoreVertical, Trash2, Users } from 'lucide-react';
 
 interface VacancyCardProps {
   vacancy: IJobPosition;
+  handleUpdate: (uuid: string) => void;
+  handleDelete: (uuid: string) => void;
 }
 
 function getDaysRemaining(deadline: Date): number {
@@ -24,7 +26,7 @@ function getDaysRemaining(deadline: Date): number {
   return Math.ceil(difference / (1000 * 3600 * 24));
 }
 
-export function VacancyCard({ vacancy }: VacancyCardProps) {
+export function VacancyCard({ vacancy, handleUpdate, handleDelete }: VacancyCardProps) {
   const daysRemaining = getDaysRemaining(vacancy.due_date);
   const isUrgent = daysRemaining <= 7 && daysRemaining > 0;
   const isExpired = daysRemaining <= 0;
@@ -40,19 +42,19 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <Eye className="mr-2 h-4 w-4" />
                 Ver detalles
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+              </DropdownMenuItem> */}
+              <DropdownMenuItem onClick={() => handleUpdate(vacancy.uuid)}>
                 <FileEdit className="mr-2 h-4 w-4" />
-                Editar
+                Update
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem onClick={() => handleDelete(vacancy.uuid)} className="text-destructive">
                 <Trash2 className="mr-2 h-4 w-4" />
-                Eliminar
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
