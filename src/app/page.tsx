@@ -4,80 +4,55 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/contexts/auth-context";
 import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
+import { UserRoleEnum } from "@/enums/user.enum";
 import { useGetAllCountry } from "@/hooks/api/country.hook";
 import { useGetAllJobPosition } from "@/hooks/api/job-position.hook";
+import { debounceWithParameters } from "@/utils/job-position";
+import { capitalizeFirstLetter } from "@/utils/string";
 import { motion } from "framer-motion";
 import {
-    Briefcase,
-    Building2,
-    Clock,
-    DollarSign,
-    MapPin,
-    Search
+  Briefcase,
+  Building2,
+  Clock,
+  DollarSign,
+  MapPin,
+  Search,
 } from "lucide-react";
-import { ChangeEvent, useState } from "react";
-
-const jobs = [
-  {
-    id: 1,
-    title: "Desarrollador Full Stack",
-    company: "TechCorp",
-    location: "Ciudad de México",
-    type: "Tiempo Completo",
-    salary: "$25,000 - $35,000 MXN",
-    posted: "2d",
-    featured: true,
-    skills: ["React", "Node.js", "TypeScript", "MongoDB"],
-    description:
-      "Buscamos un desarrollador full stack con experiencia en React y Node.js para unirse a nuestro equipo...",
-  },
-  {
-    id: 2,
-    title: "Diseñador UX/UI Senior",
-    company: "DesignStudio",
-    location: "Remoto",
-    type: "Tiempo Completo",
-    salary: "$30,000 - $45,000 MXN",
-    posted: "1d",
-    featured: true,
-    skills: ["Figma", "Adobe XD", "User Research", "Prototyping"],
-    description:
-      "Únete a nuestro equipo de diseño para crear experiencias digitales excepcionales...",
-  },
-  {
-    id: 3,
-    title: "Product Manager",
-    company: "InnovaSoft",
-    location: "Guadalajara",
-    type: "Tiempo Completo",
-    salary: "$40,000 - $60,000 MXN",
-    posted: "3d",
-    featured: false,
-    skills: ["Agile", "Scrum", "Product Strategy", "Analytics"],
-    description:
-      "Buscamos un Product Manager experimentado para liderar el desarrollo de productos digitales...",
-  },
-];
+import { ChangeEvent, useMemo, useState } from "react";
 
 export default function Home() {
+  const { user } = useAuth();
+
+  const isCandidate = useMemo(() => {
+    return user?.role === UserRoleEnum.CANDIDATE;
+  }, [user]);
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
 
-  const { data: jobPositions } = useGetAllJobPosition();
+  const handleSearchTermChange = debounceWithParameters((searchTerm) => {
+    setSearchTerm(searchTerm);
+  }, 500);
+
+  const { data: jobPositions } = useGetAllJobPosition({
+    jobOrSkill: searchTerm,
+    location: locationFilter,
+    contractType: typeFilter,
+  });
   const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry();
   const jobPositionContractType = Object.values(
     JobPositionContractTypeEnum
   ).map((type) => ({
     value: type,
-    label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+    label: capitalizeFirstLetter(type.replace("_", " ")),
   }));
 
   return (
@@ -93,8 +68,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Encuentra tu próxima
-              <span className="text-primary"> oportunidad</span>
+              Find your next one
+              <span className="text-primary"> opportunity</span>
             </motion.h1>
             <motion.p
               className="mt-4 text-xl text-muted-foreground"
@@ -102,8 +77,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Explora las mejores ofertas laborales y da el siguiente paso en tu
-              carrera
+              Explore the best job opportunities and take the next step in your
+              career.
             </motion.p>
           </div>
 
@@ -118,32 +93,30 @@ export default function Home() {
                 <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Buscar por puesto o habilidad..."
+                  placeholder="Search by job title or company"
                   className="pl-10 bg-white"
-                  value={searchTerm}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setSearchTerm(e.target.value)
+                    handleSearchTermChange(e.target.value)
                   }
                 />
               </div>
               <Select value={locationFilter} onValueChange={setLocationFilter}>
                 <SelectTrigger className="w-full sm:w-[200px] bg-white">
-                  <SelectValue placeholder="Ubicación" />
+                  <SelectValue placeholder="Location" />
                 </SelectTrigger>
                 <SelectContent>
-                  {!isLoadingCountries && countries && (
+                  {!isLoadingCountries &&
+                    countries &&
                     countries.map((country) => (
-                      <SelectItem
-                        key={country.uuid}
-                        value={country.uuid}
-                      >{country.name}</SelectItem>
-                    ))
-                  )}
+                      <SelectItem key={country.uuid} value={country.name}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger className="w-full sm:w-[200px] bg-white">
-                  <SelectValue placeholder="Tipo" />
+                  <SelectValue placeholder="Contract Type" />
                 </SelectTrigger>
                 <SelectContent>
                   {jobPositionContractType.map((type) => (
@@ -161,71 +134,77 @@ export default function Home() {
       {/* Jobs List */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid gap-6">
-          {jobPositions && jobPositions.map((job, index) => (
-            <motion.div
-              key={job.uuid}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <div className="group relative bg-card hover:shadow-lg transition-shadow rounded-lg p-6 border">
-                
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="space-y-3">
-                    <div>
-                      <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
-                        {job.name}
-                      </h3>
-                      <div className="flex items-center gap-2 text-muted-foreground mt-1">
-                        <Building2 className="h-4 w-4" />
-                        <span>{job.recruiter.institution.name}</span>
+          {jobPositions &&
+            jobPositions.map((job, index) => (
+              <motion.div
+                key={job.uuid}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <div className="group relative bg-card hover:shadow-lg transition-shadow rounded-lg p-6 border">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
+                          {job.name}
+                        </h3>
+                        <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                          <Building2 className="h-4 w-4" />
+                          <span>{job.recruiter.institution.name}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          <span>{job.country.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Briefcase className="h-4 w-4" />
+                          <span>
+                            {capitalizeFirstLetter(
+                              job.contract_type.replace("_", " ")
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <DollarSign className="h-4 w-4" />
+                          <span>{`${`$${job.minimum_salary}`} -${`$${job.maximum_salary}`} USD`}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          <span>Hace {job.posted}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-muted-foreground line-clamp-2">
+                        {job.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2">
+                        {job.competencies.map((competency) => (
+                          <Badge key={competency.uuid} variant="secondary">
+                            {competency.name}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        <span>{job.country.name}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Briefcase className="h-4 w-4" />
-                        <span>{job.contract_type}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
-                        <span>{`${`$${job.minimum_salary}`} -${`$${job.maximum_salary}`} USD`}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>Hace {job.posted}</span>
-                      </div>
+                    <div className="flex sm:flex-col gap-3 sm:min-w-[120px]">
+                      {(isCandidate || !user) && (
+                        <Button className="flex-1" size="lg">
+                          Apply
+                        </Button>
+                      )}
+                      <Button variant="outline" className="flex-1" size="lg">
+                        See Details
+                      </Button>
                     </div>
-
-                    <p className="text-muted-foreground line-clamp-2">
-                      {job.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2">
-                      {job.competencies.map((competency) => (
-                        <Badge key={competency.uuid} variant="secondary">
-                          {competency.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex sm:flex-col gap-3 sm:min-w-[120px]">
-                    <Button className="flex-1" size="lg">
-                      Aplicar
-                    </Button>
-                    <Button variant="outline" className="flex-1" size="lg">
-                      Ver Detalles
-                    </Button>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
         </div>
       </section>
     </main>
