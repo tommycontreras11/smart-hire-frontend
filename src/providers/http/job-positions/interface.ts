@@ -22,6 +22,12 @@ export interface IJobPosition {
   status: StatusEnum;
 }
 
+export interface IJobPositionFilter { 
+  jobOrSkill?: string | undefined;
+  location?: string | undefined;
+  contractType?: string | undefined;
+}
+
 export interface ICreateJobPosition {
   name: string;
   description: string;

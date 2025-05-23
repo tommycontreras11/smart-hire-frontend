@@ -1,11 +1,12 @@
 import jobPositionsProvider from "@/providers/http/job-positions";
+import { IJobPositionFilter } from "@/providers/http/job-positions/interface";
 import { useQuery } from "react-query";
 
-export function useGetAllJobPosition() {
+export function useGetAllJobPosition(filters?: IJobPositionFilter) {
     const query = useQuery({
-        queryKey: ["job-positions"],
+        queryKey: ["job-positions", filters],
         retry: 1,
-        queryFn: () => jobPositionsProvider.getAll(),
+        queryFn: () => jobPositionsProvider.getAll(filters),
     });
 
     return {

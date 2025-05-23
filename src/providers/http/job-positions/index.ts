@@ -3,16 +3,19 @@ import Base from "@/providers/base";
 import {
   ICreateJobPosition,
   IJobPosition,
+  IJobPositionFilter,
   IUpdateJobPosition,
 } from "./interface";
+import { appendFilterString } from "@/utils/job-position";
 
 export class JobPositionsProvider extends Base {
   constructor() {
     super(`${config.apiURL}/job-positions`);
   }
 
-  public getAll(): Promise<IResponse<IJobPosition[]>> {
-    return this.get("/");
+  public getAll(filters?: IJobPositionFilter): Promise<IResponse<IJobPosition[]>> {
+    let filtersString = appendFilterString(filters);
+    return this.get(`/${filtersString != undefined ? filtersString : ""}`);
   }
 
   public getOne(uuid: string): Promise<IResponse<IJobPosition>> {
