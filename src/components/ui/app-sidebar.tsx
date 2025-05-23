@@ -33,6 +33,24 @@ const data: IAppSidebarProps = {
       },
     },
     {
+      name: "Candidates",
+      url: "/admin/candidates",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
+      name: "Categories",
+      url: "/admin/categories",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
       name: "Countries",
       url: "/admin/countries",
       icon: Home,
@@ -42,8 +60,71 @@ const data: IAppSidebarProps = {
       },
     },
     {
-      name: "Vacancies",
-      url: "/recruiter/vacancies",
+      name: "Departments",
+      url: "/admin/departments",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
+      name: "Employees",
+      url: "/admin/employees",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
+      name: "Institutions",
+      url: "/admin/institutions",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
+      name: "Job Positions",
+      url: "/admin/job-positions",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },    
+    {
+      name: "Languages",
+      url: "/admin/languages",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },  
+    {
+      name: "Position Types",
+      url: "/admin/position-types",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
+      name: "Recruiters",
+      url: "/admin/recruiters",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
+      name: "Training",
+      url: "/recruiter/training",
       icon: Home,
       isActive: true,
       visibleProps: {
