@@ -1,5 +1,6 @@
 "use client";
 
+import { UserRoleEnum } from "@/enums/user.enum";
 import { useMe } from "@/hooks/api/auth.provider.hook";
 import { useSignIn, useSignOut } from "@/mutations/api/auth";
 import { IAuth, IMeUser } from "@/providers/http/auth/interface";
@@ -56,7 +57,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     me().then((data) => {
       setUser(data.data);
       setIsLoggedIn(true);
-      router.push("/");
+
+      if(data.data?.role === UserRoleEnum.EMPLOYEE) {
+        router.push("/admin");
+      }else if(data.data?.role === UserRoleEnum.RECRUITER) {
+        router.push("/recruiter");
+      }else {
+        router.push("/");
+      }
     });
   });
 
