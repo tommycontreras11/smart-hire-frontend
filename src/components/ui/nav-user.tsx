@@ -46,7 +46,7 @@ export function NavUser() {
               }
               onClick={() => {
                 if(!isLoggedIn) {
-                  router.push("/auth/signIn");
+                  router.push("/auth/sign-in");
                 }
               }}
             >
@@ -89,7 +89,7 @@ export function NavUser() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => { router.push("/auth/signOut") }}>
+              <DropdownMenuItem onClick={() => { router.push("/auth/sign-out") }}>
                 <LogOut />
                 Log out
               </DropdownMenuItem>

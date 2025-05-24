@@ -9,7 +9,20 @@ import {
 } from "@/components/ui/sidebar";
 import { IAppSidebarProps } from "@/interfaces/sidebar.interface";
 import {
-  Home
+  Home,
+  Users,
+  FolderKanban,
+  BarChart3,
+  Globe,
+  Building2,
+  BriefcaseBusiness,
+  ListChecks,
+  GraduationCap,
+  BadgeCheck,
+  Languages,
+  Shapes,
+  UserCog,
+  Dumbbell,
 } from "lucide-react";
 import * as React from "react";
 import { MainNav } from "./nav-main";
@@ -35,7 +48,7 @@ const data: IAppSidebarProps = {
     {
       name: "Candidates",
       url: "/admin/candidates",
-      icon: Home,
+      icon: Users,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -44,7 +57,7 @@ const data: IAppSidebarProps = {
     {
       name: "Categories",
       url: "/admin/categories",
-      icon: Home,
+      icon: FolderKanban,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -53,7 +66,7 @@ const data: IAppSidebarProps = {
     {
       name: "Competencies",
       url: "/admin/competencies",
-      icon: Home,
+      icon: BarChart3,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -62,7 +75,7 @@ const data: IAppSidebarProps = {
     {
       name: "Countries",
       url: "/admin/countries",
-      icon: Home,
+      icon: Globe,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -71,7 +84,7 @@ const data: IAppSidebarProps = {
     {
       name: "Departments",
       url: "/admin/departments",
-      icon: Home,
+      icon: Building2,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -80,7 +93,7 @@ const data: IAppSidebarProps = {
     {
       name: "Employees",
       url: "/admin/employees",
-      icon: Home,
+      icon: BriefcaseBusiness,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -89,7 +102,7 @@ const data: IAppSidebarProps = {
     {
       name: "Evaluation Methods",
       url: "/admin/evaluation-methods",
-      icon: Home,
+      icon: ListChecks,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -98,7 +111,7 @@ const data: IAppSidebarProps = {
     {
       name: "Institutions",
       url: "/admin/institutions",
-      icon: Home,
+      icon: GraduationCap,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -107,25 +120,25 @@ const data: IAppSidebarProps = {
     {
       name: "Job Positions",
       url: "/admin/job-positions",
-      icon: Home,
+      icon: BadgeCheck,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
       },
-    },    
+    },
     {
       name: "Languages",
       url: "/admin/languages",
-      icon: Home,
+      icon: Languages,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
       },
-    },  
+    },
     {
       name: "Position Types",
       url: "/admin/position-types",
-      icon: Home,
+      icon: Shapes,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -134,7 +147,7 @@ const data: IAppSidebarProps = {
     {
       name: "Recruiters",
       url: "/admin/recruiters",
-      icon: Home,
+      icon: UserCog,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.EMPLOYEE,
@@ -143,12 +156,12 @@ const data: IAppSidebarProps = {
     {
       name: "Training",
       url: "/recruiter/training",
-      icon: Home,
+      icon: Dumbbell,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.RECRUITER,
       },
-    }
+    },
   ],
 };
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
