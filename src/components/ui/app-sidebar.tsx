@@ -78,6 +78,15 @@ const data: IAppSidebarProps = {
       },
     },
     {
+      name: "Evaluation Methods",
+      url: "/admin/evaluation-methods",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
       name: "Institutions",
       url: "/admin/institutions",
       icon: Home,
