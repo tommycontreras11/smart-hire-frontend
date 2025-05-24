@@ -47,7 +47,7 @@ export default function Employee() {
       monthly_salary: "",
       entry_date: new Date(),
       departmentUUID: "",
-      jobPositionUUID: "",
+      positionTypeUUID: "",
     },
   });
 
@@ -94,11 +94,11 @@ export default function Employee() {
     });
 
     setEmployeeFields((prev) => {
-      if (!prev.find((field) => field.name === "jobPositionUUID")) {
+      if (!prev.find((field) => field.name === "positionTypeUUID")) {
         return [
           ...prev,
           {
-            name: "jobPositionUUID",
+            name: "positionTypeUUID",
             label: "Job Position",
             type: "select",
             options: jobPositions.map((jobPosition) => ({
@@ -128,8 +128,8 @@ export default function Employee() {
           value: employee.department.uuid,
         },
         {
-          property: "jobPositionUUID",
-          value: employee.jobPosition.uuid,
+          property: "positionTypeUUID",
+          value: employee.positionType.uuid,
         },
       ]);
     }

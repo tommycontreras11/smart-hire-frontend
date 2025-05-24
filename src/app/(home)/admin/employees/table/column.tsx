@@ -59,7 +59,7 @@ export const columns = ({
     ),
   },
   {
-    accessorKey: "jobPosition.name",
+    accessorKey: "positionType.name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Position"} />
     ),

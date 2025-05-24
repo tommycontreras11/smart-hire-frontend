@@ -26,5 +26,5 @@ export const updateEmployeeFormSchema = z.object({
     }),
   entry_date: z.date().refine((value) => value, "Entry date is required"),
   departmentUUID: z.string().uuid("Department must be a valid UUID"),
-  jobPositionUUID: z.string().uuid("Job position must be a valid UUID"),
+  positionTypeUUID: z.string().uuid("Position type must be a valid UUID"),
 });
