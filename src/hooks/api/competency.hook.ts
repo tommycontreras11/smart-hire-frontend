@@ -13,3 +13,17 @@ export function useGetAllCompetency() {
     data: query.data?.data,
   };
 }
+
+export function useGetOneCompetency(uuid: string) {
+  const query = useQuery({
+    queryKey: ["competencies", uuid],
+    retry: 1,
+    queryFn: () => competenciesProvider.getOne(uuid),
+    enabled: !!uuid,
+  });
+
+  return {
+    ...query,
+    data: query.data?.data,
+  };
+}

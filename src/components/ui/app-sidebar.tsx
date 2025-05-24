@@ -51,6 +51,15 @@ const data: IAppSidebarProps = {
       },
     },
     {
+      name: "Competencies",
+      url: "/admin/competencies",
+      icon: Home,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
+      },
+    },
+    {
       name: "Countries",
       url: "/admin/countries",
       icon: Home,
