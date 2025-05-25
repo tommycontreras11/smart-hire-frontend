@@ -23,6 +23,7 @@ import {
   Shapes,
   UserCog,
   Dumbbell,
+  BriefcaseIcon,
 } from "lucide-react";
 import * as React from "react";
 import { MainNav } from "./nav-main";
@@ -37,7 +38,7 @@ const data: IAppSidebarProps = {
   mainNav: [
     {
       name: "Home",
-      url: "/",
+      url: `${UserRoleEnum.RECRUITER ? "/recruiter" : "/admin"}`,
       icon: Home,
       isActive: true,
       visibleProps: {
@@ -161,7 +162,16 @@ const data: IAppSidebarProps = {
       visibleProps: {
         userRole: UserRoleEnum.RECRUITER,
       },
-    },
+    },    
+    {
+      name: "Vacancies",
+      url: "/recruiter/vacancies",
+      icon: BriefcaseIcon,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.RECRUITER,
+      },
+    },    
   ],
 };
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
