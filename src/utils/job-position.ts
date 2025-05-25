@@ -9,8 +9,6 @@ export const appendFilterString = (filters?: IJobPositionFilter) => {
 
   filters?.jobOrSkill && (filtersString += `?jobOrSkill=${filters.jobOrSkill}`);
 
-  console.log("filtersString", filters);
-
   filters?.location &&
     (filtersString += `${appendSignFilterString(filters?.jobOrSkill)}location=${
       filters.location

@@ -3,6 +3,8 @@ import { ICountry } from "../countries/interface";
 import { ILanguage } from "../languages/interface";
 import { IRecruiter } from "../recruiters/interface";
 import { ICompetency } from "../competencies/interface";
+import { IDepartment } from "../departments/interface";
+import { IPositionType } from "../position-types/interface";
 
 export interface IJobPosition {
   uuid: string;
@@ -15,14 +17,16 @@ export interface IJobPosition {
   country: ICountry;
   language: ILanguage;
   recruiter: IRecruiter;
-  competencies: ICompetency[]
+  department: IDepartment;
+  positionType: IPositionType;
+  competencies: ICompetency[];
   total_applied: number;
-  posted: string
+  posted: string;
   date_posted: Date;
   status: StatusEnum;
 }
 
-export interface IJobPositionFilter { 
+export interface IJobPositionFilter {
   jobOrSkill?: string | undefined;
   location?: string | undefined;
   contractType?: string | undefined;
@@ -38,6 +42,8 @@ export interface ICreateJobPosition {
   recruiterUUID: string;
   countryUUID: string;
   languageUUID: string;
+  departmentUUID: string;
+  positionTypeUUID: string;
   competencyUUIDs: string[];
 }
 

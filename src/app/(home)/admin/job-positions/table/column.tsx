@@ -72,6 +72,18 @@ export const columns = ({
     )
   },
   {
+    accessorKey: "department.name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Department"} />
+    )
+  },
+  {
+    accessorKey: "positionType.name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Position Type"} />
+    )
+  },
+  {
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Status"} />

@@ -6,9 +6,7 @@ import {
 } from "@/components/common/modal/create-update";
 import DataTable from "@/components/common/table/data-table";
 import { commonStatusTableDefinitions } from "@/definitions/common.definition";
-import {
-  JobPositionContractTypeEnum,
-} from "@/enums/job-position.enum";
+import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
 import { useGetAllCountry } from "@/hooks/api/country.hook";
 import {
   useGetAllJobPosition,
@@ -24,15 +22,15 @@ import {
   ICreateJobPosition,
   IUpdateJobPosition,
 } from "@/providers/http/job-positions/interface";
-import {
-  jobPositionUpdateFormSchema
-} from "@/schema/job-position.schema";
+import { jobPositionUpdateFormSchema } from "@/schema/job-position.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { columns } from "./table/column";
 import { useGetAllCompetency } from "@/hooks/api/competency.hook";
+import { useGetAllDepartment } from "@/hooks/api/department.hook";
+import { useGetAllPositionType } from "@/hooks/api/position-type";
 
 export default function JobPosition() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,7 +51,7 @@ export default function JobPosition() {
         value: level,
       })),
     },
-    { name: "due_date", label: "Due Date", type: "date" }
+    { name: "due_date", label: "Due Date", type: "date" },
   ]);
 
   const form = useForm<IUpdateJobPosition>({
@@ -68,6 +66,8 @@ export default function JobPosition() {
       countryUUID: "",
       languageUUID: "",
       recruiterUUID: "",
+      departmentUUID: "",
+      positionTypeUUID: "",
       competencyUUIDs: [],
     },
   });
@@ -80,7 +80,12 @@ export default function JobPosition() {
     useGetAllLanguage();
   const { data: recruiters, isLoading: isLoadingRecruiters } =
     useGetAllRecruiter();
-  const { data: competencies, isLoading: isLoadingCompetencies } =  useGetAllCompetency()
+  const { data: departments, isLoading: isLoadingDepartments } =
+    useGetAllDepartment();
+  const { data: positionTypes, isLoading: isLoadingPositionTypes } =
+    useGetAllPositionType();
+  const { data: competencies, isLoading: isLoadingCompetencies } =
+    useGetAllCompetency();
 
   const { mutate: updateJobPosition } = useUpdateJobPosition(() => {
     clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
@@ -96,10 +101,14 @@ export default function JobPosition() {
       isLoadingLanguages ||
       isLoadingRecruiters ||
       isLoadingCompetencies ||
+      isLoadingDepartments ||
+      isLoadingPositionTypes ||
       !jobPositions ||
       !countries ||
       !languages ||
       !recruiters ||
+      !departments ||
+      !positionTypes ||
       !competencies
     )
       return;
@@ -159,6 +168,42 @@ export default function JobPosition() {
     });
 
     setJobPositionFields((prev) => {
+      if (!prev.find((field) => field.name === "departmentUUID")) {
+        return [
+          ...prev,
+          {
+            name: "departmentUUID",
+            label: "Department",
+            type: "select",
+            options: departments.map((department) => ({
+              label: department.name,
+              value: department.uuid,
+            })),
+          },
+        ];
+      }
+      return prev;
+    });
+
+    setJobPositionFields((prev) => {
+      if (!prev.find((field) => field.name === "positionTypeUUID")) {
+        return [
+          ...prev,
+          {
+            name: "positionTypeUUID",
+            label: "Position Type",
+            type: "select",
+            options: positionTypes.map((positionType) => ({
+              label: positionType.name,
+              value: positionType.uuid,
+            })),
+          },
+        ];
+      }
+      return prev;
+    });
+
+    setJobPositionFields((prev) => {
       if (!prev.find((field) => field.name === "competencyUUIDs")) {
         return [
           ...prev,
@@ -175,7 +220,13 @@ export default function JobPosition() {
       }
       return prev;
     });
-  }, [isLoadingCountries, isLoadingLanguages, isLoadingRecruiters, isLoadingCompetencies]);
+  }, [
+    isLoadingCountries,
+    isLoadingLanguages,
+    isLoadingRecruiters,
+    isLoadingDepartments,
+    isLoadingCompetencies,
+  ]);
 
   useEffect(() => {
     if (!jobPosition) return;
@@ -197,6 +248,7 @@ export default function JobPosition() {
         { property: "countryUUID", value: jobPosition.country.uuid },
         { property: "languageUUID", value: jobPosition.language.uuid },
         { property: "recruiterUUID", value: jobPosition.recruiter.uuid },
+        { property: "departmentUUID", value: jobPosition.department.uuid },
         {
           property: "competencyUUIDs",
           value: jobPosition.competencies.map((competency) => competency.uuid),
