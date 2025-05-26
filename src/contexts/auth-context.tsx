@@ -54,18 +54,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { mutate: signIn } = useSignIn(async (data: ISignInResponse) => {
     await saveCookie(data.token);
 
-    me().then((data) => {
-      setUser(data.data);
-      setIsLoggedIn(true);
+    const response = await me();
+    const user = response.data;
 
-      if(data.data?.role === UserRoleEnum.EMPLOYEE) {
-        router.push("/admin");
-      }else if(data.data?.role === UserRoleEnum.RECRUITER) {
-        router.push("/recruiter");
-      }else {
-        router.push("/");
-      }
-    });
+    setUser(user);
+    setIsLoggedIn(true);
+
+    console.log(user);
+
+    if (user?.role === UserRoleEnum.EMPLOYEE) {
+      router.push("/admin");
+    } else if (user?.role === UserRoleEnum.RECRUITER) {
+      router.push("/recruiter");
+    } else {
+      router.push("/");
+    }
   });
 
   useEffect(() => {
@@ -74,8 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(data);
         setIsLoggedIn(true);
       } else {
-        setUser(null);      
-        setLoading(false)
+        setUser(null);
+        setLoading(false);
       }
     };
 

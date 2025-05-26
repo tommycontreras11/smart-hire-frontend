@@ -250,6 +250,10 @@ export default function JobPosition() {
         { property: "recruiterUUID", value: jobPosition.recruiter.uuid },
         { property: "departmentUUID", value: jobPosition.department.uuid },
         {
+          property: "positionTypeUUID",
+          value: jobPosition.positionType.uuid,
+        },
+        {
           property: "competencyUUIDs",
           value: jobPosition.competencies.map((competency) => competency.uuid),
         },

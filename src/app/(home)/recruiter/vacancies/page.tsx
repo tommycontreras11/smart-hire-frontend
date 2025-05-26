@@ -28,11 +28,14 @@ import { StatusEnum, UserRoleEnum } from "@/enums/common.enum";
 import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
 import { useGetAllCompetency } from "@/hooks/api/competency.hook";
 import { useGetAllCountry } from "@/hooks/api/country.hook";
+import { useGetAllDepartment } from "@/hooks/api/department.hook";
 import {
   useGetAllJobPosition,
   useGetOneJobPosition,
 } from "@/hooks/api/job-position.hook";
 import { useGetAllLanguage } from "@/hooks/api/language.hook";
+import { useGetAllPositionType } from "@/hooks/api/position-type";
+import { useGetAllRecruiter } from "@/hooks/api/recruiter.hook";
 import {
   useCreateJobPosition,
   useDeleteJobPosition,
@@ -92,6 +95,8 @@ export default function VacanciesPage() {
       due_date: new Date(),
       countryUUID: "",
       languageUUID: "",
+      departmentUUID: "",
+      positionTypeUUID: "",
       competencyUUIDs: [],
     },
   });
@@ -116,13 +121,19 @@ export default function VacanciesPage() {
   const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry();
   const { data: languages, isLoading: isLoadingLanguages } =
     useGetAllLanguage();
+  const { data: recruiters, isLoading: isLoadingRecruiters } =
+    useGetAllRecruiter();
+  const { data: departments, isLoading: isLoadingDepartments } =
+    useGetAllDepartment();
+  const { data: positionTypes, isLoading: isLoadingPositionTypes } =
+    useGetAllPositionType();
   const { data: competencies, isLoading: isLoadingCompetencies } =
     useGetAllCompetency();
 
   useEffect(() => {
     if (!jobPosition) return;
 
-    if (isModalOpen && isEditable) {
+    if (isEditable && isModalOpen) {
       fillFormInput(form, [
         { property: "name", value: jobPosition.name },
         { property: "description", value: jobPosition.description },
@@ -138,6 +149,12 @@ export default function VacanciesPage() {
         { property: "due_date", value: jobPosition.due_date },
         { property: "countryUUID", value: jobPosition.country.uuid },
         { property: "languageUUID", value: jobPosition.language.uuid },
+        { property: "recruiterUUID", value: jobPosition.recruiter.uuid },
+        { property: "departmentUUID", value: jobPosition.department.uuid },
+        {
+          property: "positionTypeUUID",
+          value: jobPosition.positionType.uuid,
+        },
         {
           property: "competencyUUIDs",
           value: jobPosition.competencies.map((competency) => competency.uuid),
@@ -145,18 +162,25 @@ export default function VacanciesPage() {
       ]);
     }
 
-    if (!isModalOpen || !isEditable) {
+    if (!isEditable || !isModalOpen) {
       clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
     }
-  }, [jobPosition, isModalOpen, isEditable]);
+  }, [jobPosition, isEditable, isModalOpen]);
 
   useEffect(() => {
     if (
-      isLoadingLanguages ||
       isLoadingCountries ||
+      isLoadingLanguages ||
+      isLoadingRecruiters ||
       isLoadingCompetencies ||
+      isLoadingDepartments ||
+      isLoadingPositionTypes ||
+      !jobPositions ||
       !countries ||
       !languages ||
+      !recruiters ||
+      !departments ||
+      !positionTypes ||
       !competencies
     )
       return;
@@ -198,6 +222,42 @@ export default function VacanciesPage() {
     });
 
     setJobPositionFields((prev) => {
+      if (!prev.find((field) => field.name === "departmentUUID")) {
+        return [
+          ...prev,
+          {
+            name: "departmentUUID",
+            label: "Department",
+            type: "select",
+            options: departments.map((department) => ({
+              label: department.name,
+              value: department.uuid,
+            })),
+          },
+        ];
+      }
+      return prev;
+    });
+
+    setJobPositionFields((prev) => {
+      if (!prev.find((field) => field.name === "positionTypeUUID")) {
+        return [
+          ...prev,
+          {
+            name: "positionTypeUUID",
+            label: "Position Type",
+            type: "select",
+            options: positionTypes.map((positionType) => ({
+              label: positionType.name,
+              value: positionType.uuid,
+            })),
+          },
+        ];
+      }
+      return prev;
+    });
+
+    setJobPositionFields((prev) => {
       if (!prev.find((field) => field.name === "competencyUUIDs")) {
         return [
           ...prev,
@@ -214,7 +274,13 @@ export default function VacanciesPage() {
       }
       return prev;
     });
-  }, [isLoadingCountries, isLoadingLanguages, isLoadingCompetencies]);
+  }, [
+    isLoadingCountries,
+    isLoadingLanguages,
+    isLoadingRecruiters,
+    isLoadingDepartments,
+    isLoadingCompetencies,
+  ]);
 
   const handleDelete = (uuid: string) => {
     if (!isValidUser) return;
