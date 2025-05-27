@@ -69,8 +69,6 @@ export default function Home() {
   }));
 
   const handleApply = (jobPositionUUID: string) => {
-    console.log('!isCandidate', !isCandidate)
-    console.log('!user', !user)
     if (!isCandidate || !user) {
       toast.success("Error", {
         description: "You must be logged in as a candidate to apply for a job",
