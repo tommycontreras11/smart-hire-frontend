@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { IActiveVacancy } from '@/providers/http/recruiters/interface';
 
 interface Vacancy {
   id: string;
@@ -54,7 +55,7 @@ function getDaysRemaining(deadline: string): number {
   return Math.ceil(difference / (1000 * 3600 * 24));
 }
 
-export function ActiveVacancies() {
+export function ActiveVacancies({ vacancies }: { vacancies: IActiveVacancy[] }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -69,19 +70,19 @@ export function ActiveVacancies() {
       <CardContent>
         <div className="space-y-4">
           {vacancies.map((vacancy) => {
-            const daysRemaining = getDaysRemaining(vacancy.deadline);
+            const daysRemaining = getDaysRemaining(vacancy.due_date.toString());
             const isUrgent = daysRemaining <= 7;
             
             return (
               <div
-                key={vacancy.id}
+                key={vacancy.uuid}
                 className="rounded-lg border p-3 text-sm transition-all hover:bg-accent"
               >
                 <div className="flex items-center justify-between">
-                  <div className="font-medium">{vacancy.position}</div>
+                  <div className="font-medium">{vacancy.name}</div>
                   <div className="flex items-center space-x-1">
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      {vacancy.applicants} candidatos
+                      {vacancy.total_candidates} candidatos
                     </span>
                   </div>
                 </div>
@@ -89,7 +90,7 @@ export function ActiveVacancies() {
                   <div className="flex items-center">
                     <span>{vacancy.department}</span>
                     <span className="mx-2">•</span>
-                    <span>{vacancy.location}</span>
+                    <span>{vacancy.country}</span>
                   </div>
                   <div 
                     className={`${isUrgent ? 'text-destructive' : 'text-muted-foreground'}`}

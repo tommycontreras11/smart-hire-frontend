@@ -1,11 +1,16 @@
+"use client";
+
 import { ActiveVacancies } from '@/components/common/dashboard/active-vacancies';
 import { OverviewChart } from '@/components/common/dashboard/overview-chart';
 import { RecentCandidates } from '@/components/common/dashboard/recent-candidates';
 import { StatsCard } from '@/components/common/dashboard/stats-card';
 import { TimeToHire } from '@/components/common/dashboard/time-to-hire';
+import { useGetAllDashboardDetail } from '@/hooks/api/recruiter.hook';
 import { Briefcase, Calendar, CheckCircle, Users } from 'lucide-react';
 
 export default function Recruiter() {
+  const { data: dashboardData, isLoading } = useGetAllDashboardDetail();
+
   return (
     <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -20,27 +25,27 @@ export default function Recruiter() {
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Vacantes Activas"
-          value="24"
+          value={dashboardData?.dashboardResume.total_active_vacancies.toString() || '0'}
           icon={Briefcase}
           description="mes anterior"
           trend={{ value: 12, isPositive: true }}
         />
         <StatsCard
           title="Candidatos Nuevos"
-          value="154"
+          value={dashboardData?.dashboardResume.total_recent_candidates.toString() || '0'}
           icon={Users}
           description="mes anterior"
           trend={{ value: 8, isPositive: true }}
         />
         <StatsCard
           title="Entrevistas Programadas"
-          value="38"
+          value={dashboardData?.dashboardResume.total_interviews.toString() || '0'}
           icon={Calendar}
           description="esta semana"
         />
         <StatsCard
           title="Contrataciones"
-          value="8"
+          value={dashboardData?.dashboardResume.total_hired.toString() || '0'}
           icon={CheckCircle}
           description="mes actual"
           trend={{ value: 2, isPositive: false }}
@@ -48,13 +53,13 @@ export default function Recruiter() {
       </div>
 
       <div className="grid gap-4 grid-cols-1 xl:grid-cols-3">
-        <OverviewChart />
+        <OverviewChart dashboard={dashboardData} />
         <TimeToHire />
       </div>
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-        <RecentCandidates />
-        <ActiveVacancies />
+        <RecentCandidates candidates={dashboardData?.recentCandidates || []} />
+        <ActiveVacancies vacancies={dashboardData?.activeVacancies || []} />
       </div>
     </main>
   );
