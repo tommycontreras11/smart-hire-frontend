@@ -1,6 +1,6 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
-import { ICreateRecruiter, IRecruiter, IUpdateRecruiter } from "./interface";
+import { ICreateRecruiter, IRecruiter, IRecruiterDashboard, IUpdateRecruiter } from "./interface";
 
 export class RecruitersProvider extends Base {
   constructor() {
@@ -9,6 +9,10 @@ export class RecruitersProvider extends Base {
 
   public getAll(): Promise<IResponse<IRecruiter[]>> {
     return this.get("");
+  }
+
+  public getAllDashboardDetail(): Promise<IResponse<IRecruiterDashboard>> {
+    return this.get("/dashboard-detail");
   }
 
   public getOne(uuid: string): Promise<IResponse<IRecruiter>> {

@@ -14,6 +14,19 @@ export function useGetAllRecruiter() {
   };
 }
 
+export function useGetAllDashboardDetail() {
+  const query = useQuery({
+    queryKey: ["dashboard-detail"],
+    retry: 1,
+    queryFn: () => recruitersProvider.getAllDashboardDetail(),
+  });
+
+  return {
+    ...query,
+    data: query.data?.data,
+  };
+}
+
 export function useGetOneRecruiter(uuid: string) {
   const query = useQuery({
     queryKey: ["recruiter", uuid],
