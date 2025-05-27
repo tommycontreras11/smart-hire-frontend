@@ -60,8 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(user);
     setIsLoggedIn(true);
 
-    console.log(user);
-
     if (user?.role === UserRoleEnum.EMPLOYEE) {
       router.push("/admin");
     } else if (user?.role === UserRoleEnum.RECRUITER) {
