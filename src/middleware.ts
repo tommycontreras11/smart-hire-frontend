@@ -18,10 +18,10 @@ const protectedRoutes = [
   "/admin/languages",
   "/admin/position-types",
   "/admin/recruiters",
-  "/admin/training",
-
+  
   "/recruiter",
   "/recruiter/vacancies",
+  "/recruiter/training",
 ];
 
 // Helper function to check if a path is protected
