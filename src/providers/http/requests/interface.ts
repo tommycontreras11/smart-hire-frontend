@@ -1,4 +1,4 @@
-import { StatusEnum } from "@/enums/common.enum";
+import { StatusRequestEnum } from "@/enums/request.enum";
 import { ICandidate } from "../candidates/interface";
 import { IJobPosition } from "../job-positions/interface";
 import { IRecruiter } from "../recruiters/interface";
@@ -8,7 +8,7 @@ export interface IRequest {
   candidate: ICandidate;
   jobPosition: IJobPosition;
   recruiter: IRecruiter;
-  status: StatusEnum;
+  status: StatusRequestEnum;
 }
 
 export interface ICreateRequest {
@@ -16,4 +16,6 @@ export interface ICreateRequest {
   jobPositionUUID: string;
 }
 
-export interface IUpdateRequest extends Partial<ICreateRequest> {}
+export interface IUpdateRequest extends Partial<ICreateRequest> {
+  status: StatusRequestEnum
+}

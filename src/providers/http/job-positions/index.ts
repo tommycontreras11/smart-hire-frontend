@@ -4,6 +4,7 @@ import {
   ICreateJobPosition,
   IJobPosition,
   IJobPositionFilter,
+  IRecruitmentProcess,
   IUpdateJobPosition,
 } from "./interface";
 import { appendFilterString } from "@/utils/job-position";
@@ -16,6 +17,10 @@ export class JobPositionsProvider extends Base {
   public getAll(filters?: IJobPositionFilter): Promise<IResponse<IJobPosition[]>> {
     let filtersString = appendFilterString(filters);
     return this.get(`/${filtersString != undefined ? filtersString : ""}`);
+  }
+
+  public getAllRecruitmentProcess(): Promise<IResponse<IRecruitmentProcess[]>> {
+    return this.get("/recruitment-process");
   }
 
   public getOne(uuid: string): Promise<IResponse<IJobPosition>> {
