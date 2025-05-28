@@ -39,7 +39,7 @@ export interface ICreateJobPosition {
   maximum_salary: string;
   contract_type: string;
   due_date: Date;
-  recruiterUUID: string;
+  recruiterUUID?: string;
   countryUUID: string;
   languageUUID: string;
   departmentUUID: string;

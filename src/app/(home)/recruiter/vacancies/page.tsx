@@ -175,7 +175,6 @@ export default function VacanciesPage() {
       isLoadingCompetencies ||
       isLoadingDepartments ||
       isLoadingPositionTypes ||
-      !jobPositions ||
       !countries ||
       !languages ||
       !recruiters ||
@@ -279,6 +278,7 @@ export default function VacanciesPage() {
     isLoadingLanguages,
     isLoadingRecruiters,
     isLoadingDepartments,
+    isLoadingPositionTypes,
     isLoadingCompetencies,
   ]);
 
@@ -427,17 +427,22 @@ export default function VacanciesPage() {
       </Tabs>
 
       {/* <CreateVacancyDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
-      {!isLoadingLanguages && !isLoadingCountries && !isLoadingCompetencies && (
-        <CreateUpdateForm<ICreateJobPosition | IUpdateJobPosition>
-          isEditable={isEditable}
-          entityName="Job Position"
-          fields={jobPositionFields}
-          form={form}
-          onSubmit={handleSubmit}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
+      {!isLoadingLanguages &&
+        !isLoadingCountries &&
+        !isLoadingDepartments &&
+        !isLoadingPositionTypes &&
+        !isLoadingRecruiters &&
+        !isLoadingCompetencies && (
+          <CreateUpdateForm<ICreateJobPosition | IUpdateJobPosition>
+            isEditable={isEditable}
+            entityName="Job Position"
+            fields={jobPositionFields}
+            form={form}
+            onSubmit={handleSubmit}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+        )}
     </main>
   );
 }

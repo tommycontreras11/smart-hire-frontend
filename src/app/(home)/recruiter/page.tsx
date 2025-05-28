@@ -9,7 +9,7 @@ import { useGetAllDashboardDetail } from '@/hooks/api/recruiter.hook';
 import { Briefcase, Calendar, CheckCircle, Users } from 'lucide-react';
 
 export default function Recruiter() {
-  const { data: dashboardData, isLoading } = useGetAllDashboardDetail();
+  const { data: dashboardData, refetch: refetchDashboard } = useGetAllDashboardDetail();
 
   return (
     <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -59,7 +59,7 @@ export default function Recruiter() {
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <RecentCandidates candidates={dashboardData?.recentCandidates || []} />
-        <ActiveVacancies vacancies={dashboardData?.activeVacancies || []} />
+        <ActiveVacancies vacancies={dashboardData?.activeVacancies || []} refetchDashboard={refetchDashboard} />
       </div>
     </main>
   );
