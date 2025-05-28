@@ -5,6 +5,8 @@ import { getCookie } from "./utils/cookie";
 import { me } from "./utils/auth.lib";
 
 const protectedRoutes = [
+  "recruitment-process",
+
   "/admin",
   "/admin/candidates",
   "/admin/categories",
@@ -44,18 +46,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // let allowedRoutes = [...protectedRoutes];
-
-  // if (
-  //   (currentPath === "/my-requests" || currentPath === "/my-loans") &&
-  //   user?.data?.role === UserRoleEnum.USER
-  // ) {
-  //   allowedRoutes = allowedRoutes.filter(
-  //     (route) => route !== "/my-requests" && route !== "/my-loans"
-  //   );
-  // }
-
   const role = user?.data?.role;
+
+  let allowedRoutes = [...protectedRoutes];
+
+  if (
+    (currentPath === "/recruitment-process") &&
+    role === UserRoleEnum.CANDIDATE
+  ) {
+    allowedRoutes = allowedRoutes.filter(
+      (route) => route !== "recruitment-process"
+    );
+  }
 
   if (
     user?.data &&
