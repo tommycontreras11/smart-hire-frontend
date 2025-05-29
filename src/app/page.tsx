@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  CreateUpdateForm,
+  IFormField,
+} from "@/components/common/modal/create-update";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +21,11 @@ import { useGetAllCountry } from "@/hooks/api/country.hook";
 import { useGetAllJobPosition } from "@/hooks/api/job-position.hook";
 import { useGetAllRequest } from "@/hooks/api/request.hook";
 import { useCreateRequest } from "@/mutations/api/requests";
+import { ICreateRequest } from "@/providers/http/requests/interface";
+import { createRequestFormSchema } from "@/schema/request.schema";
 import { debounceWithParameters } from "@/utils/job-position";
 import { capitalizeFirstLetter } from "@/utils/string";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import {
   Briefcase,
@@ -29,10 +36,24 @@ import {
   Search,
 } from "lucide-react";
 import { ChangeEvent, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function Home() {
   const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [uuid, setUUID] = useState<string | null>("");
+
+  const [requestFields, setRequestFields] = useState<IFormField[]>([
+    { name: "file", label: "Curriculum", type: "file" },
+  ]);
+
+  const form = useForm<ICreateRequest>({
+    resolver: zodResolver(createRequestFormSchema),
+    defaultValues: {
+      file: undefined,
+    },
+  });
 
   const isCandidate = useMemo(() => {
     return user?.role === UserRoleEnum.CANDIDATE;
@@ -68,19 +89,24 @@ export default function Home() {
     label: capitalizeFirstLetter(type.replace("_", " ")),
   }));
 
-  const handleApply = (jobPositionUUID: string) => {
-    if (!isCandidate || !user) {
-      toast.success("Error", {
-        description: "You must be logged in as a candidate to apply for a job",
-        duration: 3000,
-      });
-      return;
-    }
+  const handleSubmit = (data: Partial<ICreateRequest>) => {
+    if (!uuid || !user) return;
 
-    createRequest({
-      jobPositionUUID: jobPositionUUID,
-      candidateUUID: user.uuid,
+    const formData = new FormData();
+    
+    data.candidateUUID = user!.uuid as string;
+    data.jobPositionUUID = uuid as string;
+
+    requestFields.forEach((field) => {
+      const value = data?.[field.name as keyof ICreateRequest];
+      if (value !== undefined && value !== null) {
+        formData.append(field.name, value.toString());
+      }
     });
+
+    if (data.file) formData.append("file", data.file);
+
+    createRequest(formData);
   };
 
   return (
@@ -234,7 +260,19 @@ export default function Home() {
                           <Button
                             className="flex-1"
                             size="lg"
-                            onClick={() => handleApply(job.uuid)}
+                            onClick={() => {
+                              if (!isCandidate || !user) {
+                                toast.success("Error", {
+                                  description:
+                                    "You must be logged in as a candidate to apply for a job",
+                                  duration: 3000,
+                                });
+                                return;
+                              }
+
+                              setIsModalOpen(true);
+                              setUUID(job.uuid);
+                            }}
                           >
                             Apply
                           </Button>
@@ -249,6 +287,15 @@ export default function Home() {
               );
             })}
         </div>
+        <CreateUpdateForm<ICreateRequest>
+          isEditable={false}
+          entityName="Request"
+          fields={requestFields}
+          form={form}
+          onSubmit={handleSubmit}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </section>
     </main>
   );

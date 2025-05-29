@@ -10,7 +10,7 @@ export function useCreateRequest(onSuccessCallback: (data: any) => void) {
   const queryClient = useQueryClient();
 
   return useMutation(
-    (data: ICreateRequest) => requestsProvider.create(data),
+    (data: FormData) => requestsProvider.create(data),
     getMutationOptions(queryClient, "requests", null, {
       onSuccess: onSuccessCallback,
     })

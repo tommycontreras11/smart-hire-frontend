@@ -12,10 +12,13 @@ export interface IRequest {
 }
 
 export interface ICreateRequest {
-  candidateUUID: string;
-  jobPositionUUID: string;
+  file: File;
+  candidateUUID?: string;
+  jobPositionUUID?: string;
 }
 
 export interface IUpdateRequest extends Partial<ICreateRequest> {
-  status: StatusRequestEnum
+  next_step?: string;
+  interview_date?: Date;
+  status: StatusRequestEnum;
 }

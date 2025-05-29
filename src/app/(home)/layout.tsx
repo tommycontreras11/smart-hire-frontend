@@ -7,16 +7,6 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 
 import "./../globals.css";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { AuthProvider } from "@/contexts/auth-context";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 60 * 24,
-    },
-  },
-});
 
 export default function HomeLayout({
   children,
@@ -24,23 +14,19 @@ export default function HomeLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1" />
-              </div>
-            </header>
-            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-              {children}
-              <Toaster />
-            </div>
-          </SidebarInset>
-        </SidebarProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          {children}
+          <Toaster />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

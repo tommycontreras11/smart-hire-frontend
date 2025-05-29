@@ -1,6 +1,7 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
 import { ICreateRequest, IRequest, IUpdateRequest } from "./interface";
+import { headers } from "next/headers";
 
 export class RequestsProvider extends Base {
   constructor() {
@@ -15,8 +16,17 @@ export class RequestsProvider extends Base {
     return this.get(`/${uuid}`);
   }
 
-  create(data: ICreateRequest) {
-    return this.post("/", data);
+  create(data: FormData) {
+    return this.post(
+      "/",
+      data,
+      {},
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
   }
 
   update(uuid: string, data: IUpdateRequest) {
