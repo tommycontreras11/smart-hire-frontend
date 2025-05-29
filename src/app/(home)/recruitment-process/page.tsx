@@ -160,12 +160,12 @@ export default function RecruitmentProcess() {
                         </div>
                       </div>
 
-                      {/* {application.nextStep && (
+                      {application.next_step && (
                       <div className="rounded-lg bg-primary/5 p-4">
                         <p className="text-sm font-medium">Próximo paso:</p>
-                        <p className="text-sm text-muted-foreground">{application.nextStep}</p>
+                        <p className="text-sm text-muted-foreground">{application.next_step}</p>
                       </div>
-                    )} */}
+                    )}
 
                       <div className="flex justify-end space-x-2">
                         <Button variant="outline">Ver Detalles</Button>

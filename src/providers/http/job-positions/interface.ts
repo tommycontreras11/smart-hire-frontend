@@ -38,6 +38,9 @@ export interface IRecruitmentProcess {
   name: string;
   institution: string;
   position: string;
+  curriculum?: string;
+  next_step?: string;
+  interview_date?: Date;
   applied_at: Date;
   last_update: Date;
   status: StatusRequestEnum
