@@ -26,6 +26,7 @@ import { createRequestFormSchema } from "@/schema/request.schema";
 import { debounceWithParameters } from "@/utils/job-position";
 import { capitalizeFirstLetter } from "@/utils/string";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { set } from "date-fns";
 import { motion } from "framer-motion";
 import {
   Briefcase,
@@ -80,6 +81,9 @@ export default function Home() {
   const { mutate: createRequest } = useCreateRequest(() => {
     refetchRequests();
     refetchJobPositions();
+    setIsModalOpen(false);
+    setUUID(null);
+    form.reset();
   });
 
   const jobPositionContractType = Object.values(
@@ -94,9 +98,6 @@ export default function Home() {
 
     const formData = new FormData();
     
-    data.candidateUUID = user!.uuid as string;
-    data.jobPositionUUID = uuid as string;
-
     requestFields.forEach((field) => {
       const value = data?.[field.name as keyof ICreateRequest];
       if (value !== undefined && value !== null) {
@@ -105,6 +106,9 @@ export default function Home() {
     });
 
     if (data.file) formData.append("file", data.file);
+    formData.append("candidateUUID", user!.uuid as string);
+    formData.append("jobPositionUUID", uuid as string);
+
 
     createRequest(formData);
   };

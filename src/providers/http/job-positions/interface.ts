@@ -36,6 +36,7 @@ export interface IJobPositionFilter {
 export interface IRecruitmentProcess {
   uuid: string;
   name: string;
+  email: string;
   institution: string;
   position: string;
   curriculum?: string;

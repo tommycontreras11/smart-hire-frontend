@@ -56,6 +56,15 @@ const data: IAppSidebarProps = {
       },
     },
     {
+      name: "Candidates",
+      url: "/recruiter/candidates",
+      icon: Users,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.RECRUITER,
+      },
+    },
+    {
       name: "Categories",
       url: "/admin/categories",
       icon: FolderKanban,

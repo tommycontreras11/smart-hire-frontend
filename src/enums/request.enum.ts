@@ -1,4 +1,5 @@
 export enum StatusRequestEnum {
+  ALL = "ALL",
   DRAFT = "DRAFT",
   SUBMITTED = "SUBMITTED",
   UNDER_REVIEW = "UNDER_REVIEW",
