@@ -1,16 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { CandidateGrid } from '@/components/common/candidates/candidate-grid';
+import { CandidateList } from '@/components/common/candidates/candidate-list';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,16 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StatusRequestEnum } from '@/enums/request.enum';
 import {
   Filter,
-  Plus,
   Search,
-  SlidersHorizontal,
+  SlidersHorizontal
 } from 'lucide-react';
-import { CandidateList } from '@/components/common/candidates/candidate-list';
-import { CandidateGrid } from '@/components/common/candidates/candidate-grid';
-import { StatusRequestEnum } from '@/enums/request.enum';
-import { capitalizeFirstLetter } from '@/utils/string';
+import { useState } from 'react';
 
 export default function CandidatesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -103,33 +101,10 @@ export default function CandidatesPage() {
 
       <Tabs defaultValue="ALL" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="ALL">Todos</TabsTrigger>
-          {/* <TabsTrigger value="new">Nuevos</TabsTrigger> */}
           {Object.values(StatusRequestEnum).map((status) => 
             <TabsTrigger key={status} value={status}>{status}</TabsTrigger>
         )}
-          {/* <TabsTrigger value="review">En Revisión</TabsTrigger>
-          <TabsTrigger value="interview">En Entrevista</TabsTrigger>
-          <TabsTrigger value="offer">Oferta</TabsTrigger>
-          <TabsTrigger value="hired">Contratados</TabsTrigger>
-          <TabsTrigger value="rejected">Rechazados</TabsTrigger> */}
         </TabsList>
-        
-        {/* <TabsContent value="all">
-          {viewMode === 'list' ? (
-            <CandidateList searchTerm={searchTerm} status="all" />
-          ) : (
-            <CandidateGrid searchTerm={searchTerm} status="all" />
-          )}
-        </TabsContent> */}
-        
-        {/* <TabsContent value="new">
-          {viewMode === 'list' ? (
-            <CandidateList searchTerm={searchTerm} status="new" />
-          ) : (
-            <CandidateGrid searchTerm={searchTerm} status="new" />
-          )}
-        </TabsContent> */}
         
         {Object.values(StatusRequestEnum).map((status) => 
         
@@ -141,39 +116,6 @@ export default function CandidatesPage() {
           )}
         </TabsContent>
         )}
-
-        
-        {/* <TabsContent value="interview">
-          {viewMode === 'list' ? (
-            <CandidateList searchTerm={searchTerm} status="interview" />
-          ) : (
-            <CandidateGrid searchTerm={searchTerm} status="interview" />
-          )}
-        </TabsContent>
-        
-        <TabsContent value="offer">
-          {viewMode === 'list' ? (
-            <CandidateList searchTerm={searchTerm} status="offer" />
-          ) : (
-            <CandidateGrid searchTerm={searchTerm} status="offer" />
-          )}
-        </TabsContent>
-        
-        <TabsContent value="hired">
-          {viewMode === 'list' ? (
-            <CandidateList searchTerm={searchTerm} status="hired" />
-          ) : (
-            <CandidateGrid searchTerm={searchTerm} status="hired" />
-          )}
-        </TabsContent>
-        
-        <TabsContent value="rejected">
-          {viewMode === 'list' ? (
-            <CandidateList searchTerm={searchTerm} status="rejected" />
-          ) : (
-            <CandidateGrid searchTerm={searchTerm} status="rejected" />
-          )}
-        </TabsContent> */}
       </Tabs>
     </main>
   );

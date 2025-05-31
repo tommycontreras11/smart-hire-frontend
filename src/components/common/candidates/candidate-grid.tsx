@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { StatusRequestEnum } from "@/enums/request.enum";
+import { useGetAllRecruitmentProcess } from "@/hooks/api/job-position.hook";
 import {
   Calendar,
   CheckCircle,
@@ -19,11 +21,8 @@ import {
   FileText,
   Mail,
   MoreHorizontal,
-  Star,
-  XCircle,
+  XCircle
 } from "lucide-react";
-import { candidatesData, type Candidate } from "@/lib/data/candidates";
-import { StatusRequestEnum } from "@/enums/request.enum";
 import { statusBadgeMap } from "./candidate-list";
 
 interface CandidateGridProps {
@@ -32,7 +31,9 @@ interface CandidateGridProps {
 }
 
 export function CandidateGrid({ searchTerm, status }: CandidateGridProps) {
-  const filteredCandidates = candidatesData.filter((candidate) => {
+  const { data: recruitmentProcesses } = useGetAllRecruitmentProcess()
+
+  const filteredCandidates = recruitmentProcesses && recruitmentProcesses.filter((candidate) => {
     const matchesSearch =
       candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -45,9 +46,9 @@ export function CandidateGrid({ searchTerm, status }: CandidateGridProps) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {filteredCandidates.length > 0 ? (
+      {filteredCandidates && filteredCandidates.length > 0 ? (
         filteredCandidates.map((candidate) => (
-          <Card key={candidate.id} className="overflow-hidden">
+          <Card key={candidate.uuid} className="overflow-hidden">
             <CardContent className="p-0">
               <div className="relative p-6">
                 <div className="absolute right-4 top-4">
@@ -92,7 +93,6 @@ export function CandidateGrid({ searchTerm, status }: CandidateGridProps) {
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="h-20 w-20 mb-4">
                     <AvatarImage
-                      src={candidate.avatarUrl}
                       alt={candidate.name}
                     />
                     <AvatarFallback className="text-xl">
@@ -108,7 +108,7 @@ export function CandidateGrid({ searchTerm, status }: CandidateGridProps) {
                   </p>
                   <p className="font-medium">{candidate.position}</p>
 
-                  <div className="flex mt-2">
+                  {/* <div className="flex mt-2">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
@@ -119,7 +119,7 @@ export function CandidateGrid({ searchTerm, status }: CandidateGridProps) {
                         }`}
                       />
                     ))}
-                  </div>
+                  </div> */}
 
                   <div className="w-full mt-4">
                     {candidate.status && statusBadgeMap[candidate.status] && (
@@ -138,7 +138,7 @@ export function CandidateGrid({ searchTerm, status }: CandidateGridProps) {
 
               <div className="border-t px-6 py-3 bg-muted/30 flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">
-                  Aplicó: {new Date(candidate.appliedDate).toLocaleDateString()}
+                  Aplicó: {new Date(candidate.applied_at).toLocaleDateString()}
                 </span>
 
                 <div className="flex space-x-1">

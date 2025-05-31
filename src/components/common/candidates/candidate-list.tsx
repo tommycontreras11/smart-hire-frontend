@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,18 +19,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { StatusRequestEnum } from "@/enums/request.enum";
+import { useGetAllRecruitmentProcess } from "@/hooks/api/job-position.hook";
 import {
+  Calendar,
+  CheckCircle,
   Eye,
   FileText,
-  MoreHorizontal,
   Mail,
-  Calendar,
-  Star,
-  CheckCircle,
-  XCircle,
+  MoreHorizontal,
+  XCircle
 } from "lucide-react";
-import { candidatesData, type Candidate } from "@/lib/data/candidates";
-import { StatusRequestEnum } from "@/enums/request.enum";
 
 interface CandidateListProps {
   searchTerm: string;
@@ -86,7 +84,9 @@ interface CandidateListProps {
   };
 
 export function CandidateList({ searchTerm, status }: CandidateListProps) {
-  const filteredCandidates = candidatesData.filter((candidate) => {
+  const { data: recruitmentProcesses } = useGetAllRecruitmentProcess()
+
+  const filteredCandidates = recruitmentProcesses && recruitmentProcesses.filter((candidate) => {
     const matchesSearch =
       candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -102,23 +102,22 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[250px]">Candidato</TableHead>
-            <TableHead>Posición</TableHead>
-            <TableHead>Evaluación</TableHead>
-            <TableHead>Fecha de Aplicación</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead className="text-right">Acciones</TableHead>
+            <TableHead className="w-[250px]">Candidate</TableHead>
+            <TableHead>Position</TableHead>
+            {/* <TableHead>Evaluación</TableHead> */}
+            <TableHead>Application Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredCandidates.length > 0 ? (
+          {filteredCandidates && filteredCandidates.length > 0 ? (
             filteredCandidates.map((candidate) => (
-              <TableRow key={candidate.id}>
+              <TableRow key={candidate.uuid}>
                 <TableCell className="font-medium">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-9 w-9">
                       <AvatarImage
-                        src={candidate.avatarUrl}
                         alt={candidate.name}
                       />
                       <AvatarFallback>
@@ -137,7 +136,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                   </div>
                 </TableCell>
                 <TableCell>{candidate.position}</TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
                       <Star
@@ -150,9 +149,9 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                       />
                     ))}
                   </div>
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
-                  {new Date(candidate.appliedDate).toLocaleDateString()}
+                  {new Date(candidate.applied_at).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
                   {candidate.status && statusBadgeMap[candidate.status] && (
