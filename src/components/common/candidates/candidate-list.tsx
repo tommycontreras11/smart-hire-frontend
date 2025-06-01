@@ -25,9 +25,8 @@ import {
   Calendar,
   CheckCircle,
   FileText,
-  Mail,
   MoreHorizontal,
-  XCircle,
+  XCircle
 } from "lucide-react";
 import { useState } from "react";
 
@@ -163,7 +162,23 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
           description: "Interview scheduled successfully",
           duration: 3000,
         });
-        updateRequest({ uuid, data });
+        
+        const formattedDate = interviewDate!.toLocaleString("en-US", {
+          timeZone: "UTC",
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        updateRequest({
+          uuid,
+          data: {
+            ...data,
+            nextStep: `Technical interview scheduled for ${formattedDate}`,
+          },
+        });
       }
 
       if (!emailData.success) {
@@ -269,10 +284,10 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                           <FileText className="mr-2 h-4 w-4" />
                           Ver CV
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        {/* <DropdownMenuItem>
                           <Mail className="mr-2 h-4 w-4" />
                           Enviar Correo
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem
                           className={
                             ![StatusRequestEnum.UNDER_REVIEW].includes(
@@ -313,7 +328,8 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                               uuid: candidate.uuid,
                               data: {
                                 candidateUUID: candidate.candidateUUID,
-                                status: candidate.status as unknown as StatusRequestEnum,
+                                status:
+                                  candidate.status as unknown as StatusRequestEnum,
                                 nextStatus: true,
                               },
                             })
@@ -328,8 +344,8 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                               StatusRequestEnum.REJECTED,
                               StatusRequestEnum.CANCELLED,
                             ].includes(candidate.status)
-                              ? "text-destructive pointer-events-none opacity-50"
-                              : "text-destructive"
+                              ? "text-destructive"
+                              : "text-destructive pointer-events-none opacity-50"
                           }
                           disabled={[
                             StatusRequestEnum.REJECTED,
@@ -340,7 +356,8 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                               uuid: candidate.uuid,
                               data: {
                                 candidateUUID: candidate.candidateUUID,
-                                status: StatusRequestEnum.REJECTED as unknown as StatusRequestEnum,
+                                status:
+                                  StatusRequestEnum.REJECTED as unknown as StatusRequestEnum,
                                 nextStatus: false,
                               },
                             })

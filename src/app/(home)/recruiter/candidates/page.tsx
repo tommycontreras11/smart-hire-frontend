@@ -1,27 +1,10 @@
 'use client';
 
 import { CandidateList } from '@/components/common/candidates/candidate-list';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusRequestEnum } from '@/enums/request.enum';
 import {
-  Filter,
   Search
 } from 'lucide-react';
 import { useState } from 'react';
@@ -46,7 +29,7 @@ export default function CandidatesPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="sm:w-[150px]">
@@ -75,7 +58,7 @@ export default function CandidatesPage() {
               <SelectItem value="rating">Evaluación</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </div>
 
       <Tabs defaultValue="ALL" className="space-y-4">
