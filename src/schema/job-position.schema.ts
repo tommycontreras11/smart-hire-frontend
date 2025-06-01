@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const salaryRegex = /^\d{1,8}(\.\d{0,2})?$/;
 
-export const jobPositionCreateFormSchema = z.object({
+export const createJobPositionFormSchema = z.object({
   name: z
     .string()
     .refine((value) => value.trim().length > 0, "Name is required"),
@@ -47,5 +47,5 @@ export const jobPositionCreateFormSchema = z.object({
     .min(1, "At least one competency is required"),
 });
 
-export const jobPositionUpdateFormSchema =
-  jobPositionCreateFormSchema.partial();
+export const updateJobPositionFormSchema =
+  createJobPositionFormSchema.partial();

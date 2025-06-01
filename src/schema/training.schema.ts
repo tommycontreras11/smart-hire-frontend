@@ -1,7 +1,7 @@
 import { TrainingLevelEnum } from "@/enums/training.enum";
 import { z } from "zod";
 
-export const trainingCreateFormSchema = z.object({
+export const createTrainingFormSchema = z.object({
   name: z
     .string()
     .refine((value) => value.trim().length > 0, "Name is required"),
@@ -26,4 +26,4 @@ export const trainingCreateFormSchema = z.object({
   institutionUUID: z.string().uuid("Institution must be a valid UUID"),
 });
 
-export const trainingUpdateFormSchema = trainingCreateFormSchema.partial();
+export const updateTrainingFormSchema = createTrainingFormSchema.partial();
