@@ -301,10 +301,10 @@ export default function VacanciesPage() {
   return (
     <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Vacantes</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Vacancies</h1>
         <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Crear Vacante
+          Create Vacancy
         </Button>
       </div>
 
@@ -313,7 +313,7 @@ export default function VacanciesPage() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Buscar vacantes..."
+            placeholder="Search vacancies..."
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -352,9 +352,9 @@ export default function VacanciesPage() {
 
       <Tabs defaultValue="active">
         <TabsList>
-          <TabsTrigger value="active">Activas</TabsTrigger>
-          <TabsTrigger value="closed">Cerradas</TabsTrigger>
-          <TabsTrigger value="all">Todas</TabsTrigger>
+          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="closed">Closed</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
         </TabsList>
         <TabsContent value="active" className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

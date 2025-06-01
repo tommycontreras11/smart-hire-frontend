@@ -46,7 +46,7 @@ export function VacancyCard({ vacancy, handleUpdate, handleDelete }: VacancyCard
               <DropdownMenuSeparator />
               {/* <DropdownMenuItem>
                 <Eye className="mr-2 h-4 w-4" />
-                Ver detalles
+                View details
               </DropdownMenuItem> */}
               <DropdownMenuItem onClick={() => handleUpdate(vacancy.uuid)}>
                 <FileEdit className="mr-2 h-4 w-4" />
@@ -84,20 +84,20 @@ export function VacancyCard({ vacancy, handleUpdate, handleDelete }: VacancyCard
         
         <div className="mt-4 space-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Salario:</span>
+            <span className="text-muted-foreground">Salary:</span>
             <span>{`$${vacancy.minimum_salary} - $${vacancy.maximum_salary} USD`}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Aplicantes:</span>
+            <span className="text-muted-foreground">Applicants:</span>
             <div className="flex items-center">
               <Users className="mr-1 h-3.5 w-3.5" />
               <span>{vacancy.total_applied}</span>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Fecha límite:</span>
+            <span className="text-muted-foreground">Deadline:</span>
             <span className={isUrgent && !isExpired ? 'text-destructive font-medium' : isExpired ? 'text-destructive/70' : ''}>
-              {isExpired ? 'Expirada' : new Date(vacancy.due_date).toLocaleDateString()}
+              {isExpired ? 'Expired' : new Date(vacancy.due_date).toLocaleDateString()}
             </span>
           </div>
         </div>
@@ -105,7 +105,7 @@ export function VacancyCard({ vacancy, handleUpdate, handleDelete }: VacancyCard
       
       <CardFooter className="flex items-center justify-between bg-muted/50 px-6 py-3">
         <div className="text-xs text-muted-foreground">
-          Publicada: {new Date(vacancy.date_posted).toLocaleDateString()}
+          Posted: {new Date(vacancy.date_posted).toLocaleDateString()}
         </div>
         
         <Badge
