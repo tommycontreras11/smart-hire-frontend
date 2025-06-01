@@ -19,6 +19,7 @@ export interface ICreateRequest {
 
 export interface IUpdateRequest {
   file?: File;
+  link?: string;
   candidateUUID?: string;
   jobPositionUUID?: string;
   nextStep?: string;

@@ -39,6 +39,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useForm } from "react-hook-form";
 import { CreateUpdateForm, IFormField } from "../modal/create-update";
+import { useAuth } from "@/contexts/auth-context";
+import { toast } from "sonner";
+import { useSendInterviewScheduleEmail } from "@/mutations/api/emails";
 
 interface CandidateListProps {
   searchTerm: string;
@@ -88,8 +91,12 @@ export const statusBadgeMap: Record<
 };
 
 export function CandidateList({ searchTerm, status }: CandidateListProps) {
+  const { user } = useAuth();
   const { data: recruitmentProcesses, refetch } = useGetAllRecruitmentProcess();
   const [uuid, setUuid] = useState<string | null>("");
+  const [name, setName] = useState<string | null>("");
+  const [email, setEmail] = useState<string | null>("");
+  const [subject, setSubject] = useState<string | null>("");
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -97,8 +104,12 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
     {
       name: "interviewDate",
       label: "Interview Date",
-      type: "date",
-      blockDatesBeforeToday: true,
+      type: "datetime",
+    },
+    {
+      name: "link",
+      label: "Link",
+      type: "text",
     },
   ]);
 
@@ -106,6 +117,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
     resolver: zodResolver(updateRequestFormSchema),
     defaultValues: {
       interviewDate: new Date(),
+      link: "",
     },
   });
 
@@ -129,9 +141,53 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
       return matchesSearch && matchesStatus;
     });
 
-  const handleSubmit = (data: Partial<IUpdateRequest>) => {
+  const handleSubmit = async (data: Partial<IUpdateRequest>) => {
     if (!uuid || !selectedCandidate) return;
-    updateRequest({ uuid, data });
+
+    let content = data.link;
+    let interviewDate = data.interviewDate;
+
+    try {
+        const emailPayload = {
+        name,
+        email,
+        date: interviewDate,
+        subject,
+        content,
+  };
+
+      const emailData = await useSendInterviewScheduleEmail(emailPayload);
+
+      console.log(emailData)
+
+      if (emailData?.success) {
+        // toast.success("Success", {
+        //   description: "Interview scheduled successfully",
+        //   duration: 3000,
+        // });
+        alert("Interview scheduled successfully");
+        updateRequest({ uuid, data });
+      }
+
+      if (!emailData.success) {
+  // toast.error("Error", {
+  //   description: emailData.error || "No se pudo enviar el correo",
+  // });
+
+  alert(
+    emailData.error || "No se pudo enviar el correo"
+  );
+}
+
+    } catch (error) {
+      // toast.error("Error", {
+      //   description: "An error occurred, please try again later",
+      //   duration: 3000,
+      // });
+
+      alert(
+        "An error occurred, please try again later")
+    }
   };
 
   return (
@@ -188,12 +244,12 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                   </div>
                 </TableCell> */}
                   <TableCell>
+                    {new Date(candidate.applied_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
                     {candidate.interview_date
                       ? new Date(candidate.interview_date).toLocaleDateString()
                       : "-"}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(candidate.applied_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
                     {candidate.status && statusBadgeMap[candidate.status] && (
@@ -243,6 +299,9 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                           onClick={() => {
                             setIsModalOpen(true);
                             setSelectedCandidate(candidate.uuid);
+                            setName(candidate.name);
+                            setEmail(candidate.email);
+                            user && setSubject(user?.name);
                             setUuid(candidate.uuid);
                           }}
                         >

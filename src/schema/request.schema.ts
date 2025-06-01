@@ -9,4 +9,5 @@ export const updateRequestFormSchema = createRequestFormSchema
   .extend({
     nextStep: z.string(),
     interviewDate: z.date(),
+    link: z.string(),
   }).partial();

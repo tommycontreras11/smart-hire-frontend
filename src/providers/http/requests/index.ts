@@ -1,7 +1,6 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
-import { ICreateRequest, IRequest, IUpdateRequest } from "./interface";
-import { headers } from "next/headers";
+import { IRequest, IUpdateRequest } from "./interface";
 
 export class RequestsProvider extends Base {
   constructor() {

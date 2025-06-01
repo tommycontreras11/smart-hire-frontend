@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../ui/select";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 export interface IFormField {
   name: string;
@@ -37,6 +38,7 @@ export interface IFormField {
     | "email"
     | "password"
     | "date"
+    | "datetime"
     | "number"
     | "select"
     | "multi-select"
@@ -84,8 +86,8 @@ export function CreateUpdateForm<T extends FieldValues>({
             {isEditable
               ? `Update ${entityName}`
               : entityName == "Filters"
-              ? entityName
-              : `Create ${entityName}`}
+                ? entityName
+                : `Create ${entityName}`}
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -153,6 +155,22 @@ export function CreateUpdateForm<T extends FieldValues>({
                         </FormControl>
                       )}
 
+                      {fieldInput.type === "datetime" && (
+                        <FormControl>
+                          <DateTimePicker
+                            key={form.watch(field.name)}
+                            date={
+                              field.value ? new Date(field.value) : undefined
+                            }
+                            setDate={(date) => {
+                              if (date) {
+                                field.onChange(date);
+                              }
+                            }}
+                          ></DateTimePicker>
+                        </FormControl>
+                      )}
+
                       {fieldInput.type === "password" && (
                         <FormControl>
                           <Input
@@ -186,7 +204,7 @@ export function CreateUpdateForm<T extends FieldValues>({
                       {fieldInput.type === "number" && (
                         <FormControl>
                           <Input
-                            placeholder={`Type your ${field.name.replace('_', ' ')}`}
+                            placeholder={`Type your ${field.name.replace("_", " ")}`}
                             {...field}
                             className="w-full"
                             type="number"
