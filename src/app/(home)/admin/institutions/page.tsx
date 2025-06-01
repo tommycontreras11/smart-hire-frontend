@@ -111,8 +111,7 @@ export default function Institution() {
       />
 
       <CreateUpdateForm<ICreateInstitution | IUpdateInstitution>
-        isEditable={isEditable}
-        entityName="Institution"
+        title={`${isEditable ? 'Update' : 'Create'} Institution`}
         fields={institutionFields}
         form={form}
         onSubmit={handleSubmit}

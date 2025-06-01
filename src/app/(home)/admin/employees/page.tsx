@@ -173,8 +173,7 @@ export default function Employee() {
       />
 
       <CreateUpdateForm<IUpdateEmployee>
-        isEditable={isEditable}
-        entityName="Employee"
+        title={`${isEditable ? 'Update' : 'Create'} Employee`}
         fields={employeeFields}
         form={form}
         onSubmit={handleSubmit}

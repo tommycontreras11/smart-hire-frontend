@@ -419,8 +419,7 @@ export default function VacanciesPage() {
         !isLoadingRecruiters &&
         !isLoadingCompetencies && (
           <CreateUpdateForm<ICreateJobPosition | IUpdateJobPosition>
-            isEditable={isEditable}
-            entityName="Job Position"
+            title={`${isEditable ? 'Update' : 'Create'} Job Position`}
             fields={jobPositionFields}
             form={form}
             onSubmit={handleSubmit}

@@ -102,8 +102,7 @@ export default function Recruiter() {
       />
 
       <CreateUpdateForm<IUpdateRecruiter>
-        isEditable={isEditable}
-        entityName="Recruiter"
+        title={`${isEditable ? 'Update' : 'Create'} Recruiter`}
         fields={recruiterFields}
         form={form}
         onSubmit={handleSubmit}

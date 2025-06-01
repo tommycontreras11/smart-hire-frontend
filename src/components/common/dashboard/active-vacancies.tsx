@@ -144,7 +144,7 @@ export function ActiveVacancies({
   const { mutate: createJobPosition } = useCreateJobPosition(() => {
     refetchDashboard();
     setIsModalOpen(false);
-    form.reset()
+    form.reset();
   });
 
   useEffect(() => {
@@ -264,7 +264,10 @@ export function ActiveVacancies({
 
   const handleCreateJobPosition = (data: Partial<ICreateJobPosition>) => {
     if (!isValidUser || !user) return;
-    createJobPosition({ ...data, recruiterUUID: user.uuid } as ICreateJobPosition);
+    createJobPosition({
+      ...data,
+      recruiterUUID: user.uuid,
+    } as ICreateJobPosition);
   };
 
   return (
@@ -334,8 +337,7 @@ export function ActiveVacancies({
         !isLoadingRecruiters &&
         !isLoadingCompetencies && (
           <CreateUpdateForm<ICreateJobPosition>
-            isEditable={false}
-            entityName="Job Position"
+            title="Create Job Position"
             fields={jobPositionFields}
             form={form}
             onSubmit={handleCreateJobPosition}

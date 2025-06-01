@@ -111,8 +111,7 @@ export default function Department() {
       />
 
       <CreateUpdateForm<ICreateDepartment | IUpdateDepartment>
-        isEditable={isEditable}
-        entityName="Department"
+        title={`${isEditable ? 'Update' : 'Create'} Department`}
         fields={departmentFields}
         form={form}
         onSubmit={handleSubmit}

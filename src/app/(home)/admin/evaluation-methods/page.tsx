@@ -116,8 +116,7 @@ export default function EvaluationMethod() {
       />
 
       <CreateUpdateForm<ICreateEvaluationMethod | IUpdateEvaluationMethod>
-        isEditable={isEditable}
-        entityName="Evaluation Method"
+        title={`${isEditable ? 'Update' : 'Create'} Evaluation Method`}
         fields={evaluationMethodFields}
         form={form}
         onSubmit={handleSubmit}

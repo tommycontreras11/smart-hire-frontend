@@ -295,8 +295,7 @@ export default function Home() {
             })}
         </div>
         <CreateUpdateForm<ICreateRequest>
-          isEditable={false}
-          entityName="Request"
+          title="Create Request"
           fields={requestFields}
           form={form}
           onSubmit={handleSubmit}

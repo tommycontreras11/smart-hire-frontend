@@ -296,8 +296,7 @@ export default function JobPosition() {
       />
 
       <CreateUpdateForm<IUpdateJobPosition>
-        isEditable={isEditable}
-        entityName="Job Position"
+        title={`${isEditable ? 'Update' : 'Create'} Job Position`}
         fields={jobPositionFields}
         form={form}
         onSubmit={handleSubmit}

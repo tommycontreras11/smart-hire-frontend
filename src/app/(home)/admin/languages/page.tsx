@@ -110,8 +110,7 @@ export default function Language() {
       />
 
       <CreateUpdateForm<ICreateLanguage | IUpdateLanguage>
-        isEditable={isEditable}
-        entityName="Language"
+        title={`${isEditable ? 'Update' : 'Create'} Language`}
         fields={languageFields}
         form={form}
         onSubmit={handleSubmit}

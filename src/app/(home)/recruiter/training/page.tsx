@@ -174,8 +174,7 @@ export default function Training() {
       />
 
       <CreateUpdateForm<ICreateTraining | IUpdateTraining>
-        isEditable={isEditable}
-        entityName="Training"
+        title={`${isEditable ? 'Update' : 'Create'} Training`}
         fields={trainingFields}
         form={form}
         onSubmit={handleSubmit}

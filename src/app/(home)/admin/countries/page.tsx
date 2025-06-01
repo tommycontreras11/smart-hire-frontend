@@ -106,8 +106,7 @@ export default function Country() {
       />
 
       <CreateUpdateForm<ICreateCountry | IUpdateCountry>
-        isEditable={isEditable}
-        entityName="Country"
+        title={`${isEditable ? 'Update' : 'Create'} Country`}
         fields={countryFields}
         form={form}
         onSubmit={handleSubmit}

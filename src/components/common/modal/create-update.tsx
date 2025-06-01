@@ -55,8 +55,7 @@ export interface IOptionsFormField {
 }
 
 export interface CreateUpdateFormProps<T extends FieldValues> {
-  isEditable: boolean;
-  entityName: string;
+  title: string;
   fields: IFormField[];
   form: UseFormReturn<T>;
   onSubmit: (data: Partial<T>) => void;
@@ -65,8 +64,7 @@ export interface CreateUpdateFormProps<T extends FieldValues> {
 }
 
 export function CreateUpdateForm<T extends FieldValues>({
-  isEditable,
-  entityName,
+  title,
   fields,
   form,
   onSubmit,
@@ -83,11 +81,12 @@ export function CreateUpdateForm<T extends FieldValues>({
       >
         <DialogHeader>
           <DialogTitle>
-            {isEditable
-              ? `Update ${entityName}`
-              : entityName == "Filters"
-                ? entityName
-                : `Create ${entityName}`}
+            {title}
+            {/* {isEditable
+              ? `Update ${title}`
+              : title == "Filters"
+                ? title
+                : `Create ${title}`} */}
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">

@@ -111,8 +111,7 @@ export default function PositionType() {
       />
 
       <CreateUpdateForm<ICreatePositionType | IUpdatePositionType>
-        isEditable={isEditable}
-        entityName="Position Type"
+        title={`${isEditable ? 'Update' : 'Create'} Position Type`}
         fields={positionTypeFields}
         form={form}
         onSubmit={handleSubmit}

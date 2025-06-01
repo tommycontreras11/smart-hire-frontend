@@ -328,8 +328,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
 
       {isModalOpen && (
         <CreateUpdateForm
-          isEditable={true}
-          entityName="Request"
+          title="Update Request"
           fields={requestFields}
           form={form}
           onSubmit={handleSubmit}

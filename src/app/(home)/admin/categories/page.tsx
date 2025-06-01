@@ -113,8 +113,7 @@ export default function Category() {
       />
 
       <CreateUpdateForm<ICreateCategory | IUpdateCategory>
-        isEditable={isEditable}
-        entityName="Category"
+        title={`${isEditable ? 'Update' : 'Create'} Category`}
         fields={categoryFields}
         form={form}
         onSubmit={handleSubmit}

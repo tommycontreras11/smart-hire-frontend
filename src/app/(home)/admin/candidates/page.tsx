@@ -204,8 +204,7 @@ export default function Candidate() {
       />
 
       <CreateUpdateForm<ICreateCandidate | IUpdateCandidate>
-        isEditable={isEditable}
-        entityName="Candidate"
+        title={`${isEditable ? 'Update' : 'Create'} Candidate`}
         fields={candidateFields}
         form={form}
         onSubmit={handleSubmit}

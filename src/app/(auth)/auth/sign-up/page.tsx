@@ -40,7 +40,6 @@ import { useForm } from "react-hook-form";
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const { mutate: createUser } = useSignUp(() => {});
 
   const { data: departments } = useGetAllDepartment();
   const { data: positions } = useGetAllPositionType();
@@ -75,6 +74,12 @@ export default function SignUpForm() {
       type: UserRoleEnum.RECRUITER,
     },
   });
+
+  const { mutate: createUser } = useSignUp(() => {
+    candidateForm.reset();
+    recruiterForm.reset();    
+  });
+
 
   const handleSubmitWithRole = (role: UserRoleEnum) => (values: ISignUp) => {
     if (role === UserRoleEnum.CANDIDATE) {

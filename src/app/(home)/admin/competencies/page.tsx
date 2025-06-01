@@ -220,8 +220,7 @@ export default function Competency() {
       />
 
       <CreateUpdateForm<ICreateCompetency | IUpdateCompetency>
-        isEditable={isEditable}
-        entityName="Competency"
+        title={`${isEditable ? 'Update' : 'Create'} Competency`}
         fields={competencyFields}
         form={form}
         onSubmit={handleSubmit}
