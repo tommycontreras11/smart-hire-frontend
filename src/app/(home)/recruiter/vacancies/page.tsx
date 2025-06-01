@@ -6,22 +6,7 @@ import {
 } from "@/components/common/modal/create-update";
 import { VacancyCard } from "@/components/common/vacancies/vacancy-card";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { StatusEnum, UserRoleEnum } from "@/enums/common.enum";
@@ -51,7 +36,7 @@ import {
 } from "@/schema/job-position.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Filter, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -334,7 +319,7 @@ export default function VacanciesPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="sm:w-[150px]">
@@ -362,7 +347,7 @@ export default function VacanciesPage() {
               <SelectItem value="deadline">Fecha límite</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </div>
 
       <Tabs defaultValue="active">
