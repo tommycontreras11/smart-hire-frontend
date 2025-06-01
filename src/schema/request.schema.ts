@@ -7,6 +7,6 @@ export const createRequestFormSchema = z.object({
 export const updateRequestFormSchema = createRequestFormSchema
   .partial()
   .extend({
-    next_step: z.string(),
-    interview_date: z.date(),
-  });
+    nextStep: z.string(),
+    interviewDate: z.date(),
+  }).partial();

@@ -42,7 +42,8 @@ export interface IFormField {
     | "multi-select"
     | "file";
   defaultValue?: string | number | Date;
-  blockDatesAfterToday?: boolean;
+  blockDatesAfterToday?: boolean | false;
+  blockDatesBeforeToday?: boolean | false;
   options?: IOptionsFormField[];
 }
 
@@ -142,6 +143,9 @@ export function CreateUpdateForm<T extends FieldValues>({
                             disabled={(date) => {
                               if (fieldInput.blockDatesAfterToday) {
                                 return date > new Date();
+                              }
+                              if (fieldInput.blockDatesBeforeToday) {
+                                return new Date() > date;
                               }
                               return false;
                             }}

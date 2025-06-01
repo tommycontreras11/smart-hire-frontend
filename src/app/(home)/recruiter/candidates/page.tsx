@@ -1,6 +1,5 @@
 'use client';
 
-import { CandidateGrid } from '@/components/common/candidates/candidate-grid';
 import { CandidateList } from '@/components/common/candidates/candidate-list';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,19 +22,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusRequestEnum } from '@/enums/request.enum';
 import {
   Filter,
-  Search,
-  SlidersHorizontal
+  Search
 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CandidatesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   
   return (
     <main className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Candidatos</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Candidates</h1>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
@@ -43,7 +40,7 @@ export default function CandidatesPage() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Buscar candidatos..."
+            placeholder="Search candidates..."
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -54,7 +51,7 @@ export default function CandidatesPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="sm:w-[150px]">
                 <Filter className="mr-2 h-4 w-4" />
-                Filtros
+                Filters
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px]">
@@ -78,24 +75,6 @@ export default function CandidatesPage() {
               <SelectItem value="rating">Evaluación</SelectItem>
             </SelectContent>
           </Select>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <SlidersHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Vista</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setViewMode('list')}>
-                Lista
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setViewMode('grid')}>
-                Cuadrícula
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
@@ -108,12 +87,8 @@ export default function CandidatesPage() {
         
         {Object.values(StatusRequestEnum).map((status) => 
         
-        <TabsContent value={status}>
-          {viewMode === 'list' ? (
+        <TabsContent key={status} value={status}>
             <CandidateList searchTerm={searchTerm} status={status} />
-          ) : (
-            <CandidateGrid searchTerm={searchTerm} status={status} />
-          )}
         </TabsContent>
         )}
       </Tabs>

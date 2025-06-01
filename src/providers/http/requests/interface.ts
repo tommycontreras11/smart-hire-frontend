@@ -17,8 +17,12 @@ export interface ICreateRequest {
   jobPositionUUID?: string;
 }
 
-export interface IUpdateRequest extends Partial<ICreateRequest> {
-  next_step?: string;
-  interview_date?: Date;
-  status: StatusRequestEnum;
+export interface IUpdateRequest {
+  file?: File;
+  candidateUUID?: string;
+  jobPositionUUID?: string;
+  nextStep?: string;
+  interviewDate?: Date;
+  nextStatus?: boolean;
+  status?: StatusRequestEnum;
 }

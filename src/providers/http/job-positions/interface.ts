@@ -35,11 +35,12 @@ export interface IJobPositionFilter {
 
 export interface IRecruitmentProcess {
   uuid: string;
+  candidateUUID: string;
   name: string;
   email: string;
   institution: string;
   position: string;
-  curriculum?: string;
+  curriculum: string;
   next_step?: string;
   interview_date?: Date;
   applied_at: Date;
