@@ -32,16 +32,16 @@ import {
 import { useState } from "react";
 
 // Import the styles
+import { useAuth } from "@/contexts/auth-context";
+import { useSendInterviewScheduleEmail } from "@/mutations/api/emails";
 import { useUpdateRequest } from "@/mutations/api/requests";
 import { IUpdateRequest } from "@/providers/http/requests/interface";
 import { updateRequestFormSchema } from "@/schema/request.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useForm } from "react-hook-form";
-import { CreateUpdateForm, IFormField } from "../modal/create-update";
-import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
-import { useSendInterviewScheduleEmail } from "@/mutations/api/emails";
+import { CreateUpdateForm, IFormField } from "../modal/create-update";
 
 interface CandidateListProps {
   searchTerm: string;
@@ -148,45 +148,35 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
     let interviewDate = data.interviewDate;
 
     try {
-        const emailPayload = {
+      const emailPayload = {
         name,
         email,
         date: interviewDate,
         subject,
         content,
-  };
+      };
 
       const emailData = await useSendInterviewScheduleEmail(emailPayload);
 
-      console.log(emailData)
-
       if (emailData?.success) {
-        // toast.success("Success", {
-        //   description: "Interview scheduled successfully",
-        //   duration: 3000,
-        // });
-        alert("Interview scheduled successfully");
+        toast.success("Success", {
+          description: "Interview scheduled successfully",
+          duration: 3000,
+        });
         updateRequest({ uuid, data });
       }
 
       if (!emailData.success) {
-  // toast.error("Error", {
-  //   description: emailData.error || "No se pudo enviar el correo",
-  // });
-
-  alert(
-    emailData.error || "No se pudo enviar el correo"
-  );
-}
-
+        toast.error("Error", {
+          description: emailData.error || "Something went wrong",
+          duration: 3000,
+        });
+      }
     } catch (error) {
-      // toast.error("Error", {
-      //   description: "An error occurred, please try again later",
-      //   duration: 3000,
-      // });
-
-      alert(
-        "An error occurred, please try again later")
+      toast.error("Error", {
+        description: "An error occurred, please try again later",
+        duration: 3000,
+      });
     }
   };
 
@@ -323,7 +313,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                               uuid: candidate.uuid,
                               data: {
                                 candidateUUID: candidate.candidateUUID,
-                                status: candidate.status,
+                                status: candidate.status as unknown as StatusRequestEnum,
                                 nextStatus: true,
                               },
                             })
@@ -350,7 +340,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                               uuid: candidate.uuid,
                               data: {
                                 candidateUUID: candidate.candidateUUID,
-                                status: StatusRequestEnum.REJECTED,
+                                status: StatusRequestEnum.REJECTED as unknown as StatusRequestEnum,
                                 nextStatus: false,
                               },
                             })

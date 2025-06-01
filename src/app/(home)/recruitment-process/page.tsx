@@ -8,12 +8,11 @@ import { StatusRequestEnum } from "@/enums/request.enum";
 import { useGetAllRecruitmentProcess } from "@/hooks/api/job-position.hook";
 import { useUpdateRequest } from "@/mutations/api/requests";
 import {
-  CheckCircle2,
   Clock,
   FileText,
   UserCheck,
   UserX,
-  XCircle,
+  XCircle
 } from "lucide-react";
 import { useState } from "react";
 
@@ -46,11 +45,6 @@ export const statusInfo = {
       "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
     icon: FileText,
   },
-  [StatusRequestEnum.APPROVED]: {
-    label: "Aprobado",
-    color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    icon: CheckCircle2,
-  },
   [StatusRequestEnum.REJECTED]: {
     label: "No Seleccionado",
     color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
@@ -80,13 +74,13 @@ export default function RecruitmentProcess() {
       if (filter === "active") {
         return ![
           StatusRequestEnum.REJECTED,
-          StatusRequestEnum.APPROVED,
+          StatusRequestEnum.HIRED,
         ].includes(app.status);
       }
       if (filter === "completed") {
         return [
           StatusRequestEnum.REJECTED,
-          StatusRequestEnum.APPROVED,
+          StatusRequestEnum.HIRED,
         ].includes(app.status);
       }
       return true;
@@ -123,7 +117,7 @@ export default function RecruitmentProcess() {
           {applications &&
             filteredApplications &&
             filteredApplications.map((application) => {
-              const status = statusInfo[application.status];
+              const status = statusInfo[application.status] ;
               const StatusIcon = status.icon;
 
               return (

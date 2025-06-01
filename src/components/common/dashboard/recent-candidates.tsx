@@ -6,25 +6,12 @@ import { FileText } from 'lucide-react';
 import { IRecentCandidate } from '@/providers/http/recruiters/interface';
 import { StatusRequestEnum } from '@/enums/request.enum';
 
-type CandidateStatus = 'review' | 'interview' | 'technical' | 'offer' | 'hired' | 'rejected';
-
-interface Candidate {
-  id: string;
-  name: string;
-  email: string;
-  position: string;
-  status: CandidateStatus;
-  avatarUrl?: string;
-  dateApplied: string;
-}
-
 const statusColors: Record<StatusRequestEnum, string> = {
   [StatusRequestEnum.DRAFT]: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
   [StatusRequestEnum.SUBMITTED]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
   [StatusRequestEnum.UNDER_REVIEW]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
   [StatusRequestEnum.INTERVIEW]: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
   [StatusRequestEnum.EVALUATED]: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-  [StatusRequestEnum.APPROVED]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   [StatusRequestEnum.REJECTED]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
   [StatusRequestEnum.HIRED]: 'bg-green-200 text-green-900 dark:bg-green-950 dark:text-green-200',
   [StatusRequestEnum.CANCELLED]: 'bg-red-200 text-red-900 dark:bg-red-950 dark:text-red-200',
@@ -36,46 +23,10 @@ const statusLabels: Record<StatusRequestEnum, string> = {
   [StatusRequestEnum.UNDER_REVIEW]: 'En Revisión',
   [StatusRequestEnum.INTERVIEW]: 'Entrevista',
   [StatusRequestEnum.EVALUATED]: 'Evaluado',
-  [StatusRequestEnum.APPROVED]: 'Aprobado',
   [StatusRequestEnum.REJECTED]: 'Rechazado',
   [StatusRequestEnum.HIRED]: 'Contratado',
   [StatusRequestEnum.CANCELLED]: 'Cancelado',
 };
-
-const candidates: Candidate[] = [
-  {
-    id: '1',
-    name: 'Carlos Mendoza',
-    email: 'carlos@example.com',
-    position: 'Desarrollador Frontend',
-    status: 'interview',
-    dateApplied: '2025-06-15',
-  },
-  {
-    id: '2',
-    name: 'Lucia Fernandez',
-    email: 'lucia@example.com',
-    position: 'Diseñadora UX/UI',
-    status: 'technical',
-    dateApplied: '2025-06-17',
-  },
-  {
-    id: '3',
-    name: 'Roberto Torres',
-    email: 'roberto@example.com',
-    position: 'Product Manager',
-    status: 'hired',
-    dateApplied: '2025-06-10',
-  },
-  {
-    id: '4',
-    name: 'Ana Gómez',
-    email: 'ana@example.com',
-    position: 'Desarrollador Backend',
-    status: 'offer',
-    dateApplied: '2025-06-12',
-  },
-];
 
 export function RecentCandidates({ candidates }: {candidates: IRecentCandidate[] | []}) {
   return (
