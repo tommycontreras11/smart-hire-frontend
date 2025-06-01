@@ -1,6 +1,7 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
 import { IAuth, IMeUser } from "./interface";
+import { ISignUp } from "@/schema/auth.schema";
 
 export class AuthProvider extends Base {
   constructor() {
@@ -13,6 +14,10 @@ export class AuthProvider extends Base {
 
   public signIn(data: IAuth): Promise<ISignInResponse> {
     return this.post("/sign-in", data);
+  }
+
+  public signUp(data: ISignUp) {
+    return this.post("/sign-up", data);
   }
 
   public signOut() {

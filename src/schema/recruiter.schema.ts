@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const recruiterCreateFormSchema = z.object({
+export const createRecruiterFormSchema = z.object({
   identification: z
     .string()
     .refine((value) => value.trim().length > 0, "Identification is required"),
@@ -19,4 +19,4 @@ export const recruiterCreateFormSchema = z.object({
     .refine((value) => value.trim().length > 0, "Institution is required"),
 });
 
-export const recruiterUpdateFormSchema = recruiterCreateFormSchema.partial();
+export const updateRecruiterFormSchema = createRecruiterFormSchema.partial();

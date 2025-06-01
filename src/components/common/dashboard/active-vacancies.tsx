@@ -19,7 +19,7 @@ import {
   IActiveVacancy,
   IRecruiterDashboard,
 } from "@/providers/http/recruiters/interface";
-import { jobPositionCreateFormSchema } from "@/schema/job-position.schema";
+import { createJobPositionFormSchema } from "@/schema/job-position.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -113,7 +113,7 @@ export function ActiveVacancies({
   ]);
 
   const form = useForm<ICreateJobPosition>({
-    resolver: zodResolver(jobPositionCreateFormSchema),
+    resolver: zodResolver(createJobPositionFormSchema),
     defaultValues: {
       name: "",
       description: "",

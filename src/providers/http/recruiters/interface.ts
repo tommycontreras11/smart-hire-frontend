@@ -4,7 +4,6 @@ import { IPersonBase } from "@/interfaces/common.interface";
 import { StatusRequestEnum } from "@/enums/request.enum";
 
 export interface IRecruiter extends IPersonBase {
-  url: string;
   institution: IInstitution;
   status: StatusEnum;
 }
@@ -15,7 +14,7 @@ export interface IRecruiterDashboard {
   recruitmentDepartmentActivity: IRecruitmentDepartmentActivity[];
   activeVacancies: IActiveVacancy[];
   recentCandidates: IRecentCandidate[];
-} 
+}
 
 export interface IRecruitmentCommonActivity {
   total_candidates: number;
@@ -34,31 +33,35 @@ export interface IRecruitmentMonthActivity {
   activity: IRecruitmentCommonActivity;
 }
 
-export interface IRecruitmentDepartmentActivity extends IRecruitmentCommonActivity {
+export interface IRecruitmentDepartmentActivity
+  extends IRecruitmentCommonActivity {
   department: string;
   total_candidates: number;
   total_hired: number;
 }
 
-export interface IActiveVacancy { 
-  uuid: string
-  name: string
-  department: string
-  country: string
-  total_candidates: number
-  due_date: Date
+export interface IActiveVacancy {
+  uuid: string;
+  name: string;
+  department: string;
+  country: string;
+  total_candidates: number;
+  due_date: Date;
 }
 
-export interface IRecentCandidate { 
-  uuid: string
-  full_name: string
-  position_type: string
-  applied_at: Date
-  status: StatusRequestEnum
+export interface IRecentCandidate {
+  uuid: string;
+  full_name: string;
+  position_type: string;
+  applied_at: Date;
+  status: StatusRequestEnum;
 }
 
-export interface ICreateRecruiter
-  extends Partial<Omit<IRecruiter, "uuid" | "institution" | "status">> {
+export interface ICreateRecruiter {
+  identification: string;
+  email: string;
+  name: string;
+  password: string;
   institution: string;
 }
 

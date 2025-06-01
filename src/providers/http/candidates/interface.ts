@@ -1,20 +1,21 @@
 import { StatusEnum } from "@/enums/common.enum";
-import { IPositionType } from "../position-types/interface";
-import { IDepartment } from "../departments/interface";
 import { IPersonBase } from "@/interfaces/common.interface";
+import { IDepartment } from "../departments/interface";
+import { IPositionType } from "../position-types/interface";
 
 export interface ICandidate extends IPersonBase {
   desired_salary: string;
   desiredPosition: IPositionType;
   department: IDepartment;
-  url: string;
   status: StatusEnum;
 }
 
-export interface ICreateCandidate
-  extends Partial<
-    Omit<ICandidate, "uuid" | "desiredPosition" | "department" | "status">
-  > {
+export interface ICreateCandidate {  
+  identification: string;
+  email: string;
+  name: string;
+  password: string;
+  desired_salary: string;
   positionUUID: string;
   departmentUUID: string;
 }
