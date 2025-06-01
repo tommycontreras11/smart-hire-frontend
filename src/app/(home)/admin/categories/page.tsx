@@ -19,8 +19,8 @@ import {
   IUpdateCategory,
 } from "@/providers/http/categories/interface";
 import {
-  categoryCreateFormSchema,
-  categoryUpdateFormSchema,
+  createCategoryFormSchema,
+  updateCategoryFormSchema,
 } from "@/schema/category.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export default function Category() {
 
   const form = useForm<ICreateCategory | IUpdateCategory>({
     resolver: zodResolver(
-      isEditable ? categoryUpdateFormSchema : categoryCreateFormSchema
+      isEditable ? updateCategoryFormSchema : createCategoryFormSchema
     ),
     defaultValues: {
       name: "",

@@ -16,8 +16,8 @@ import {
   IUpdateLanguage,
 } from "@/providers/http/languages/interface";
 import {
-  languageCreateFormSchema,
-  languageUpdateFormSchema,
+  createLanguageFormSchema,
+  updateLanguageFormSchema,
 } from "@/schema/language.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,7 +37,7 @@ export default function Language() {
 
   const form = useForm<ICreateLanguage | IUpdateLanguage>({
     resolver: zodResolver(
-      isEditable ? languageUpdateFormSchema : languageCreateFormSchema
+      isEditable ? updateLanguageFormSchema : createLanguageFormSchema
     ),
     defaultValues: {
       name: "",

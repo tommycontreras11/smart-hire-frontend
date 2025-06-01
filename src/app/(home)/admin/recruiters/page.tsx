@@ -14,7 +14,7 @@ import {
   useUpdateRecruiter,
 } from "@/mutations/api/recruiters";
 import { IUpdateRecruiter } from "@/providers/http/recruiters/interface";
-import { recruiterUpdateFormSchema } from "@/schema/recruiter.schema";
+import { updateRecruiterFormSchema } from "@/schema/recruiter.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -35,7 +35,7 @@ export default function Recruiter() {
   ]);
 
   const form = useForm<IUpdateRecruiter>({
-    resolver: zodResolver(recruiterUpdateFormSchema),
+    resolver: zodResolver(updateRecruiterFormSchema),
     defaultValues: {
       identification: "",
       email: "",

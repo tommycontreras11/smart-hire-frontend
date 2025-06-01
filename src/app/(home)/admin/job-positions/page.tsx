@@ -22,7 +22,7 @@ import {
   ICreateJobPosition,
   IUpdateJobPosition,
 } from "@/providers/http/job-positions/interface";
-import { jobPositionUpdateFormSchema } from "@/schema/job-position.schema";
+import { updateJobPositionFormSchema } from "@/schema/job-position.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -55,7 +55,7 @@ export default function JobPosition() {
   ]);
 
   const form = useForm<IUpdateJobPosition>({
-    resolver: zodResolver(jobPositionUpdateFormSchema),
+    resolver: zodResolver(updateJobPositionFormSchema),
     defaultValues: {
       name: "",
       description: "",

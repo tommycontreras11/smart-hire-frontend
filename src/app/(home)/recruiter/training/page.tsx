@@ -20,8 +20,8 @@ import {
   IUpdateTraining,
 } from "@/providers/http/training/interface";
 import {
-  trainingCreateFormSchema,
-  trainingUpdateFormSchema,
+  createTrainingFormSchema,
+  updateTrainingFormSchema,
 } from "@/schema/training.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,7 +54,7 @@ export default function Training() {
 
   const form = useForm<ICreateTraining | IUpdateTraining>({
     resolver: zodResolver(
-      isEditable ? trainingUpdateFormSchema : trainingCreateFormSchema
+      isEditable ? updateTrainingFormSchema : createTrainingFormSchema
     ),
     defaultValues: {
       name: "",

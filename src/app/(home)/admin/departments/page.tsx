@@ -20,8 +20,8 @@ import {
   IUpdateDepartment,
 } from "@/providers/http/departments/interface";
 import {
-  departmentCreateFormSchema,
-  departmentUpdateFormSchema,
+  createDepartmentFormSchema,
+  updateDepartmentFormSchema,
 } from "@/schema/department.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export default function Department() {
 
   const form = useForm<ICreateDepartment, IUpdateDepartment>({
     resolver: zodResolver(
-      isEditable ? departmentUpdateFormSchema : departmentCreateFormSchema
+      isEditable ? updateDepartmentFormSchema : createDepartmentFormSchema
     ),
     defaultValues: {
       name: "",

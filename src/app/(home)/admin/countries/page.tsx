@@ -14,8 +14,8 @@ import {
 } from "@/mutations/api/countries";
 import { ICreateCountry, IUpdateCountry } from "@/providers/http/countries/interface";
 import {
-  countryCreateFormSchema,
-  countryUpdateFormSchema,
+  createCountryFormSchema,
+  updateCountryFormSchema,
 } from "@/schema/country.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +33,7 @@ export default function Country() {
 
   const form = useForm<ICreateCountry | IUpdateCountry>({
     resolver: zodResolver(
-      isEditable ? countryUpdateFormSchema : countryCreateFormSchema
+      isEditable ? updateCountryFormSchema : createCountryFormSchema
     ),
     defaultValues: {
       name: "",

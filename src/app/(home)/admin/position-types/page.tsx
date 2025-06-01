@@ -19,8 +19,8 @@ import {
   IUpdatePositionType,
 } from "@/providers/http/position-types/interface";
 import {
-  positionTypeCreateFormSchema,
-  positionTypeUpdateFormSchema,
+  createPositionTypeFormSchema,
+  updatePositionTypeFormSchema,
 } from "@/schema/position-type.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export default function PositionType() {
 
   const form = useForm<ICreatePositionType | IUpdatePositionType>({
     resolver: zodResolver(
-      isEditable ? positionTypeUpdateFormSchema : positionTypeCreateFormSchema
+      isEditable ? updatePositionTypeFormSchema : createPositionTypeFormSchema
     ),
     defaultValues: {
       name: "",

@@ -31,8 +31,8 @@ import {
   IUpdateJobPosition,
 } from "@/providers/http/job-positions/interface";
 import {
-  jobPositionCreateFormSchema,
-  jobPositionUpdateFormSchema,
+  createJobPositionFormSchema,
+  updateJobPositionFormSchema,
 } from "@/schema/job-position.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -69,7 +69,7 @@ export default function VacanciesPage() {
 
   const form = useForm<ICreateJobPosition | IUpdateJobPosition>({
     resolver: zodResolver(
-      isEditable ? jobPositionUpdateFormSchema : jobPositionCreateFormSchema
+      isEditable ? updateJobPositionFormSchema : createJobPositionFormSchema
     ),
     defaultValues: {
       name: "",

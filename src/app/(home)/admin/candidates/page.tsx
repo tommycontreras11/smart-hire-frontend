@@ -21,8 +21,8 @@ import {
   IUpdateCandidate,
 } from "@/providers/http/candidates/interface";
 import {
-  candidateUpdateFormSchema,
-  candidateCreateFormSchema,
+  updateCandidateFormSchema,
+  createCandidateFormSchema,
 } from "@/schema/candidate.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,7 +45,7 @@ export default function Candidate() {
 
   const form = useForm<ICreateCandidate | IUpdateCandidate>({
     resolver: zodResolver(
-      isEditable ? candidateUpdateFormSchema : candidateCreateFormSchema
+      isEditable ? updateCandidateFormSchema : createCandidateFormSchema
     ),
     defaultValues: {
       identification: "",

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { salaryRegex } from "./job-position.schema";
 
-export const candidateCreateFormSchema = z.object({
+export const createCandidateFormSchema = z.object({
   identification: z
     .string()
     .refine((value) => value.trim().length > 0, "Identification is required"),
@@ -28,4 +28,4 @@ export const candidateCreateFormSchema = z.object({
   departmentUUID: z.string().uuid("Department must be a valid UUID"),
 });
 
-export const candidateUpdateFormSchema = candidateCreateFormSchema.partial();
+export const updateCandidateFormSchema = createCandidateFormSchema.partial();

@@ -20,8 +20,8 @@ import {
   IUpdateInstitution,
 } from "@/providers/http/institutions/interface";
 import {
-  institutionCreateFormSchema,
-  institutionUpdateFormSchema,
+  createInstitutionFormSchema,
+  updateInstitutionFormSchema,
 } from "@/schema/institution.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export default function Institution() {
 
   const form = useForm<ICreateInstitution | IUpdateInstitution>({
     resolver: zodResolver(
-      isEditable ? institutionUpdateFormSchema : institutionCreateFormSchema
+      isEditable ? updateInstitutionFormSchema : createInstitutionFormSchema
     ),
     defaultValues: {
       name: "",
