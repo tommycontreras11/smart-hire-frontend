@@ -14,7 +14,13 @@ import { LogIn, LogOut, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function AppNavbar({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function AppNavbar({
+  isLoggedIn,
+  username,
+}: {
+  isLoggedIn: boolean;
+  username?: string;
+}) {
   const router = useRouter();
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -42,7 +48,7 @@ export default function AppNavbar({ isLoggedIn }: { isLoggedIn: boolean }) {
             </div>
           </div>
           <div className="flex items-center">
-            {isLoggedIn ? (
+            {isLoggedIn && username ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -50,7 +56,12 @@ export default function AppNavbar({ isLoggedIn }: { isLoggedIn: boolean }) {
                     className="relative h-8 w-8 rounded-full"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback>U</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">
+                        {username
+                          .split(" ")
+                          .map((name) => name[0])
+                          .join("")}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

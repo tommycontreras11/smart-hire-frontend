@@ -61,7 +61,7 @@ export const statusInfo = {
 
 export default function RecruitmentProcess() {
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const { data: applications, refetch } = useGetAllRecruitmentProcess();
 
   const filteredApplications =
@@ -86,7 +86,7 @@ export default function RecruitmentProcess() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-background/95">
-      <AppNavbar isLoggedIn={isLoggedIn} />
+      <AppNavbar isLoggedIn={isLoggedIn} username={user?.name} />
       <section className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">

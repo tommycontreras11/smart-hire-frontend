@@ -116,7 +116,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-background/95">
       {/* Header */}
-      <AppNavbar isLoggedIn={isLoggedIn} />
+      <AppNavbar isLoggedIn={isLoggedIn} username={user?.name} />
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
