@@ -4,6 +4,7 @@ import {
   CreateUpdateForm,
   IFormField,
 } from "@/components/common/modal/create-update";
+import AppNavbar from "@/components/ui/app-navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,14 +34,15 @@ import {
   Clock,
   DollarSign,
   MapPin,
-  Search,
+  Search
 } from "lucide-react";
 import { ChangeEvent, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uuid, setUUID] = useState<string | null>("");
 
@@ -96,7 +98,7 @@ export default function Home() {
     if (!uuid || !user) return;
 
     const formData = new FormData();
-    
+
     requestFields.forEach((field) => {
       const value = data?.[field.name as keyof ICreateRequest];
       if (value !== undefined && value !== null) {
@@ -108,12 +110,14 @@ export default function Home() {
     formData.append("candidateUUID", user!.uuid as string);
     formData.append("jobPositionUUID", uuid as string);
 
-
     createRequest(formData);
   };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-background/95">
+      {/* Header */}
+      <AppNavbar isLoggedIn={isLoggedIn} />
+
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 z-0" />
