@@ -46,9 +46,9 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uuid, setUUID] = useState<string | null>("");
 
-  const [requestFields, setRequestFields] = useState<IFormField[]>([
-    { name: "file", label: "Curriculum", type: "file" },
-  ]);
+  // const [requestFields, setRequestFields] = useState<IFormField[]>([
+  //   { name: "file", label: "Curriculum", type: "file" },
+  // ]);
 
   const form = useForm<ICreateRequest>({
     resolver: zodResolver(createRequestFormSchema),
@@ -99,14 +99,14 @@ export default function Home() {
 
     const formData = new FormData();
 
-    requestFields.forEach((field) => {
-      const value = data?.[field.name as keyof ICreateRequest];
-      if (value !== undefined && value !== null) {
-        formData.append(field.name, value.toString());
-      }
-    });
+    // requestFields.forEach((field) => {
+    //   const value = data?.[field.name as keyof ICreateRequest];
+    //   if (value !== undefined && value !== null) {
+    //     formData.append(field.name, value.toString());
+    //   }
+    // });
 
-    if (data.file) formData.append("file", data.file);
+    // if (data.file) formData.append("file", data.file);
     formData.append("candidateUUID", user!.uuid as string);
     formData.append("jobPositionUUID", uuid as string);
 
@@ -277,7 +277,9 @@ export default function Home() {
                                 return;
                               }
 
-                              setIsModalOpen(true);
+                              handleSubmit({ jobPositionUUID: job.uuid, candidateUUID: user.uuid });
+
+                              // setIsModalOpen(true);
                               setUUID(job.uuid);
                             }}
                           >
@@ -294,14 +296,14 @@ export default function Home() {
               );
             })}
         </div>
-        <CreateUpdateForm<ICreateRequest>
+        {/* <CreateUpdateForm<ICreateRequest>
           title="Create Request"
           fields={requestFields}
           form={form}
           onSubmit={handleSubmit}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-        />
+        /> */}
       </section>
     </main>
   );
