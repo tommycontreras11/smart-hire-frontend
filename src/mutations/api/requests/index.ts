@@ -1,7 +1,7 @@
 import requestsProvider from "@/providers/http/requests";
 import {
-  ICreateRequest,
-  IUpdateRequest,
+  IAcceptJob,
+  IUpdateRequest
 } from "@/providers/http/requests/interface";
 import { getMutationOptions } from "@/utils/reactQueryOptions";
 import { useMutation, useQueryClient } from "react-query";
@@ -11,6 +11,17 @@ export function useCreateRequest(onSuccessCallback: (data: any) => void) {
 
   return useMutation(
     (data: FormData) => requestsProvider.create(data),
+    getMutationOptions(queryClient, "requests", null, {
+      onSuccess: onSuccessCallback,
+    })
+  );
+}
+
+export function useAcceptJob(onSuccessCallback: (data: any) => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (data: IAcceptJob) => requestsProvider.acceptJob(data),
     getMutationOptions(queryClient, "requests", null, {
       onSuccess: onSuccessCallback,
     })

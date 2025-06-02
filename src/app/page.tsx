@@ -119,21 +119,21 @@ export default function Home() {
       <AppNavbar isLoggedIn={isLoggedIn} username={user?.name} />
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 z-0" />
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-blue-500 to-blue-700">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 z-0"  />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center">
             <motion.h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight"
+              className="text-4xl sm:text-5xl lg:text-6xl text-white font-bold tracking-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
               Find your next one
-              <span className="text-primary"> opportunity</span>
+              <span className="text-white"> opportunity</span>
             </motion.h1>
             <motion.p
-              className="mt-4 text-xl text-muted-foreground"
+              className="mt-4 text-xl text-white"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}

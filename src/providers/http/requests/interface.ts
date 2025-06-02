@@ -17,6 +17,11 @@ export interface ICreateRequest {
   jobPositionUUID?: string;
 }
 
+export interface IAcceptJob {
+  candidateUUID?: string;
+  requestUUID?: string;
+}
+
 export interface IUpdateRequest {
   file?: File;
   link?: string;

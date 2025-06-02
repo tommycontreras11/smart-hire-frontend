@@ -1,6 +1,6 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
-import { IRequest, IUpdateRequest } from "./interface";
+import { IAcceptJob, IRequest, IUpdateRequest } from "./interface";
 
 export class RequestsProvider extends Base {
   constructor() {
@@ -26,6 +26,10 @@ export class RequestsProvider extends Base {
         },
       }
     );
+  }
+
+  acceptJob(data: IAcceptJob) {
+    return this.post("/accept-job", data);
   }
 
   update(uuid: string, data: IUpdateRequest) {

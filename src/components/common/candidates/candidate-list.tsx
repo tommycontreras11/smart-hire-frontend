@@ -33,7 +33,10 @@ import {
 import { StatusRequestEnum } from "@/enums/request.enum";
 import { useGetAllRecruitmentProcess } from "@/hooks/api/job-position.hook";
 import { useAuth } from "@/contexts/auth-context";
-import { useSendInterviewScheduleEmail } from "@/mutations/api/emails";
+import {
+  useSendHiredEmail,
+  useSendInterviewScheduleEmail,
+} from "@/mutations/api/emails";
 import { useUpdateRequest } from "@/mutations/api/requests";
 import { IUpdateRequest } from "@/providers/http/requests/interface";
 import { updateRequestFormSchema } from "@/schema/request.schema";
@@ -88,12 +91,11 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const { user } = useAuth();
   const { data: recruitmentProcesses, refetch } = useGetAllRecruitmentProcess();
   const [uuid, setUuid] = useState<string | null>(null);
+  const [candidateUUID, setCandidateUUID] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [subject, setSubject] = useState<string | null>(null);
-  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(
-    null
-  );
+  const [position, setPosition] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const [requestFields] = useState<IFormField[]>([
@@ -120,7 +122,6 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const { mutate: updateRequest } = useUpdateRequest(() => {
     refetch();
     setIsModalOpen(false);
-    setSelectedCandidate(null);
     setUuid(null);
   });
 
@@ -136,7 +137,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   });
 
   const handleSubmit = async (data: Partial<IUpdateRequest>) => {
-    if (!uuid || !selectedCandidate) return;
+    if (!uuid) return;
 
     const content = data.link;
     const interviewDate = data.interviewDate;
@@ -173,6 +174,41 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
             ...data,
             nextStep: `Technical interview scheduled for ${formattedDate}`,
           },
+        });
+      } else {
+        toast.error("Error", {
+          description: emailData.error || "Something went wrong",
+          duration: 3000,
+        });
+      }
+    } catch {
+      toast.error("Error", {
+        description: "An error occurred, please try again later",
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleSendHiredSubmit = async () => {
+    if (!uuid || !name || !email || !position) return;
+
+    try {
+      const emailPayload = {
+        candidateName: name,
+        email,
+        positionTitle: position,
+        startDate: new Date().toUTCString(),
+        hrContactName: user!.name,
+        hrContactEmail: user!.email,
+        offerLink: `http://localhost:3001/accept-offer/${uuid}/${candidateUUID}`,
+      };
+
+      const emailData = await useSendHiredEmail(emailPayload);
+
+      if (emailData?.success) {
+        toast.success("Success", {
+          description: "Offer sent successfully",
+          duration: 3000,
         });
       } else {
         toast.error("Error", {
@@ -273,11 +309,11 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                           }
                           onClick={() => {
                             setIsModalOpen(true);
-                            setSelectedCandidate(candidate.uuid);
                             setName(candidate.name);
                             setEmail(candidate.email);
                             user && setSubject(user?.name);
                             setUuid(candidate.uuid);
+                            setPosition(candidate.position);
                           }}
                         >
                           <Calendar className="mr-2 h-4 w-4" />
@@ -293,8 +329,17 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                           disabled={[StatusRequestEnum.HIRED].includes(
                             candidate.status
                           )}
-                          onClick={() =>
-                            updateRequest({
+                          onClick={async () => {
+                            setName(candidate.name);
+                            setEmail(candidate.email);
+                            setUuid(candidate.uuid);
+                            setPosition(candidate.position);
+                            setCandidateUUID(candidate.candidateUUID);
+
+                            if(candidate.status == StatusRequestEnum.EVALUATED) {
+                              await handleSendHiredSubmit()
+                            } else {
+                              updateRequest({
                               uuid: candidate.uuid,
                               data: {
                                 candidateUUID: candidate.candidateUUID,
@@ -302,7 +347,8 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                                 nextStatus: true,
                               },
                             })
-                          }
+                            }
+                          }}
                         >
                           <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
                           Advance Stage
