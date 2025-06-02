@@ -23,6 +23,7 @@ const protectedRoutes = [
   
   "/recruiter",
   "/recruiter/vacancies",
+  "/recruiter/candidates",
   "/recruiter/training",
 ];
 

@@ -89,7 +89,7 @@ export default function VacanciesPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: jobPosition } = useGetOneJobPosition(uuid || "");
-  const { data: jobPositions, refetch } = useGetAllJobPosition();
+  const { data: jobPositions } = useGetAllJobPosition();
 
   const { mutate: createJobPosition } = useCreateJobPosition(() => {
     clearForm(form, true, setIsModalOpen, setIsEditable, setUUID);
@@ -118,7 +118,9 @@ export default function VacanciesPage() {
   useEffect(() => {
     if (!jobPosition) return;
 
+    
     if (isEditable && isModalOpen) {
+      console.log(jobPosition.due_date)
       fillFormInput(form, [
         { property: "name", value: jobPosition.name },
         { property: "description", value: jobPosition.description },

@@ -35,10 +35,12 @@ import { ICreateRecruiter } from "@/providers/http/recruiters/interface";
 import { ISignUp, signUpSchema } from "@/schema/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function SignUpForm() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false);
 
   const { data: departments } = useGetAllDepartment();
@@ -78,6 +80,8 @@ export default function SignUpForm() {
   const { mutate: createUser } = useSignUp(() => {
     candidateForm.reset();
     recruiterForm.reset();    
+    router.push("/auth/sign-in");
+    setShowPassword(false);
   });
 
 
@@ -399,7 +403,7 @@ export default function SignUpForm() {
                               institutions.map((institution) => (
                                 <SelectItem
                                   key={institution.uuid}
-                                  value={institution.uuid}
+                                  value={institution.name}
                                 >
                                   {institution.name}
                                 </SelectItem>

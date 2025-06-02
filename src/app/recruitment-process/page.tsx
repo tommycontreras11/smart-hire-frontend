@@ -173,8 +173,7 @@ export default function RecruitmentProcess() {
 
                         <div className="flex justify-end space-x-2">
                           <Button variant="outline">View Details</Button>
-                          {application.status !==
-                            StatusRequestEnum.REJECTED && (
+                          {![StatusRequestEnum.REJECTED, StatusRequestEnum.HIRED].includes(application.status) && (
                             <Button
                               variant="outline"
                               className="text-destructive"

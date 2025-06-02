@@ -307,6 +307,34 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                           <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
                           Advance Stage
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className={
+                            ![
+                              StatusRequestEnum.REJECTED,
+                              StatusRequestEnum.CANCELLED,
+                            ].includes(candidate.status)
+                              ? "text-destructive"
+                              : "text-destructive pointer-events-none opacity-50"
+                          }
+                          disabled={[
+                            StatusRequestEnum.REJECTED,
+                            StatusRequestEnum.CANCELLED,
+                          ].includes(candidate.status)}
+                          onClick={() =>
+                            updateRequest({
+                              uuid: candidate.uuid,
+                              data: {
+                                candidateUUID: candidate.candidateUUID,
+                                status:
+                                  StatusRequestEnum.REJECTED as unknown as StatusRequestEnum,
+                                nextStatus: false,
+                              },
+                            })
+                          }
+                        >
+                          <XCircle className="mr-2 h-4 w-4" />
+                          Reject
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -328,7 +356,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
 
       {isModalOpen && (
         <CreateUpdateForm
-          title="Update Request"
+          title="Interview Schedule"
           fields={requestFields}
           form={form}
           onSubmit={handleSubmit}
