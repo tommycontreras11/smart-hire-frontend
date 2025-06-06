@@ -42,6 +42,7 @@ import { IUpdateRequest } from "@/providers/http/requests/interface";
 import { updateRequestFormSchema } from "@/schema/request.schema";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { CreateUpdateForm, IFormField } from "../modal/create-update";
+import { PdfViewerModal } from "./pdf-viewer.modal";
 
 interface CandidateListProps {
   searchTerm: string;
@@ -97,6 +98,8 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const [subject, setSubject] = useState<string | null>(null);
   const [position, setPosition] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [selectedCV, setSelectedCV] = useState<{ url: string; name: string } | null>(null);
 
   const [requestFields] = useState<IFormField[]>([
     {
@@ -290,7 +293,10 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setSelectedCV({
+                          url: candidate.curriculum,
+                          name: candidate.name
+                        })}>
                           <FileText className="mr-2 h-4 w-4" />
                           View Resume
                         </DropdownMenuItem>
@@ -408,6 +414,15 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
           onSubmit={handleSubmit}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {selectedCV && (
+        <PdfViewerModal
+          open={!!selectedCV}
+          onOpenChange={(open) => !open && setSelectedCV(null)}
+          pdfUrl={selectedCV.url}
+          candidateName={selectedCV.name}
         />
       )}
     </>
