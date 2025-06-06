@@ -28,6 +28,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { columns } from "./table/column";
 import { commonStatusTableDefinitions } from "@/definitions/common.definition";
+import { useGetAllDepartment } from "@/hooks/api/department.hook";
 
 export default function PositionType() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,9 +44,12 @@ export default function PositionType() {
     ),
     defaultValues: {
       name: "",
+      departmentUUID: "",
     },
   });
 
+  const { data: departments, isLoading: isLoadingDepartments } =
+    useGetAllDepartment();
   const { data: positionTypes } = useGetAllPositionType();
   const { data: positionType } = useGetOnePositionType(uuid || "");
 
@@ -62,10 +66,36 @@ export default function PositionType() {
   });
 
   useEffect(() => {
+    if (!isLoadingDepartments || !departments) return;
+
+    setPositionTypeFields((prev) => {
+      if (!prev.find((field) => field.name === "departmentUUID")) {
+        return [
+          ...prev,
+          {
+            name: "departmentUUID",
+            label: "Department",
+            type: "select",
+            options: departments.map((department) => ({
+              label: department.name,
+              value: department.uuid,
+            })),
+          },
+        ];
+      }
+
+      return prev;
+    });
+  }, [departments, isLoadingDepartments]);
+
+  useEffect(() => {
     if (!positionType) return;
 
     if (isEditable && isModalOpen) {
-      fillFormInput(form, [{ property: "name", value: positionType.name }]);
+      fillFormInput(form, [
+        { property: "name", value: positionType.name },
+        { property: "departmentUUID", value: positionType.department.uuid },
+      ]);
     }
 
     if (!isEditable || !isModalOpen)
@@ -92,7 +122,7 @@ export default function PositionType() {
     if (uuid) {
       modifyPositionType(data);
     } else {
-      createPositionType(data);
+      createPositionType(data as ICreatePositionType);
     }
   };
 
@@ -111,7 +141,7 @@ export default function PositionType() {
       />
 
       <CreateUpdateForm<ICreatePositionType | IUpdatePositionType>
-        title={`${isEditable ? 'Update' : 'Create'} Position Type`}
+        title={`${isEditable ? "Update" : "Create"} Position Type`}
         fields={positionTypeFields}
         form={form}
         onSubmit={handleSubmit}

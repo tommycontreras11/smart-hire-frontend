@@ -1,11 +1,15 @@
 import positionTypes from "@/providers/http/position-types";
 import { useQuery } from "react-query";
 
-export function useGetAllPositionType() {
+export function useGetAllPositionType(
+  departmentUUID?: string,
+  isDepartmentRequired?: boolean
+) {
   const query = useQuery({
-    queryKey: ["position-types"],
+    queryKey: ["position-types", departmentUUID],
     retry: 1,
-    queryFn: () => positionTypes.getAll(),
+    queryFn: () => positionTypes.getAll(departmentUUID),
+    enabled: !isDepartmentRequired ? true : !!departmentUUID,
   });
 
   return {

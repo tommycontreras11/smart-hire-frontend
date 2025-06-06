@@ -11,8 +11,10 @@ export class PositionTypesProvider extends Base {
     super(`${config.apiURL}/position-types`);
   }
 
-  public getAll(): Promise<IResponse<IPositionType[]>> {
-    return this.get("/");
+  public getAll(departmentUUID?: string): Promise<IResponse<IPositionType[]>> {
+    return this.get(
+      `${departmentUUID ? "?departmentUUID=" + departmentUUID : "/"}`
+    );
   }
 
   public getOne(uuid: string): Promise<IResponse<IPositionType>> {

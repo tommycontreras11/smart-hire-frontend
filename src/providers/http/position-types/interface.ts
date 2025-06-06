@@ -1,11 +1,16 @@
 import { StatusEnum } from "@/enums/common.enum";
+import { IDepartment } from "../departments/interface";
 
 export interface IPositionType {
-    uuid: string,
-    name: string,
-    status: StatusEnum
+  uuid: string;
+  name: string;
+  department: IDepartment;
+  status: StatusEnum;
 }
 
-export interface ICreatePositionType extends Partial<Omit<IPositionType, "uuid" | "status">> {}
+export interface ICreatePositionType {
+  name: string;
+  departmentUUID: string;
+}
 
-export interface IUpdatePositionType extends ICreatePositionType {}
+export interface IUpdatePositionType extends Partial<ICreatePositionType> {}

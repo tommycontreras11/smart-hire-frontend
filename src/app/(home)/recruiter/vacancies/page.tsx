@@ -35,6 +35,7 @@ import {
   updateJobPositionFormSchema,
 } from "@/schema/job-position.schema";
 import { clearForm, fillFormInput } from "@/utils/form";
+import { capitalizeFirstLetter } from "@/utils/string";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -60,7 +61,7 @@ export default function VacanciesPage() {
       label: "Contract Type",
       type: "select",
       options: Object.values(JobPositionContractTypeEnum).map((level) => ({
-        label: level,
+        label: capitalizeFirstLetter(level).replace("_", " "),
         value: level,
       })),
     },
@@ -118,9 +119,8 @@ export default function VacanciesPage() {
   useEffect(() => {
     if (!jobPosition) return;
 
-    
     if (isEditable && isModalOpen) {
-      console.log(jobPosition.due_date)
+      console.log(jobPosition.due_date);
       fillFormInput(form, [
         { property: "name", value: jobPosition.name },
         { property: "description", value: jobPosition.description },
@@ -421,7 +421,7 @@ export default function VacanciesPage() {
         !isLoadingRecruiters &&
         !isLoadingCompetencies && (
           <CreateUpdateForm<ICreateJobPosition | IUpdateJobPosition>
-            title={`${isEditable ? 'Update' : 'Create'} Job Position`}
+            title={`${isEditable ? "Update" : "Create"} Job Position`}
             fields={jobPositionFields}
             form={form}
             onSubmit={handleSubmit}

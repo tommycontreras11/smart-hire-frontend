@@ -10,11 +10,11 @@ interface TimeMetric {
 }
 
 const timeMetrics: TimeMetric[] = [
-  { department: 'Desarrollo', timeInDays: 18, color: 'bg-chart-1' },
+  { department: 'Development', timeInDays: 18, color: 'bg-chart-1' },
   { department: 'Marketing', timeInDays: 12, color: 'bg-chart-2' },
-  { department: 'Ventas', timeInDays: 24, color: 'bg-chart-3' },
-  { department: 'Finanzas', timeInDays: 30, color: 'bg-chart-4' },
-  { department: 'Recursos Humanos', timeInDays: 15, color: 'bg-chart-5' },
+  { department: 'Sales', timeInDays: 24, color: 'bg-chart-3' },
+  { department: 'Finance', timeInDays: 30, color: 'bg-chart-4' },
+  { department: 'Human Resources', timeInDays: 15, color: 'bg-chart-5' },
 ];
 
 const maxDays = Math.max(...timeMetrics.map(metric => metric.timeInDays)) * 1.2;
@@ -23,9 +23,9 @@ export function TimeToHire() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tiempo de Contratación</CardTitle>
+        <CardTitle>Time to Hire</CardTitle>
         <CardDescription>
-          Tiempo promedio por departamento (días)
+          Average time per department (days)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -34,12 +34,12 @@ export function TimeToHire() {
             <div key={metric.department} className="space-y-1">
               <div className="flex items-center justify-between text-sm">
                 <div className="font-medium">{metric.department}</div>
-                <div className="text-muted-foreground">{metric.timeInDays} días</div>
+                <div className="text-muted-foreground">{metric.timeInDays} days</div>
               </div>
               <Progress 
                 value={(metric.timeInDays / maxDays) * 100} 
                 className={metric.color} 
-                aria-label={`${metric.department} tiempo de contratación`}
+                aria-label={`${metric.department} hiring time`}
               />
             </div>
           ))}

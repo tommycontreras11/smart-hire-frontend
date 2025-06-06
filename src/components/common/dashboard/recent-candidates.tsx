@@ -18,27 +18,27 @@ const statusColors: Record<StatusRequestEnum, string> = {
 };
 
 const statusLabels: Record<StatusRequestEnum, string> = {
-  [StatusRequestEnum.DRAFT]: 'Borrador',
-  [StatusRequestEnum.SUBMITTED]: 'Enviado',
-  [StatusRequestEnum.UNDER_REVIEW]: 'En Revisión',
-  [StatusRequestEnum.INTERVIEW]: 'Entrevista',
-  [StatusRequestEnum.EVALUATED]: 'Evaluado',
-  [StatusRequestEnum.REJECTED]: 'Rechazado',
-  [StatusRequestEnum.HIRED]: 'Contratado',
-  [StatusRequestEnum.CANCELLED]: 'Cancelado',
+  [StatusRequestEnum.DRAFT]: 'Draft',
+  [StatusRequestEnum.SUBMITTED]: 'Submitted',
+  [StatusRequestEnum.UNDER_REVIEW]: 'Under Review',
+  [StatusRequestEnum.INTERVIEW]: 'Interview',
+  [StatusRequestEnum.EVALUATED]: 'Evaluated',
+  [StatusRequestEnum.REJECTED]: 'Rejected',
+  [StatusRequestEnum.HIRED]: 'Hired',
+  [StatusRequestEnum.CANCELLED]: 'Cancelled',
 };
 
-export function RecentCandidates({ candidates }: {candidates: IRecentCandidate[] | []}) {
+export function RecentCandidates({ candidates }: { candidates: IRecentCandidate[] | [] }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Candidatos Recientes</CardTitle>
+          <CardTitle>Recent Candidates</CardTitle>
           <CardDescription>
-            Los últimos candidatos que aplicaron
+            The latest candidates who applied
           </CardDescription>
         </div>
-        <Button size="sm" variant="outline">Ver todos</Button>
+        <Button size="sm" variant="outline">View all</Button>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -59,7 +59,7 @@ export function RecentCandidates({ candidates }: {candidates: IRecentCandidate[]
                 </div>
                 <p className="text-sm text-muted-foreground">{candidate.position_type}</p>
                 <div className="flex items-center text-xs text-muted-foreground pt-1">
-                  <span>Aplicó: {new Date(candidate.applied_at).toLocaleDateString()}</span>
+                  <span>Applied: {new Date(candidate.applied_at).toLocaleDateString()}</span>
                   <Button variant="ghost" size="icon" className="ml-auto h-6 w-6">
                     <FileText className="h-3.5 w-3.5" />
                   </Button>

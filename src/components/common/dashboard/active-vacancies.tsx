@@ -31,46 +31,7 @@ import {
 import { CreateUpdateForm, IFormField } from "../modal/create-update";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRoleEnum } from "@/enums/common.enum";
-
-interface Vacancy {
-  id: string;
-  position: string;
-  department: string;
-  location: string;
-  applicants: number;
-  postDate: string;
-  deadline: string;
-}
-
-const vacancies: Vacancy[] = [
-  {
-    id: "1",
-    position: "Desarrollador Full Stack",
-    department: "Tecnología",
-    location: "Remoto",
-    applicants: 24,
-    postDate: "2025-06-01",
-    deadline: "2025-06-30",
-  },
-  {
-    id: "2",
-    position: "Diseñador UX/UI",
-    department: "Diseño",
-    location: "Ciudad de México",
-    applicants: 18,
-    postDate: "2025-06-05",
-    deadline: "2025-07-05",
-  },
-  {
-    id: "3",
-    position: "Gerente de Marketing",
-    department: "Marketing",
-    location: "Ciudad de México",
-    applicants: 12,
-    postDate: "2025-06-10",
-    deadline: "2025-07-10",
-  },
-];
+import { capitalizeFirstLetter } from "@/utils/string";
 
 function getDaysRemaining(deadline: string): number {
   const today = new Date();
@@ -105,7 +66,7 @@ export function ActiveVacancies({
       label: "Contract Type",
       type: "select",
       options: Object.values(JobPositionContractTypeEnum).map((level) => ({
-        label: level,
+        label: capitalizeFirstLetter(level).replace("_", " "),
         value: level,
       })),
     },
@@ -275,15 +236,15 @@ export function ActiveVacancies({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Vacantes Activas</CardTitle>
-            <CardDescription>Vacantes publicadas actualmente</CardDescription>
+            <CardTitle>Active Vacancies</CardTitle>
+            <CardDescription>Currently posted job openings</CardDescription>
           </div>
           <Button
             size="sm"
             variant="outline"
             onClick={() => setIsModalOpen(true)}
           >
-            Crear Vacante
+            Create Vacancy
           </Button>
         </CardHeader>
         <CardContent>
@@ -303,7 +264,7 @@ export function ActiveVacancies({
                     <div className="font-medium">{vacancy.name}</div>
                     <div className="flex items-center space-x-1">
                       <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        {vacancy.total_candidates} candidatos
+                        {vacancy.total_candidates} candidates
                       </span>
                     </div>
                   </div>
@@ -319,8 +280,8 @@ export function ActiveVacancies({
                       }`}
                     >
                       {daysRemaining > 0
-                        ? `${daysRemaining} días restantes`
-                        : "Expirada"}
+                        ? `${daysRemaining} days remaining`
+                        : "Expired"}
                     </div>
                   </div>
                 </div>

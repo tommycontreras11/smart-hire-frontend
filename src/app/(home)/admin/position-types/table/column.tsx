@@ -27,6 +27,12 @@ export const columns = ({
     },
   },
   {
+    accessorKey: "department.name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={"Department"} />
+    ),
+  },
+  {
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title={"Status"} />
