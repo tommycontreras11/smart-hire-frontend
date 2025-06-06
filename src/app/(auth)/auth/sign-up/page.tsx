@@ -42,9 +42,10 @@ import { useForm } from "react-hook-form";
 export default function SignUpForm() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false);
+  const [departmentSelected, setDepartmentSelected] = useState<string | null>(null);
 
   const { data: departments } = useGetAllDepartment();
-  const { data: positions } = useGetAllPositionType();
+  const { data: positions } = useGetAllPositionType(departmentSelected || "", true);
   const { data: institutions } = useGetAllInstitution();
 
   const candidateForm = useForm<ISignUp>({
@@ -225,6 +226,7 @@ export default function SignUpForm() {
                         <Select
                           onValueChange={(value) => {
                             field.onChange(value);
+                            setDepartmentSelected(value);
                           }}
                           value={field.value}
                         >
@@ -259,6 +261,7 @@ export default function SignUpForm() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
+                          disabled={!departmentSelected}
                         >
                           <FormControl className="w-full">
                             <SelectTrigger>

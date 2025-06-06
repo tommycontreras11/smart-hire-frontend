@@ -9,7 +9,6 @@ export default function AuthLayout({
   return (
     <main>
       {children}
-      <Toaster />
     </main>
   );
 }
