@@ -46,12 +46,16 @@ export interface IFormField {
   defaultValue?: string | number | Date;
   blockDatesAfterToday?: boolean | false;
   blockDatesBeforeToday?: boolean | false;
+  triggerToDisableField?: string;
+  disabledByField?: string;
+  fieldToBeDisabled?: string;
   options?: IOptionsFormField[];
 }
 
 export interface IOptionsFormField {
   label: string;
   value: string;
+  uuidsRelation?: string[];
 }
 
 export interface CreateUpdateFormProps<T extends FieldValues> {
@@ -100,158 +104,183 @@ export function CreateUpdateForm<T extends FieldValues>({
                   key={fieldInput.name}
                   control={form.control}
                   name={fieldInput.name as Path<T>}
-                  render={({ field, fieldState }) => (
-                    <FormItem className="col-span-1">
-                      <FormLabel
-                        className={fieldState?.error?.message && "text-red-500"}
-                      >
-                        {fieldInput.label}
-                      </FormLabel>
+                  render={({ field, fieldState }) => {
+                    let disabledByFieldValue = "";
+                    
+                    if (fieldInput.disabledByField) {
+                      disabledByFieldValue =
+                        fieldInput.disabledByField &&
+                        form.getValues(fieldInput.disabledByField as Path<T>);
+                    }
 
-                      {fieldInput.type === "text" && (
-                        <FormControl>
-                          <Input
-                            placeholder={`Type your ${field.name}`}
-                            {...field}
-                            className="w-full"
-                          />
-                        </FormControl>
-                      )}
+                    let isDisabled =
+                      field.name == (fieldInput.fieldToBeDisabled &&
+                      !disabledByFieldValue);
 
-                      {fieldInput.type === "email" && (
-                        <FormControl>
-                          <Input
-                            placeholder={`Type your ${field.name}`}
-                            {...field}
-                            className="w-full"
-                            type="email"
-                          />
-                        </FormControl>
-                      )}
+                    const filteredOptions =
+                      fieldInput.disabledByField !== "" && disabledByFieldValue
+                        ? fieldInput.options?.filter((option) =>
+                            option.uuidsRelation?.includes(disabledByFieldValue)
+                          )
+                        : fieldInput.options;
 
-                      {fieldInput.type === "date" && (
-                        <FormControl>
-                          <DatePicker
-                            key={form.watch(field.name)}
-                            date={
-                              field.value ? new Date(field.value) : undefined
-                            }
-                            setDate={(date) => {
-                              if (date) {
-                                field.onChange(date);
-                              }
-                            }}
-                            disabled={(date) => {
-                              if (fieldInput.blockDatesAfterToday) {
-                                return date > new Date();
-                              }
-                              if (fieldInput.blockDatesBeforeToday) {
-                                return new Date() > date;
-                              }
-                              return false;
-                            }}
-                          />
-                        </FormControl>
-                      )}
-
-                      {fieldInput.type === "datetime" && (
-                        <FormControl>
-                          <DateTimePicker
-                            key={form.watch(field.name)}
-                            date={
-                              field.value ? new Date(field.value) : undefined
-                            }
-                            setDate={(date) => {
-                              if (date) {
-                                field.onChange(date);
-                              }
-                            }}
-                          ></DateTimePicker>
-                        </FormControl>
-                      )}
-
-                      {fieldInput.type === "password" && (
-                        <FormControl>
-                          <Input
-                            placeholder={`Type your ${field.name}`}
-                            {...field}
-                            className="w-full"
-                            type="password"
-                          />
-                        </FormControl>
-                      )}
-
-                      {fieldInput.type === "file" && (
-                        <Controller
-                          name={"file" as Path<T>}
-                          control={form.control}
-                          render={({ field: { onChange, ref } }) => (
-                            <FormControl>
-                              <Input
-                                type="file"
-                                className="w-full"
-                                ref={ref} // ✅ Correctly handle ref
-                                onChange={(e) =>
-                                  onChange(e.target.files?.[0] || null)
-                                } // ✅ Handle file change
-                              />
-                            </FormControl>
-                          )}
-                        />
-                      )}
-
-                      {fieldInput.type === "number" && (
-                        <FormControl>
-                          <Input
-                            placeholder={`Type your ${field.name.replace("_", " ")}`}
-                            {...field}
-                            className="w-full"
-                            type="number"
-                          />
-                        </FormControl>
-                      )}
-
-                      {fieldInput.type === "select" && (
-                        <Select
-                          key={form.watch(field.name)}
-                          onValueChange={field.onChange}
-                          defaultValue={form.getValues(field.name as Path<T>)}
+                    return (
+                      <FormItem className="col-span-1">
+                        <FormLabel
+                          className={
+                            fieldState?.error?.message && "text-red-500"
+                          }
                         >
-                          <FormControl>
-                            <SelectTrigger className="w-full">
-                              <SelectValue
-                                placeholder={`Select a ${fieldInput.label.toLowerCase()}`}
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {fieldInput.options?.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
+                          {fieldInput.label}
+                        </FormLabel>
 
-                      {fieldInput.type === "multi-select" &&
-                        fieldInput.options && (
-                          <MultiSelect
-                            key={form.watch(field.name)}
-                            options={fieldInput.options}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            placeholder="Select options"
-                            className="w-full"
+                        {fieldInput.type === "text" && (
+                          <FormControl>
+                            <Input
+                              placeholder={`Type your ${field.name}`}
+                              {...field}
+                              className="w-full"
+                            />
+                          </FormControl>
+                        )}
+
+                        {fieldInput.type === "email" && (
+                          <FormControl>
+                            <Input
+                              placeholder={`Type your ${field.name}`}
+                              {...field}
+                              className="w-full"
+                              type="email"
+                            />
+                          </FormControl>
+                        )}
+
+                        {fieldInput.type === "date" && (
+                          <FormControl>
+                            <DatePicker
+                              key={form.watch(field.name)}
+                              date={
+                                field.value ? new Date(field.value) : undefined
+                              }
+                              setDate={(date) => {
+                                if (date) {
+                                  field.onChange(date);
+                                }
+                              }}
+                              disabled={(date) => {
+                                if (fieldInput.blockDatesAfterToday) {
+                                  return date > new Date();
+                                }
+                                if (fieldInput.blockDatesBeforeToday) {
+                                  return new Date() > date;
+                                }
+                                return false;
+                              }}
+                            />
+                          </FormControl>
+                        )}
+
+                        {fieldInput.type === "datetime" && (
+                          <FormControl>
+                            <DateTimePicker
+                              key={form.watch(field.name)}
+                              date={
+                                field.value ? new Date(field.value) : undefined
+                              }
+                              setDate={(date) => {
+                                if (date) {
+                                  field.onChange(date);
+                                }
+                              }}
+                            ></DateTimePicker>
+                          </FormControl>
+                        )}
+
+                        {fieldInput.type === "password" && (
+                          <FormControl>
+                            <Input
+                              placeholder={`Type your ${field.name}`}
+                              {...field}
+                              className="w-full"
+                              type="password"
+                            />
+                          </FormControl>
+                        )}
+
+                        {fieldInput.type === "file" && (
+                          <Controller
+                            name={"file" as Path<T>}
+                            control={form.control}
+                            render={({ field: { onChange, ref } }) => (
+                              <FormControl>
+                                <Input
+                                  type="file"
+                                  className="w-full"
+                                  ref={ref} // ✅ Correctly handle ref
+                                  onChange={(e) =>
+                                    onChange(e.target.files?.[0] || null)
+                                  } // ✅ Handle file change
+                                />
+                              </FormControl>
+                            )}
                           />
                         )}
 
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                        {fieldInput.type === "number" && (
+                          <FormControl>
+                            <Input
+                              placeholder={`Type your ${field.name.replace("_", " ")}`}
+                              {...field}
+                              className="w-full"
+                              type="number"
+                            />
+                          </FormControl>
+                        )}
+
+                        {fieldInput.type === "select" && (
+                          <Select
+                            key={form.watch(field.name)}
+                            onValueChange={field.onChange}
+                            defaultValue={form.getValues(field.name as Path<T>)}
+                            disabled={isDisabled}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="w-full">
+                                <SelectValue
+                                  placeholder={`Select a ${fieldInput.label.toLowerCase()}`}
+                                />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {filteredOptions?.map((option) => (
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+
+                        {fieldInput.type === "multi-select" &&
+                          fieldInput.options && (
+                            <MultiSelect
+                              key={form.watch(field.name)}
+                              disabled={isDisabled}
+                              options={filteredOptions || []}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              placeholder="Select options"
+                              className="w-full"
+                            />
+                          )}
+
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               ))}
 

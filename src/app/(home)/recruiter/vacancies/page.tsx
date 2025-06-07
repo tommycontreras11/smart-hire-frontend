@@ -233,9 +233,13 @@ export default function VacanciesPage() {
             name: "positionTypeUUID",
             label: "Position Type",
             type: "select",
+            disabledByField: "departmentUUID",
+            fieldToBeDisabled: "positionTypeUUID",
+            triggerToDisableField: "departmentUUID",
             options: positionTypes.map((positionType) => ({
               label: positionType.name,
               value: positionType.uuid,
+              uuidsRelation: [positionType.department.uuid],
             })),
           },
         ];
@@ -251,9 +255,13 @@ export default function VacanciesPage() {
             name: "competencyUUIDs",
             label: "Competencies",
             type: "multi-select",
+            disabledByField: "positionTypeUUID",
+            fieldToBeDisabled: "competencyUUIDs",
+            triggerToDisableField: "positionTypeUUID",
             options: competencies.map((competency) => ({
               label: competency.name,
               value: competency.uuid,
+              uuidsRelation: competency.positionTypes.map((positionType) => positionType.uuid),
             })),
           },
         ];
@@ -287,17 +295,18 @@ export default function VacanciesPage() {
 
   const handleSubmit = (data: ICreateJobPosition | IUpdateJobPosition) => {
     if (!isValidUser) return;
-    if (uuid) {
-      handleUpdate({
-        ...data,
-        recruiterUUID: user?.uuid,
-      } as IUpdateJobPosition);
-    } else {
-      createJobPosition({
-        ...data,
-        recruiterUUID: user?.uuid,
-      } as ICreateJobPosition);
-    }
+    console.log(data)
+    // if (uuid) {
+    //   handleUpdate({
+    //     ...data,
+    //     recruiterUUID: user?.uuid,
+    //   } as IUpdateJobPosition);
+    // } else {
+    //   createJobPosition({
+    //     ...data,
+    //     recruiterUUID: user?.uuid,
+    //   } as ICreateJobPosition);
+    // }
   };
 
   return (

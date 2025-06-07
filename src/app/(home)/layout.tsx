@@ -4,7 +4,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/sonner";
 
 import "./../globals.css";
 
@@ -24,7 +23,6 @@ export default function HomeLayout({
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {children}
-          <Toaster />
         </div>
       </SidebarInset>
     </SidebarProvider>
