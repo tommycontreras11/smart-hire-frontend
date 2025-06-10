@@ -33,9 +33,9 @@ function isProtectedRoute(path: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-  const cookie = await getCookie();
+  // const cookie = await getCookie();
 
-  const user = cookie ? await me() : null;
+  const user = await me();
 
   const currentPath = request.nextUrl.pathname;
 
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isProtectedRoute(currentPath) && !user) {
+  if ((isProtectedRoute(currentPath) && !user.data)) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
