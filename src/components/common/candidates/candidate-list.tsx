@@ -30,7 +30,7 @@ import {
   MoreHorizontal,
   XCircle,
 } from "lucide-react";
-import { StatusRequestEnum } from "@/enums/request.enum";
+import { StatusRequestEnum, StatusRequestFilterEnum } from "@/enums/request.enum";
 import { useGetAllRecruitmentProcess } from "@/hooks/api/job-position.hook";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -46,43 +46,47 @@ import { PdfViewerModal } from "./pdf-viewer.modal";
 
 interface CandidateListProps {
   searchTerm: string;
-  status: StatusRequestEnum | "ALL";
+  status: StatusRequestFilterEnum;
 }
 
 const statusBadgeMap: Record<string, { label: string; className: string }> = {
-  [StatusRequestEnum.DRAFT]: {
+  [StatusRequestFilterEnum.ALL]: {
+    label: "ALL",
+    className: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+  },
+  [StatusRequestFilterEnum.DRAFT]: {
     label: "Draft",
     className: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
   },
-  [StatusRequestEnum.SUBMITTED]: {
+  [StatusRequestFilterEnum.SUBMITTED]: {
     label: "New",
     className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
   },
-  [StatusRequestEnum.UNDER_REVIEW]: {
+  [StatusRequestFilterEnum.UNDER_REVIEW]: {
     label: "Under Review",
     className:
       "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
   },
-  [StatusRequestEnum.INTERVIEW]: {
+  [StatusRequestFilterEnum.INTERVIEW]: {
     label: "Interview",
     className:
       "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
   },
-  [StatusRequestEnum.EVALUATED]: {
+  [StatusRequestFilterEnum.EVALUATED]: {
     label: "Evaluated",
     className:
       "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
   },
-  [StatusRequestEnum.REJECTED]: {
+  [StatusRequestFilterEnum.REJECTED]: {
     label: "Rejected",
     className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
   },
-  [StatusRequestEnum.HIRED]: {
+  [StatusRequestFilterEnum.HIRED]: {
     label: "Hired",
     className:
       "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   },
-  [StatusRequestEnum.CANCELLED]: {
+  [StatusRequestFilterEnum.CANCELLED]: {
     label: "Cancelled",
     className: "bg-gray-200 text-gray-900 dark:bg-gray-800 dark:text-gray-400",
   },
@@ -302,14 +306,14 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className={
-                            ![StatusRequestEnum.UNDER_REVIEW].includes(
+                            ![StatusRequestFilterEnum.UNDER_REVIEW].includes(
                               candidate.status
                             )
                               ? "pointer-events-none opacity-50"
                               : ""
                           }
                           disabled={
-                            ![StatusRequestEnum.UNDER_REVIEW].includes(
+                            ![StatusRequestFilterEnum.UNDER_REVIEW].includes(
                               candidate.status
                             )
                           }
@@ -328,11 +332,11 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className={
-                            [StatusRequestEnum.HIRED].includes(candidate.status)
+                            [StatusRequestFilterEnum.HIRED, StatusRequestFilterEnum.UNDER_REVIEW].includes(candidate.status)
                               ? "pointer-events-none opacity-50"
                               : ""
                           }
-                          disabled={[StatusRequestEnum.HIRED].includes(
+                          disabled={[StatusRequestFilterEnum.HIRED, StatusRequestFilterEnum.UNDER_REVIEW].includes(
                             candidate.status
                           )}
                           onClick={async () => {
@@ -342,14 +346,14 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                             setPosition(candidate.position);
                             setCandidateUUID(candidate.candidateUUID);
 
-                            if(candidate.status == StatusRequestEnum.EVALUATED) {
+                            if(candidate.status == StatusRequestFilterEnum.EVALUATED) {
                               await handleSendHiredSubmit()
                             } else {
                               updateRequest({
                               uuid: candidate.uuid,
                               data: {
                                 candidateUUID: candidate.candidateUUID,
-                                status: candidate.status,
+                                status: candidate.status as unknown as StatusRequestEnum,
                                 nextStatus: true,
                               },
                             })
@@ -362,16 +366,16 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                         <DropdownMenuItem
                           className={
                             ![
-                              StatusRequestEnum.REJECTED,
-                              StatusRequestEnum.CANCELLED,
+                              StatusRequestFilterEnum.REJECTED,
+                              StatusRequestFilterEnum.CANCELLED,
                             ].includes(candidate.status)
                               ? "text-destructive"
                               : "text-destructive pointer-events-none opacity-50"
                           }
                           disabled={[
-                            StatusRequestEnum.REJECTED,
-                            StatusRequestEnum.CANCELLED,
-                          ].includes(candidate.status)}
+                            StatusRequestFilterEnum.REJECTED,
+                            StatusRequestFilterEnum.CANCELLED,
+                          ].includes(candidate.status )}
                           onClick={() =>
                             updateRequest({
                               uuid: candidate.uuid,

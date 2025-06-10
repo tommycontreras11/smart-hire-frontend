@@ -26,5 +26,7 @@ export async function sendInterviewEmail({
     })
   );
 
+  console.log(html)
+
   return await sendEmail({ to: email, subject: "Interview Confirmation 🎉", html });
 }

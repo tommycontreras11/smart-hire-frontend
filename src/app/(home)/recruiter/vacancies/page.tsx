@@ -295,18 +295,18 @@ export default function VacanciesPage() {
 
   const handleSubmit = (data: ICreateJobPosition | IUpdateJobPosition) => {
     if (!isValidUser) return;
-    console.log(data)
-    // if (uuid) {
-    //   handleUpdate({
-    //     ...data,
-    //     recruiterUUID: user?.uuid,
-    //   } as IUpdateJobPosition);
-    // } else {
-    //   createJobPosition({
-    //     ...data,
-    //     recruiterUUID: user?.uuid,
-    //   } as ICreateJobPosition);
-    // }
+
+    if (uuid) {
+      handleUpdate({
+        ...data,
+        recruiterUUID: user?.uuid,
+      } as IUpdateJobPosition);
+    } else {
+      createJobPosition({
+        ...data,
+        recruiterUUID: user?.uuid,
+      } as ICreateJobPosition);
+    }
   };
 
   return (

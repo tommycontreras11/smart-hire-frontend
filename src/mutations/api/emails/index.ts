@@ -3,7 +3,7 @@ import { ISendInterviewScheduleEmail, IResponseEmail } from "@/providers/http/em
 
 export async function useSendInterviewScheduleEmail(data: ISendInterviewScheduleEmail): Promise<IResponseEmail> {
   try {
-    const response = await fetch("/api", {
+    const response = await fetch("/api/interview", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
