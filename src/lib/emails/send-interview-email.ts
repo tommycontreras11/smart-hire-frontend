@@ -16,6 +16,8 @@ export async function sendInterviewEmail({
   subject: string;
   content: string;
 }) {
+
+  // const html = "s"
   const html = await render(
     InterviewScheduled({
       candidateName: name,
@@ -23,8 +25,7 @@ export async function sendInterviewEmail({
       interviewerName: subject,
       interviewDate: new Date(date).toLocaleDateString(),
       interviewTime: new Date(date).toLocaleTimeString(),
-    })
-  );
+    }))
 
   return await sendEmail({ to: email, subject: "Interview Confirmation 🎉", html });
 }

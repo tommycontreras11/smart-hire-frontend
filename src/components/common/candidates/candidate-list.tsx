@@ -35,7 +35,7 @@ import { useGetAllRecruitmentProcess } from "@/hooks/api/job-position.hook";
 import { useAuth } from "@/contexts/auth-context";
 import {
   useSendHiredEmail,
-  useSendInterviewScheduleEmail,
+  useSendInterviewEmail,
 } from "@/mutations/api/emails";
 import { useUpdateRequest } from "@/mutations/api/requests";
 import { IUpdateRequest } from "@/providers/http/requests/interface";
@@ -99,7 +99,10 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const [position, setPosition] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const [selectedCV, setSelectedCV] = useState<{ url: string; name: string } | null>(null);
+  const [selectedCV, setSelectedCV] = useState<{
+    url: string;
+    name: string;
+  } | null>(null);
 
   const [requestFields] = useState<IFormField[]>([
     {
@@ -128,6 +131,13 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
     setUuid(null);
   });
 
+  const { mutate: sendHiredEmail } = useSendHiredEmail(() => {
+    refetch();
+  });
+  const { mutate: sendInterviewEmail } = useSendInterviewEmail(() => {
+    refetch();
+  });
+
   const filteredCandidates = recruitmentProcesses?.filter((candidate) => {
     const matchesSearch =
       candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -143,47 +153,49 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
     if (!uuid) return;
 
     const content = data.link;
-    const interviewDate = data.interviewDate;
+    const date = data.interviewDate;
 
     try {
       const emailPayload = {
-        name,
-        email,
-        date: interviewDate,
-        subject,
-        content,
+        candidateName: name,
+        interviewLink: content,
+        interviewerName: subject,
+        interviewDate: new Date(date ?? "").toLocaleDateString(),
+        interviewTime: new Date(date ?? "").toLocaleTimeString(),
       };
 
-      const emailData = await useSendInterviewScheduleEmail(emailPayload);
+      sendInterviewEmail({ ...emailPayload, requestUUID: uuid, to: email! });
 
-      if (emailData?.success) {
-        toast.success("Success", {
-          description: "Interview scheduled successfully",
-          duration: 3000,
-        });
+      //const emailData = await useSendInterviewScheduleEmail(emailPayload);
 
-        const formattedDate = interviewDate!.toLocaleString("en-US", {
-          timeZone: "UTC",
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+      // if (emailData?.success) {
+      //   toast.success("Success", {
+      //     description: "Interview scheduled successfully",
+      //     duration: 3000,
+      //   });
 
-        updateRequest({
-          uuid,
-          data: {
-            ...data,
-            nextStep: `Technical interview scheduled for ${formattedDate}`,
-          },
-        });
-      } else {
-        toast.error("Error", {
-          description: emailData.error || "Something went wrong",
-          duration: 3000,
-        });
-      }
+      //   const formattedDate = interviewDate!.toLocaleString("en-US", {
+      //     timeZone: "UTC",
+      //     month: "long",
+      //     day: "numeric",
+      //     year: "numeric",
+      //     hour: "2-digit",
+      //     minute: "2-digit",
+      //   });
+
+      //   updateRequest({
+      //     uuid,
+      //     data: {
+      //       ...data,
+      //       nextStep: `Technical interview scheduled for ${formattedDate}`,
+      //     },
+      //   });
+      // } else {
+      //   toast.error("Error", {
+      //     description: emailData.error || "Something went wrong",
+      //     duration: 3000,
+      //   });
+      // }
     } catch {
       toast.error("Error", {
         description: "An error occurred, please try again later",
@@ -206,19 +218,21 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
         offerLink: `http://localhost:3001/accept-offer/${uuid}/${candidateUUID}`,
       };
 
-      const emailData = await useSendHiredEmail(emailPayload);
+      sendHiredEmail({ ...emailPayload, requestUUID: uuid });
 
-      if (emailData?.success) {
-        toast.success("Success", {
-          description: "Offer sent successfully",
-          duration: 3000,
-        });
-      } else {
-        toast.error("Error", {
-          description: emailData.error || "Something went wrong",
-          duration: 3000,
-        });
-      }
+      // const emailData = await useSendHiredEmail(emailPayload);
+
+      // if (emailData?.success) {
+      //   toast.success("Success", {
+      //     description: "Offer sent successfully",
+      //     duration: 3000,
+      //   });
+      // } else {
+      //   toast.error("Error", {
+      //     description: emailData.error || "Something went wrong",
+      //     duration: 3000,
+      //   });
+      // }
     } catch {
       toast.error("Error", {
         description: "An error occurred, please try again later",
@@ -293,10 +307,14 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setSelectedCV({
-                          url: candidate.curriculum,
-                          name: candidate.name
-                        })}>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setSelectedCV({
+                              url: candidate.curriculum,
+                              name: candidate.name,
+                            })
+                          }
+                        >
                           <FileText className="mr-2 h-4 w-4" />
                           View Resume
                         </DropdownMenuItem>
@@ -342,17 +360,19 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                             setPosition(candidate.position);
                             setCandidateUUID(candidate.candidateUUID);
 
-                            if(candidate.status == StatusRequestEnum.EVALUATED) {
-                              await handleSendHiredSubmit()
+                            if (
+                              candidate.status == StatusRequestEnum.EVALUATED
+                            ) {
+                              await handleSendHiredSubmit();
                             } else {
                               updateRequest({
-                              uuid: candidate.uuid,
-                              data: {
-                                candidateUUID: candidate.candidateUUID,
-                                status: candidate.status,
-                                nextStatus: true,
-                              },
-                            })
+                                uuid: candidate.uuid,
+                                data: {
+                                  candidateUUID: candidate.candidateUUID,
+                                  status: candidate.status,
+                                  nextStatus: true,
+                                },
+                              });
                             }
                           }}
                         >

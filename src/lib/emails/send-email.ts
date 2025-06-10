@@ -1,6 +1,5 @@
-import nodemailer from "nodemailer";
 import { config } from "@/lib/config";
-import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -22,7 +21,7 @@ export async function sendEmail({
   to: string;
   subject: string;
   html: string;
-}): Promise<any> {
+}) {
   try {
     await transporter.sendMail({
       from: `Tommy <${config.gmailUser}>`,
@@ -31,8 +30,8 @@ export async function sendEmail({
       html,
     });
 
-    return NextResponse.json({ success: true });
+    return { success: true, error : null };
   } catch (error) {
-    return NextResponse.json({ success: false, error });
+    return { success: false, error };
   }
 }
