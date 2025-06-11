@@ -1,9 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,16 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Calendar,
-  CheckCircle,
-  FileText,
-  MoreHorizontal,
-  XCircle,
-} from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 import { StatusRequestEnum } from "@/enums/request.enum";
 import { useGetAllRecruitmentProcess } from "@/hooks/api/job-position.hook";
-import { useAuth } from "@/contexts/auth-context";
 import {
   useSendHiredEmail,
   useSendInterviewEmail,
@@ -40,7 +29,17 @@ import {
 import { useUpdateRequest } from "@/mutations/api/requests";
 import { IUpdateRequest } from "@/providers/http/requests/interface";
 import { updateRequestFormSchema } from "@/schema/request.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import {
+  Calendar,
+  CheckCircle,
+  FileText,
+  MoreHorizontal,
+  XCircle,
+} from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { CreateUpdateForm, IFormField } from "../modal/create-update";
 import { PdfViewerModal } from "./pdf-viewer.modal";
 
@@ -90,7 +89,7 @@ const statusBadgeMap: Record<string, { label: string; className: string }> = {
 
 export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const { user } = useAuth();
-  const { data: recruitmentProcesses, refetch } = useGetAllRecruitmentProcess();
+
   const [uuid, setUuid] = useState<string | null>(null);
   const [candidateUUID, setCandidateUUID] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
@@ -98,6 +97,14 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const [subject, setSubject] = useState<string | null>(null);
   const [position, setPosition] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [emailCandidateInfo, setEmailCandidateInfo] = useState<{
+    uuid: string;
+    name: string;
+    email: string;
+    subject: string;
+    position: string;
+  } | null>(null);
 
   const [selectedCV, setSelectedCV] = useState<{
     url: string;
@@ -116,6 +123,8 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
       type: "text",
     },
   ]);
+
+  const { data: recruitmentProcesses, refetch } = useGetAllRecruitmentProcess();
 
   const form = useForm<IUpdateRequest>({
     resolver: zodResolver(updateRequestFormSchema),
@@ -136,6 +145,7 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   });
   const { mutate: sendInterviewEmail } = useSendInterviewEmail(() => {
     refetch();
+    form.reset();
   });
 
   const filteredCandidates = recruitmentProcesses?.filter((candidate) => {
@@ -155,90 +165,31 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
     const content = data.link;
     const date = data.interviewDate;
 
-    try {
-      const emailPayload = {
-        candidateName: name,
-        interviewLink: content,
-        interviewerName: subject,
-        interviewDate: new Date(date ?? "").toLocaleDateString(),
-        interviewTime: new Date(date ?? "").toLocaleTimeString(),
-      };
+    const emailPayload = {
+      candidateName: name,
+      interviewLink: content,
+      interviewerName: subject,
+      interviewDate: new Date(date ?? "").toLocaleDateString(),
+      interviewTime: new Date(date ?? "").toLocaleTimeString(),
+    };
 
-      sendInterviewEmail({ ...emailPayload, requestUUID: uuid, to: email! });
-
-      //const emailData = await useSendInterviewScheduleEmail(emailPayload);
-
-      // if (emailData?.success) {
-      //   toast.success("Success", {
-      //     description: "Interview scheduled successfully",
-      //     duration: 3000,
-      //   });
-
-      //   const formattedDate = interviewDate!.toLocaleString("en-US", {
-      //     timeZone: "UTC",
-      //     month: "long",
-      //     day: "numeric",
-      //     year: "numeric",
-      //     hour: "2-digit",
-      //     minute: "2-digit",
-      //   });
-
-      //   updateRequest({
-      //     uuid,
-      //     data: {
-      //       ...data,
-      //       nextStep: `Technical interview scheduled for ${formattedDate}`,
-      //     },
-      //   });
-      // } else {
-      //   toast.error("Error", {
-      //     description: emailData.error || "Something went wrong",
-      //     duration: 3000,
-      //   });
-      // }
-    } catch {
-      toast.error("Error", {
-        description: "An error occurred, please try again later",
-        duration: 3000,
-      });
-    }
+    sendInterviewEmail({ ...emailPayload, requestUUID: uuid, to: email! });
   };
 
   const handleSendHiredSubmit = async () => {
     if (!uuid || !name || !email || !position) return;
 
-    try {
-      const emailPayload = {
-        candidateName: name,
-        email,
-        positionTitle: position,
-        startDate: new Date().toUTCString(),
-        hrContactName: user!.name,
-        hrContactEmail: user!.email,
-        offerLink: `http://localhost:3001/accept-offer/${uuid}/${candidateUUID}`,
-      };
+    const emailPayload = {
+      candidateName: name,
+      email,
+      positionTitle: position,
+      startDate: new Date().toUTCString(),
+      hrContactName: user!.name,
+      hrContactEmail: user!.email,
+      offerLink: `http://localhost:3001/accept-offer/${uuid}/${candidateUUID}`,
+    };
 
-      sendHiredEmail({ ...emailPayload, requestUUID: uuid });
-
-      // const emailData = await useSendHiredEmail(emailPayload);
-
-      // if (emailData?.success) {
-      //   toast.success("Success", {
-      //     description: "Offer sent successfully",
-      //     duration: 3000,
-      //   });
-      // } else {
-      //   toast.error("Error", {
-      //     description: emailData.error || "Something went wrong",
-      //     duration: 3000,
-      //   });
-      // }
-    } catch {
-      toast.error("Error", {
-        description: "An error occurred, please try again later",
-        duration: 3000,
-      });
-    }
+    sendHiredEmail({ ...emailPayload, requestUUID: uuid });
   };
 
   return (

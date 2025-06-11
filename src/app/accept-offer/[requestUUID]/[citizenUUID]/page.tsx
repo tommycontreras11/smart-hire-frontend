@@ -10,9 +10,8 @@ import Link from "next/link";
 
 export default function AcceptOffer() {
   const { requestUUID, citizenUUID } = useParams();
-  const [error, setError] = useState<string>('');
 
-  const { mutate: acceptJob, status } = useAcceptJob(() => {
+  const { mutate: acceptJob, status, error } = useAcceptJob(() => {
 
   });
 
@@ -23,7 +22,7 @@ export default function AcceptOffer() {
       candidateUUID: citizenUUID as string,
       requestUUID: requestUUID as string
     });
-  }, [citizenUUID, requestUUID, acceptJob]);
+  }, []);
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-background/95">
