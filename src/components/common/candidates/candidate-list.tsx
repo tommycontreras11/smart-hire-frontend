@@ -143,9 +143,11 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const { mutate: sendHiredEmail } = useSendHiredEmail(() => {
     refetch();
   });
+
   const { mutate: sendInterviewEmail } = useSendInterviewEmail(() => {
     refetch();
-    form.reset();
+    setIsModalOpen(false);
+    setUuid(null);
   });
 
   const filteredCandidates = recruitmentProcesses?.filter((candidate) => {
