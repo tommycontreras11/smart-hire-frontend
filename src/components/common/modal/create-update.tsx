@@ -111,11 +111,11 @@ export function CreateUpdateForm<T extends FieldValues>({
                       disabledByFieldValue =
                         fieldInput.disabledByField &&
                         form.getValues(fieldInput.disabledByField as Path<T>);
-                    }
+                      }
 
                     let isDisabled =
-                      field.name == (fieldInput.fieldToBeDisabled &&
-                      !disabledByFieldValue);
+                      (field.name == fieldInput.fieldToBeDisabled) &&
+                      (!disabledByFieldValue);
 
                     const filteredOptions =
                       fieldInput.disabledByField !== "" && disabledByFieldValue
