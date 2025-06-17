@@ -120,7 +120,27 @@ export default function VacanciesPage() {
     if (!jobPosition) return;
 
     if (isEditable && isModalOpen) {
-      console.log(jobPosition.due_date);
+      // Status shouldn't appear on create mode
+      console.log(jobPosition.status)
+      setJobPositionFields((prev) => {
+        if(!prev.find((field) => field.name === "status")) {
+          return [
+            ...prev,
+            {
+              name: "status",
+              label: "Status",
+              type: "select",
+              defaultValue: jobPosition.status,
+              options: Object.values(StatusEnum).map((status) => ({
+                label: status,
+                value: status,
+              })),
+            }
+          ]
+        }
+        return prev
+      })
+
       fillFormInput(form, [
         { property: "name", value: jobPosition.name },
         { property: "description", value: jobPosition.description },

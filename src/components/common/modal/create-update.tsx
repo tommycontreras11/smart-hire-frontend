@@ -241,7 +241,7 @@ export function CreateUpdateForm<T extends FieldValues>({
                           <Select
                             key={form.watch(field.name)}
                             onValueChange={field.onChange}
-                            defaultValue={form.getValues(field.name as Path<T>)}
+                            defaultValue={form.getValues(field.name as Path<T>) as string || (fieldInput.defaultValue as string) }
                             disabled={isDisabled}
                           >
                             <FormControl>
