@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { columns } from "./table/column";
 import { commonStatusTableDefinitions } from "@/definitions/common.definition";
+import { EmployeeReportButton } from "@/components/common/pdf/employee-report-button";
 
 export default function Employee() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,6 +37,10 @@ export default function Employee() {
     { name: "monthly_salary", label: "Monthly Salary", type: "number" },
     { name: "entry_date", label: "Entry Date", type: "date" },
   ]);
+
+  const now = new Date();
+  const options = { month: "long" as const, year: "numeric" as const };
+  const formattedDate = now.toLocaleDateString("en-US", options);
 
   const form = useForm<IUpdateEmployee>({
     resolver: zodResolver(updateEmployeeFormSchema),
@@ -121,7 +126,10 @@ export default function Employee() {
         { property: "email", value: employee.email },
         { property: "name", value: employee.name },
         { property: "password", value: employee.password },
-        { property: "monthly_salary", value: employee.monthly_salary.toString() },
+        {
+          property: "monthly_salary",
+          value: employee.monthly_salary.toString(),
+        },
         { property: "entry_date", value: new Date(employee.entry_date) },
         {
           property: "departmentUUID",
@@ -160,12 +168,22 @@ export default function Employee() {
 
   return (
     <div className="mx-auto w-full overflow-x-auto">
-      <button
+      <div className="flex justify-between items-center mb-4">
+        <button
         className="bg-sky-700 hover:bg-sky-800 text-white font-bold py-2 px-4 rounded mb-4"
         onClick={() => setIsModalOpen(true)}
       >
         Create
       </button>
+      {employees && employees.length > 0 && (
+        <EmployeeReportButton
+          employees={employees}
+          reportTitle="Monthly Employee Report"
+          generatedDate={formattedDate}
+        />
+      )}
+      </div>
+
       <DataTable
         data={employees || []}
         columns={columns({ handleUpdate, handleDelete })}
@@ -173,7 +191,7 @@ export default function Employee() {
       />
 
       <CreateUpdateForm<IUpdateEmployee>
-        title={`${isEditable ? 'Update' : 'Create'} Employee`}
+        title={`${isEditable ? "Update" : "Create"} Employee`}
         fields={employeeFields}
         form={form}
         onSubmit={handleSubmit}
