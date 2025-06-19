@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     color: "#000000",
     backgroundColor: "#e0e7ff",
     padding: "4 8",
+    marginTop: 4,
     borderRadius: 4,
   },
   infoGrid: {
