@@ -5,7 +5,7 @@ import { IRecruiter } from "../recruiters/interface";
 import { ICompetency } from "../competencies/interface";
 import { IDepartment } from "../departments/interface";
 import { IPositionType } from "../position-types/interface";
-import { StatusRequestEnum } from "@/enums/request.enum";
+import { StatusRequestFilterEnum } from "@/enums/request.enum";
 
 export interface IJobPosition {
   uuid: string;
@@ -45,7 +45,7 @@ export interface IRecruitmentProcess {
   interview_date?: Date;
   applied_at: Date;
   last_update: Date;
-  status: StatusRequestEnum
+  status: StatusRequestFilterEnum
 }
 
 export interface ICreateJobPosition {

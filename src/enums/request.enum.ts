@@ -8,3 +8,15 @@ export enum StatusRequestEnum {
   HIRED = "HIRED",
   CANCELLED = "CANCELLED",
 }
+
+export enum StatusRequestFilterEnum {
+  ALL = "ALL",
+  DRAFT = "DRAFT",
+  SUBMITTED = "SUBMITTED",
+  UNDER_REVIEW = "UNDER_REVIEW",
+  INTERVIEW = "INTERVIEW",
+  EVALUATED = "EVALUATED",
+  REJECTED = "REJECTED",
+  HIRED = "HIRED",
+  CANCELLED = "CANCELLED",
+}

@@ -3,7 +3,7 @@
 import { CandidateList } from '@/components/common/candidates/candidate-list';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { StatusRequestEnum } from '@/enums/request.enum';
+import { StatusRequestFilterEnum } from '@/enums/request.enum';
 import {
   Search
 } from 'lucide-react';
@@ -63,12 +63,12 @@ export default function CandidatesPage() {
 
       <Tabs defaultValue="ALL" className="space-y-4">
         <TabsList>
-          {Object.values(StatusRequestEnum).map((status) => 
+          {Object.values(StatusRequestFilterEnum).map((status) => 
             <TabsTrigger key={status} value={status}>{status}</TabsTrigger>
         )}
         </TabsList>
         
-        {Object.values(StatusRequestEnum).map((status) => 
+        {Object.values(StatusRequestFilterEnum).map((status) => 
         
         <TabsContent key={status} value={status}>
             <CandidateList searchTerm={searchTerm} status={status} />
