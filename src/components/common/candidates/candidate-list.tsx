@@ -42,6 +42,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CreateUpdateForm, IFormField } from "../modal/create-update";
 import { PdfViewerModal } from "./pdf-viewer.modal";
+import { ICandidate } from "@/providers/http/candidates/interface";
+import { IRecruitmentProcess } from "@/providers/http/job-positions/interface";
 
 interface CandidateListProps {
   searchTerm: string;
@@ -95,7 +97,6 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
   const { user } = useAuth();
 
   const [uuid, setUuid] = useState<string | null>(null);
-  const [candidateUUID, setCandidateUUID] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [subject, setSubject] = useState<string | null>(null);
@@ -182,20 +183,20 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
     sendInterviewEmail({ ...emailPayload, requestUUID: uuid, to: email! });
   };
 
-  const handleSendHiredSubmit = async () => {
-    if (!uuid || !name || !email || !position) return;
+  const handleSendHiredSubmit = async (recruitmentProcess: IRecruitmentProcess) => {
+    if (!recruitmentProcess.uuid || !recruitmentProcess.name || !recruitmentProcess.email || !recruitmentProcess.position) return;
 
     const emailPayload = {
-      candidateName: name,
-      email,
-      positionTitle: position,
+      candidateName: recruitmentProcess.name,
+      email: recruitmentProcess.email,
+      positionTitle: recruitmentProcess.position,
       startDate: new Date().toUTCString(),
-      hrContactName: user!.name,
-      hrContactEmail: user!.email,
-      offerLink: `http://localhost:3001/accept-offer/${uuid}/${candidateUUID}`,
+      hrContactName: recruitmentProcess.name,
+      hrContactEmail: recruitmentProcess.email,
+      offerLink: `http://localhost:3001/accept-offer/${recruitmentProcess.uuid}/${recruitmentProcess.candidateUUID}`,
     };
 
-    sendHiredEmail({ ...emailPayload, requestUUID: uuid });
+    sendHiredEmail({ ...emailPayload, requestUUID: recruitmentProcess.uuid });
   };
 
   return (
@@ -303,24 +304,18 @@ export function CandidateList({ searchTerm, status }: CandidateListProps) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className={
-                            [StatusRequestFilterEnum.HIRED].includes(candidate.status)
+                            [StatusRequestFilterEnum.UNDER_REVIEW, StatusRequestFilterEnum.HIRED].includes(candidate.status)
                               ? "pointer-events-none opacity-50"
                               : ""
                           }
-                          disabled={[StatusRequestFilterEnum.HIRED].includes(
+                          disabled={[StatusRequestFilterEnum.UNDER_REVIEW, StatusRequestFilterEnum.HIRED].includes(
                             candidate.status
                           )}
-                          onClick={async () => {
-                            setName(candidate.name);
-                            setEmail(candidate.email);
-                            setUuid(candidate.uuid);
-                            setPosition(candidate.position);
-                            setCandidateUUID(candidate.candidateUUID);
-
+                          onClick={async () => {                            
                             if (
                               candidate.status == StatusRequestFilterEnum.EVALUATED
                             ) {
-                              await handleSendHiredSubmit();
+                              await handleSendHiredSubmit(candidate);
                             } else {
                               updateRequest({
                                 uuid: candidate.uuid,
