@@ -51,6 +51,14 @@ export async function middleware(request: NextRequest) {
 
   let allowedRoutes = [...protectedRoutes];
 
+  if(user?.data && role === UserRoleEnum.RECRUITER && currentPath === "/") {
+    return NextResponse.redirect(new URL("/recruiter", request.url));
+  }
+
+  if(user?.data && role === UserRoleEnum.EMPLOYEE && currentPath === "/") {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+
   if (
     (currentPath === "/recruitment-process") &&
     role === UserRoleEnum.CANDIDATE
