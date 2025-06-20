@@ -17,13 +17,14 @@ export function useCreateRequest(onSuccessCallback: (data: any) => void) {
   );
 }
 
-export function useAcceptJob(onSuccessCallback: (data: any) => void) {
+export function useAcceptJob(onSuccessCallback: (data: any) => void, onErrorCallback?: (error: any) => void) {
   const queryClient = useQueryClient();
 
   return useMutation(
     (data: IAcceptJob) => requestsProvider.acceptJob(data),
     getMutationOptions(queryClient, "requests", null, {
       onSuccess: onSuccessCallback,
+      onError: onErrorCallback,
     })
   );
 }
