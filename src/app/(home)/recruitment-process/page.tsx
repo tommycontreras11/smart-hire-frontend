@@ -1,6 +1,5 @@
 "use client";
 
-import AppNavbar from "@/components/ui/app-navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +60,7 @@ export const statusInfo = {
 
 export default function RecruitmentProcess() {
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn } = useAuth();
   const { data: applications, refetch } = useGetAllRecruitmentProcess();
 
   const filteredApplications =
@@ -69,12 +68,12 @@ export default function RecruitmentProcess() {
     applications.filter((app) => {
       if (filter === "active") {
         return ![StatusRequestEnum.REJECTED, StatusRequestEnum.HIRED].includes(
-          app.status
+          app.status as unknown as StatusRequestEnum
         );
       }
       if (filter === "completed") {
         return [StatusRequestEnum.REJECTED, StatusRequestEnum.HIRED].includes(
-          app.status
+          app.status as unknown as StatusRequestEnum
         );
       }
       return true;
@@ -85,8 +84,6 @@ export default function RecruitmentProcess() {
   });
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-background/95">
-      <AppNavbar isLoggedIn={isLoggedIn} username={user?.name} />
       <section className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -125,7 +122,7 @@ export default function RecruitmentProcess() {
             {applications &&
               filteredApplications &&
               filteredApplications.map((application) => {
-                const status = statusInfo[application.status];
+                const status = statusInfo[application.status as unknown as StatusRequestEnum];
                 const StatusIcon = status.icon;
 
                 return (
@@ -173,7 +170,7 @@ export default function RecruitmentProcess() {
 
                         <div className="flex justify-end space-x-2">
                           <Button variant="outline">View Details</Button>
-                          {![StatusRequestEnum.REJECTED, StatusRequestEnum.HIRED].includes(application.status) && (
+                          {![StatusRequestEnum.REJECTED, StatusRequestEnum.HIRED].includes(application.status as unknown as StatusRequestEnum) && (
                             <Button
                               variant="outline"
                               className="text-destructive"
@@ -210,6 +207,5 @@ export default function RecruitmentProcess() {
           </div>
         </Tabs>
       </section>
-    </main>
   );
 }

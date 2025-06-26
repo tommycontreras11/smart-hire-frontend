@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { UserRoleEnum } from "./enums/common.enum";
-import { getCookie } from "./utils/cookie";
 import { me } from "./utils/auth.lib";
 
 const protectedRoutes = [

@@ -10,18 +10,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogIn, LogOut, UserPlus } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
+import { CircleUserIcon, LogIn, LogOut, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function AppNavbar({
-  isLoggedIn,
-  username,
-}: {
-  isLoggedIn: boolean;
-  username?: string;
-}) {
+export default function AppNavbar() {
   const router = useRouter();
+    const { isLoggedIn, user } = useAuth();
+
+  const username = user?.name;
+
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,6 +67,12 @@ export default function AppNavbar({
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => router.push("/account/profile")}
+                  >
+                    <CircleUserIcon className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => router.push("/auth/sign-out")}
                   >

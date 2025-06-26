@@ -20,4 +20,7 @@ export interface ICreateCandidate {
   departmentUUID: string;
 }
 
-export interface IUpdateCandidate extends Partial<ICreateCandidate> {}
+export interface IUpdateCandidate extends Partial<ICreateCandidate> {
+  trainingUUIDs?: string[];
+  competencyUUIDs?: string[];
+}
