@@ -24,6 +24,7 @@ import {
   UserCog,
   Dumbbell,
   BriefcaseIcon,
+  Brain,
 } from "lucide-react";
 import * as React from "react";
 import { MainNav } from "./nav-main";
@@ -166,7 +167,7 @@ const data: IAppSidebarProps = {
     {
       name: "Training",
       url: "/recruiter/training",
-      icon: Dumbbell,
+      icon: Brain,
       isActive: true,
       visibleProps: {
         userRole: UserRoleEnum.RECRUITER,
