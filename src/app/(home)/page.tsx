@@ -4,7 +4,6 @@ import {
   CreateUpdateForm,
   IFormField,
 } from "@/components/common/modal/create-update";
-import AppNavbar from "@/components/ui/app-navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +33,7 @@ import {
   Clock,
   DollarSign,
   MapPin,
-  Search
+  Search,
 } from "lucide-react";
 import { ChangeEvent, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -114,13 +113,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-background/95">
-      {/* Header */}
-      <AppNavbar isLoggedIn={isLoggedIn} username={user?.name} />
-
+    <>
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-blue-500 to-blue-700">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 z-0"  />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 z-0" />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center">
             <motion.h1
@@ -305,6 +301,6 @@ export default function Home() {
           onClose={() => setIsModalOpen(false)}
         />
       </section>
-    </main>
+    </>
   );
 }

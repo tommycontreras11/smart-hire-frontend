@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAcceptJob } from "@/mutations/api/requests";
-import { set } from "date-fns";
 import { CheckCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";

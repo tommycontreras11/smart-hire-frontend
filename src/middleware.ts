@@ -5,7 +5,7 @@ import { me } from "./utils/auth.lib";
 
 const protectedRoutes = [
   "recruitment-process",
-
+  "/account/profile",
   "/admin",
   "/admin/candidates",
   "/admin/categories",
@@ -19,7 +19,6 @@ const protectedRoutes = [
   "/admin/languages",
   "/admin/position-types",
   "/admin/recruiters",
-  
   "/recruiter",
   "/recruiter/vacancies",
   "/recruiter/candidates",
