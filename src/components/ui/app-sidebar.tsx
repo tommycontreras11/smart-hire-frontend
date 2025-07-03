@@ -25,6 +25,7 @@ import {
   Dumbbell,
   BriefcaseIcon,
   Brain,
+  BrainIcon,
 } from "lucide-react";
 import * as React from "react";
 import { MainNav } from "./nav-main";
@@ -45,6 +46,15 @@ const data: IAppSidebarProps = {
       visibleProps: {
         bothRoles: true,
         default: true,
+      },
+    },
+    {
+      name: "Academic Disciplines",
+      url: "/admin/academic-disciplines",
+      icon: BrainIcon,
+      isActive: true,
+      visibleProps: {
+        userRole: UserRoleEnum.EMPLOYEE,
       },
     },
     {
