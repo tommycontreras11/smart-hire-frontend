@@ -1,27 +1,15 @@
-'use client';
+"use client";
 
-import { ChangeEvent, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -30,32 +18,51 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  Camera,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Briefcase,
-  GraduationCap,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/auth-context";
+import { useGetOneCandidate } from "@/hooks/api/candidate.hook";
+import { useUpdateCandidate } from "@/mutations/api/candidates";
+import { IUpdateCandidateProfile } from "@/providers/http/candidates/interface";
+import { updateCandidateProfileFormSchema } from "@/schema/candidate.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
   Award,
-  Settings,
   Bell,
-  Shield,
+  Briefcase,
+  Building,
+  Calendar,
+  CalendarDays,
+  Camera,
+  Edit,
+  Edit3,
   Eye,
   EyeOff,
-  Save,
-  Edit3,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Phone,
   Plus,
-  X,
-  Edit,
+  Save,
+  Settings,
+  Shield,
   Trash2,
-  CalendarDays,
-  Building,
-} from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+  X,
+} from "lucide-react";
+import { ChangeEvent, useState } from "react";
+import { useForm } from "react-hook-form";
 
 // Types for education and certification
 interface Education {
@@ -79,109 +86,136 @@ interface Certification {
 
 // Mock user data
 const mockUser = {
-  id: '1',
-  name: 'Ana García Rodríguez',
-  email: 'ana.garcia@company.com',
-  phone: '+52 55 1234 5678',
-  location: 'Ciudad de México, México',
-  avatar: '',
-  title: 'Senior UX/UI Designer',
-  department: 'Design',
-  employeeId: 'EMP-2024-001',
-  startDate: '2023-03-15',
-  manager: 'Carlos Mendoza',
-  bio: 'Passionate UX/UI designer with 5+ years of experience creating user-centered digital experiences. I specialize in design systems, user research, and prototyping.',
-  skills: ['Figma', 'Adobe XD', 'Sketch', 'Prototyping', 'User Research', 'Design Systems', 'HTML/CSS', 'JavaScript'],
+  id: "1",
+  name: "Ana García Rodríguez",
+  email: "ana.garcia@company.com",
+  phone: "+52 55 1234 5678",
+  location: "Ciudad de México, México",
+  avatar: "",
+  title: "Senior UX/UI Designer",
+  department: "Design",
+  employeeId: "EMP-2024-001",
+  startDate: "2023-03-15",
+  manager: "Carlos Mendoza",
+  bio: "Passionate UX/UI designer with 5+ years of experience creating user-centered digital experiences. I specialize in design systems, user research, and prototyping.",
+  skills: [
+    "Figma",
+    "Adobe XD",
+    "Sketch",
+    "Prototyping",
+    "User Research",
+    "Design Systems",
+    "HTML/CSS",
+    "JavaScript",
+  ],
   education: [
     {
-      id: '1',
-      degree: 'Master in Digital Design',
-      institution: 'Universidad de las Américas',
-      year: '2020',
-      description: 'Specialized in user experience design and digital product development.',
-      gpa: '3.8',
+      id: "1",
+      degree: "Master in Digital Design",
+      institution: "Universidad de las Américas",
+      year: "2020",
+      description:
+        "Specialized in user experience design and digital product development.",
+      gpa: "3.8",
     },
     {
-      id: '2',
-      degree: 'Bachelor in Graphic Design',
-      institution: 'Universidad Nacional',
-      year: '2018',
-      description: 'Focused on visual communication and brand identity design.',
-      gpa: '3.6',
+      id: "2",
+      degree: "Bachelor in Graphic Design",
+      institution: "Universidad Nacional",
+      year: "2018",
+      description: "Focused on visual communication and brand identity design.",
+      gpa: "3.6",
     },
   ] as Education[],
   certifications: [
     {
-      id: '1',
-      name: 'Google UX Design Certificate',
-      issuer: 'Google',
-      issueDate: '2023-01-15',
-      credentialId: 'GUX-2023-001',
-      description: 'Comprehensive UX design program covering user research, wireframing, and prototyping.',
+      id: "1",
+      name: "Google UX Design Certificate",
+      issuer: "Google",
+      issueDate: "2023-01-15",
+      credentialId: "GUX-2023-001",
+      description:
+        "Comprehensive UX design program covering user research, wireframing, and prototyping.",
     },
     {
-      id: '2',
-      name: 'Adobe Certified Expert',
-      issuer: 'Adobe',
-      issueDate: '2022-08-20',
-      expiryDate: '2025-08-20',
-      credentialId: 'ACE-2022-456',
-      description: 'Expert-level certification in Adobe Creative Suite applications.',
+      id: "2",
+      name: "Adobe Certified Expert",
+      issuer: "Adobe",
+      issueDate: "2022-08-20",
+      expiryDate: "2025-08-20",
+      credentialId: "ACE-2022-456",
+      description:
+        "Expert-level certification in Adobe Creative Suite applications.",
     },
     {
-      id: '3',
-      name: 'Figma Professional Certification',
-      issuer: 'Figma',
-      issueDate: '2023-06-10',
-      credentialId: 'FPC-2023-789',
-      description: 'Advanced certification in Figma design and prototyping tools.',
+      id: "3",
+      name: "Figma Professional Certification",
+      issuer: "Figma",
+      issueDate: "2023-06-10",
+      credentialId: "FPC-2023-789",
+      description:
+        "Advanced certification in Figma design and prototyping tools.",
     },
   ] as Certification[],
   socialLinks: {
-    linkedin: 'https://linkedin.com/in/anagarcia',
-    portfolio: 'https://anagarcia.design',
-    github: 'https://github.com/anagarcia',
+    linkedin: "https://linkedin.com/in/anagarcia",
+    portfolio: "https://anagarcia.design",
+    github: "https://github.com/anagarcia",
   },
 };
 
 export default function Profile() {
-  const [user, setUser] = useState(mockUser);
+  const { user: userAuth } = useAuth();
+
   const [isEditing, setIsEditing] = useState(false);
-  const [newSkill, setNewSkill] = useState('');
+  const [newSkill, setNewSkill] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Education state
   const [isEducationDialogOpen, setIsEducationDialogOpen] = useState(false);
-  const [editingEducation, setEditingEducation] = useState<Education | null>(null);
+  const [editingEducation, setEditingEducation] = useState<Education | null>(
+    null
+  );
+
+  const { data: user } = useGetOneCandidate(userAuth?.uuid || '');
+
   const [educationForm, setEducationForm] = useState<Partial<Education>>({});
-  
+
   // Certification state
-  const [isCertificationDialogOpen, setIsCertificationDialogOpen] = useState(false);
-  const [editingCertification, setEditingCertification] = useState<Certification | null>(null);
-  const [certificationForm, setCertificationForm] = useState<Partial<Certification>>({});
+  const [isCertificationDialogOpen, setIsCertificationDialogOpen] =
+    useState(false);
+  const [editingCertification, setEditingCertification] =
+    useState<Certification | null>(null);
+  const [certificationForm, setCertificationForm] = useState<
+    Partial<Certification>
+  >({});
+
+  const form = useForm<IUpdateCandidateProfile>({
+    resolver: zodResolver(updateCandidateProfileFormSchema),
+    defaultValues: {
+      identification: "",
+      email: "",
+      name: "",
+      password: "",
+      phone: "",
+      location: "",
+      desired_salary: "",
+      social_links: [],
+      competencyUUIDs: [],
+    },
+  });
+
+  const { mutate: updateCandidate } = useUpdateCandidate(() => {});
 
   const handleSave = () => {
     setIsEditing(false);
     // Here you would typically save to your backend
-    console.log('Saving user data:', user);
+    console.log("Saving user data:", user);
   };
 
-  const addSkill = () => {
-    if (newSkill.trim() && !user.skills.includes(newSkill.trim())) {
-      setUser({
-        ...user,
-        skills: [...user.skills, newSkill.trim()],
-      });
-      setNewSkill('');
-    }
-  };
+  const addSkill = () => {};
 
-  const removeSkill = (skillToRemove: string) => {
-    setUser({
-      ...user,
-      skills: user.skills.filter(skill => skill !== skillToRemove),
-    });
-  };
+  const removeSkill = (skillToRemove: string) => {};
 
   // Education functions
   const openEducationDialog = (education?: Education) => {
@@ -196,41 +230,22 @@ export default function Profile() {
   };
 
   const saveEducation = () => {
-    if (!educationForm.degree || !educationForm.institution || !educationForm.year) return;
+    if (
+      !educationForm.degree ||
+      !educationForm.institution ||
+      !educationForm.year
+    )
+      return;
 
     if (editingEducation) {
-      // Update existing education
-      setUser({
-        ...user,
-        education: user.education.map(edu => 
-          edu.id === editingEducation.id 
-            ? { ...educationForm, id: editingEducation.id } as Education
-            : edu
-        ),
-      });
-    } else {
-      // Add new education
-      const newEducation: Education = {
-        ...educationForm,
-        id: Date.now().toString(),
-      } as Education;
-      setUser({
-        ...user,
-        education: [...user.education, newEducation],
-      });
     }
-    
+
     setIsEducationDialogOpen(false);
     setEducationForm({});
     setEditingEducation(null);
   };
 
-  const deleteEducation = (id: string) => {
-    setUser({
-      ...user,
-      education: user.education.filter(edu => edu.id !== id),
-    });
-  };
+  const deleteEducation = (id: string) => {};
 
   // Certification functions
   const openCertificationDialog = (certification?: Certification) => {
@@ -245,41 +260,23 @@ export default function Profile() {
   };
 
   const saveCertification = () => {
-    if (!certificationForm.name || !certificationForm.issuer || !certificationForm.issueDate) return;
+    if (
+      !certificationForm.name ||
+      !certificationForm.issuer ||
+      !certificationForm.issueDate
+    )
+      return;
 
     if (editingCertification) {
-      // Update existing certification
-      setUser({
-        ...user,
-        certifications: user.certifications.map(cert => 
-          cert.id === editingCertification.id 
-            ? { ...certificationForm, id: editingCertification.id } as Certification
-            : cert
-        ),
-      });
     } else {
-      // Add new certification
-      const newCertification: Certification = {
-        ...certificationForm,
-        id: Date.now().toString(),
-      } as Certification;
-      setUser({
-        ...user,
-        certifications: [...user.certifications, newCertification],
-      });
     }
-    
+
     setIsCertificationDialogOpen(false);
     setCertificationForm({});
     setEditingCertification(null);
   };
 
-  const deleteCertification = (id: string) => {
-    setUser({
-      ...user,
-      certifications: user.certifications.filter(cert => cert.id !== id),
-    });
-  };
+  const deleteCertification = (id: string) => {};
 
   return (
     <main className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -316,9 +313,12 @@ export default function Profile() {
           <CardHeader className="text-center">
             <div className="relative mx-auto">
               <Avatar className="h-32 w-32 mx-auto">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={user?.avatar || ""} alt={user?.name} />
                 <AvatarFallback className="text-2xl">
-                  {user.name.split(' ').map(n => n[0]).join('')}
+                  {user?.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </AvatarFallback>
               </Avatar>
               {isEditing && (
@@ -332,10 +332,10 @@ export default function Profile() {
               )}
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold">{user.name}</h2>
-              <p className="text-lg text-muted-foreground">{user.title}</p>
+              <h2 className="text-2xl font-bold">{user?.name}</h2>
+              <p className="text-lg text-muted-foreground">{user?.desiredPosition.name}</p>
               <Badge variant="outline" className="bg-primary/10">
-                {user.department}
+                {user?.department?.name}
               </Badge>
             </div>
           </CardHeader>
@@ -343,28 +343,30 @@ export default function Profile() {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-sm">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{user.email}</span>
+                <span>{user?.email}</span>
               </div>
               <div className="flex items-center space-x-3 text-sm">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{user.phone}</span>
+                <span>{user?.phone}</span>
               </div>
               <div className="flex items-center space-x-3 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>{user.location}</span>
+                <span>{user?.location}</span>
               </div>
               <div className="flex items-center space-x-3 text-sm">
                 <Briefcase className="h-4 w-4 text-muted-foreground" />
-                <span>ID: {user.employeeId}</span>
+                <span>ID: {user?.identification}</span>
               </div>
               <div className="flex items-center space-x-3 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Started {new Date(user.startDate).toLocaleDateString()}</span>
+                <span>
+                  Started {new Date(user.startDate).toLocaleDateString()}
+                </span>
               </div>
             </div>
-            
+
             <Separator />
-            
+
             <div>
               <h4 className="font-medium mb-2">Manager</h4>
               <p className="text-sm text-muted-foreground">{user.manager}</p>
@@ -398,7 +400,9 @@ export default function Profile() {
                       <Input
                         id="name"
                         value={user.name}
-                        onChange={(e) => setUser({ ...user, name: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, name: e.target.value })
+                        }
                         disabled={!isEditing}
                       />
                     </div>
@@ -408,7 +412,9 @@ export default function Profile() {
                         id="email"
                         type="email"
                         value={user.email}
-                        onChange={(e) => setUser({ ...user, email: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, email: e.target.value })
+                        }
                         disabled={!isEditing}
                       />
                     </div>
@@ -417,7 +423,9 @@ export default function Profile() {
                       <Input
                         id="phone"
                         value={user.phone}
-                        onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, phone: e.target.value })
+                        }
                         disabled={!isEditing}
                       />
                     </div>
@@ -426,7 +434,9 @@ export default function Profile() {
                       <Input
                         id="location"
                         value={user.location}
-                        onChange={(e) => setUser({ ...user, location: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, location: e.target.value })
+                        }
                         disabled={!isEditing}
                       />
                     </div>
@@ -436,7 +446,9 @@ export default function Profile() {
                     <Textarea
                       id="bio"
                       value={user.bio}
-                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setUser({ ...user, bio: e.target.value })}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                        setUser({ ...user, bio: e.target.value })
+                      }
                       disabled={!isEditing}
                       className="min-h-[100px]"
                     />
@@ -457,10 +469,15 @@ export default function Profile() {
                     <Input
                       id="linkedin"
                       value={user.socialLinks.linkedin}
-                      onChange={(e) => setUser({
-                        ...user,
-                        socialLinks: { ...user.socialLinks, linkedin: e.target.value }
-                      })}
+                      onChange={(e) =>
+                        setUser({
+                          ...user,
+                          socialLinks: {
+                            ...user.socialLinks,
+                            linkedin: e.target.value,
+                          },
+                        })
+                      }
                       disabled={!isEditing}
                       placeholder="https://linkedin.com/in/yourprofile"
                     />
@@ -470,10 +487,15 @@ export default function Profile() {
                     <Input
                       id="portfolio"
                       value={user.socialLinks.portfolio}
-                      onChange={(e) => setUser({
-                        ...user,
-                        socialLinks: { ...user.socialLinks, portfolio: e.target.value }
-                      })}
+                      onChange={(e) =>
+                        setUser({
+                          ...user,
+                          socialLinks: {
+                            ...user.socialLinks,
+                            portfolio: e.target.value,
+                          },
+                        })
+                      }
                       disabled={!isEditing}
                       placeholder="https://yourportfolio.com"
                     />
@@ -483,10 +505,15 @@ export default function Profile() {
                     <Input
                       id="github"
                       value={user.socialLinks.github}
-                      onChange={(e) => setUser({
-                        ...user,
-                        socialLinks: { ...user.socialLinks, github: e.target.value }
-                      })}
+                      onChange={(e) =>
+                        setUser({
+                          ...user,
+                          socialLinks: {
+                            ...user.socialLinks,
+                            github: e.target.value,
+                          },
+                        })
+                      }
                       disabled={!isEditing}
                       placeholder="https://github.com/yourusername"
                     />
@@ -511,7 +538,9 @@ export default function Profile() {
                       <Input
                         id="title"
                         value={user.title}
-                        onChange={(e) => setUser({ ...user, title: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, title: e.target.value })
+                        }
                         disabled={!isEditing}
                       />
                     </div>
@@ -519,7 +548,9 @@ export default function Profile() {
                       <Label htmlFor="department">Department</Label>
                       <Select
                         value={user.department}
-                        onValueChange={(value) => setUser({ ...user, department: value })}
+                        onValueChange={(value) =>
+                          setUser({ ...user, department: value })
+                        }
                         disabled={!isEditing}
                       >
                         <SelectTrigger>
@@ -527,7 +558,9 @@ export default function Profile() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Design">Design</SelectItem>
-                          <SelectItem value="Engineering">Engineering</SelectItem>
+                          <SelectItem value="Engineering">
+                            Engineering
+                          </SelectItem>
                           <SelectItem value="Product">Product</SelectItem>
                           <SelectItem value="Marketing">Marketing</SelectItem>
                           <SelectItem value="Sales">Sales</SelectItem>
@@ -549,7 +582,9 @@ export default function Profile() {
                       <Input
                         id="manager"
                         value={user.manager}
-                        onChange={(e) => setUser({ ...user, manager: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, manager: e.target.value })
+                        }
                         disabled={!isEditing}
                       />
                     </div>
@@ -575,7 +610,7 @@ export default function Profile() {
                           placeholder="Add a new skill"
                           value={newSkill}
                           onChange={(e) => setNewSkill(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                          onKeyPress={(e) => e.key === "Enter" && addSkill()}
                         />
                         <Button onClick={addSkill} size="icon">
                           <Plus className="h-4 w-4" />
@@ -584,7 +619,11 @@ export default function Profile() {
                     )}
                     <div className="flex flex-wrap gap-2">
                       {user.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary" className="text-sm">
+                        <Badge
+                          key={skill}
+                          variant="secondary"
+                          className="text-sm"
+                        >
                           {skill}
                           {isEditing && (
                             <button
@@ -609,7 +648,8 @@ export default function Profile() {
                     Education & Certifications
                   </CardTitle>
                   <CardDescription>
-                    Manage your educational background and professional certifications
+                    Manage your educational background and professional
+                    certifications
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -620,10 +660,13 @@ export default function Profile() {
                         <GraduationCap className="mr-2 h-4 w-4" />
                         Education
                       </h4>
-                      <Dialog open={isEducationDialogOpen} onOpenChange={setIsEducationDialogOpen}>
+                      <Dialog
+                        open={isEducationDialogOpen}
+                        onOpenChange={setIsEducationDialogOpen}
+                      >
                         <DialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => openEducationDialog()}
                           >
@@ -634,10 +677,13 @@ export default function Profile() {
                         <DialogContent className="sm:max-w-[525px]">
                           <DialogHeader>
                             <DialogTitle>
-                              {editingEducation ? 'Edit Education' : 'Add Education'}
+                              {editingEducation
+                                ? "Edit Education"
+                                : "Add Education"}
                             </DialogTitle>
                             <DialogDescription>
-                              Add your educational background and qualifications.
+                              Add your educational background and
+                              qualifications.
                             </DialogDescription>
                           </DialogHeader>
                           <div className="grid gap-4 py-4">
@@ -645,11 +691,13 @@ export default function Profile() {
                               <Label htmlFor="degree">Degree/Program</Label>
                               <Input
                                 id="degree"
-                                value={educationForm.degree || ''}
-                                onChange={(e) => setEducationForm({
-                                  ...educationForm,
-                                  degree: e.target.value
-                                })}
+                                value={educationForm.degree || ""}
+                                onChange={(e) =>
+                                  setEducationForm({
+                                    ...educationForm,
+                                    degree: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., Bachelor of Science in Computer Science"
                               />
                             </div>
@@ -657,11 +705,13 @@ export default function Profile() {
                               <Label htmlFor="institution">Institution</Label>
                               <Input
                                 id="institution"
-                                value={educationForm.institution || ''}
-                                onChange={(e) => setEducationForm({
-                                  ...educationForm,
-                                  institution: e.target.value
-                                })}
+                                value={educationForm.institution || ""}
+                                onChange={(e) =>
+                                  setEducationForm({
+                                    ...educationForm,
+                                    institution: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., Stanford University"
                               />
                             </div>
@@ -670,11 +720,13 @@ export default function Profile() {
                                 <Label htmlFor="year">Graduation Year</Label>
                                 <Input
                                   id="year"
-                                  value={educationForm.year || ''}
-                                  onChange={(e) => setEducationForm({
-                                    ...educationForm,
-                                    year: e.target.value
-                                  })}
+                                  value={educationForm.year || ""}
+                                  onChange={(e) =>
+                                    setEducationForm({
+                                      ...educationForm,
+                                      year: e.target.value,
+                                    })
+                                  }
                                   placeholder="2023"
                                 />
                               </div>
@@ -682,44 +734,58 @@ export default function Profile() {
                                 <Label htmlFor="gpa">GPA (Optional)</Label>
                                 <Input
                                   id="gpa"
-                                  value={educationForm.gpa || ''}
-                                  onChange={(e) => setEducationForm({
-                                    ...educationForm,
-                                    gpa: e.target.value
-                                  })}
+                                  value={educationForm.gpa || ""}
+                                  onChange={(e) =>
+                                    setEducationForm({
+                                      ...educationForm,
+                                      gpa: e.target.value,
+                                    })
+                                  }
                                   placeholder="3.8"
                                 />
                               </div>
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="description">Description (Optional)</Label>
+                              <Label htmlFor="description">
+                                Description (Optional)
+                              </Label>
                               <Textarea
                                 id="description"
-                                value={educationForm.description || ''}
-                                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setEducationForm({
-                                  ...educationForm,
-                                  description: e.target.value
-                                })}
+                                value={educationForm.description || ""}
+                                onChange={(
+                                  e: ChangeEvent<HTMLTextAreaElement>
+                                ) =>
+                                  setEducationForm({
+                                    ...educationForm,
+                                    description: e.target.value,
+                                  })
+                                }
                                 placeholder="Relevant coursework, achievements, or focus areas..."
                                 className="min-h-[80px]"
                               />
                             </div>
                           </div>
                           <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsEducationDialogOpen(false)}>
+                            <Button
+                              variant="outline"
+                              onClick={() => setIsEducationDialogOpen(false)}
+                            >
                               Cancel
                             </Button>
                             <Button onClick={saveEducation}>
-                              {editingEducation ? 'Update' : 'Add'} Education
+                              {editingEducation ? "Update" : "Add"} Education
                             </Button>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
                     </div>
-                    
+
                     <div className="space-y-4">
                       {user.education.map((edu) => (
-                        <div key={edu.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
+                        <div
+                          key={edu.id}
+                          className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                        >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-start space-x-3">
@@ -727,7 +793,9 @@ export default function Profile() {
                                   <GraduationCap className="h-4 w-4 text-primary" />
                                 </div>
                                 <div className="flex-1">
-                                  <h5 className="font-semibold text-lg">{edu.degree}</h5>
+                                  <h5 className="font-semibold text-lg">
+                                    {edu.degree}
+                                  </h5>
                                   <div className="flex items-center space-x-2 text-muted-foreground mt-1">
                                     <Building className="h-4 w-4" />
                                     <span>{edu.institution}</span>
@@ -772,19 +840,21 @@ export default function Profile() {
                           </div>
                         </div>
                       ))}
-                      
+
                       {user.education.length === 0 && (
                         <div className="text-center py-8 text-muted-foreground">
                           <GraduationCap className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No education records added yet.</p>
-                          <p className="text-sm">Click "Add Education" to get started.</p>
+                          <p className="text-sm">
+                            Click "Add Education" to get started.
+                          </p>
                         </div>
                       )}
                     </div>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   {/* Certifications Section */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
@@ -792,10 +862,13 @@ export default function Profile() {
                         <Award className="mr-2 h-4 w-4" />
                         Certifications
                       </h4>
-                      <Dialog open={isCertificationDialogOpen} onOpenChange={setIsCertificationDialogOpen}>
+                      <Dialog
+                        open={isCertificationDialogOpen}
+                        onOpenChange={setIsCertificationDialogOpen}
+                      >
                         <DialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => openCertificationDialog()}
                           >
@@ -806,34 +879,45 @@ export default function Profile() {
                         <DialogContent className="sm:max-w-[525px]">
                           <DialogHeader>
                             <DialogTitle>
-                              {editingCertification ? 'Edit Certification' : 'Add Certification'}
+                              {editingCertification
+                                ? "Edit Certification"
+                                : "Add Certification"}
                             </DialogTitle>
                             <DialogDescription>
-                              Add your professional certifications and credentials.
+                              Add your professional certifications and
+                              credentials.
                             </DialogDescription>
                           </DialogHeader>
                           <div className="grid gap-4 py-4">
                             <div className="space-y-2">
-                              <Label htmlFor="certName">Certification Name</Label>
+                              <Label htmlFor="certName">
+                                Certification Name
+                              </Label>
                               <Input
                                 id="certName"
-                                value={certificationForm.name || ''}
-                                onChange={(e) => setCertificationForm({
-                                  ...certificationForm,
-                                  name: e.target.value
-                                })}
+                                value={certificationForm.name || ""}
+                                onChange={(e) =>
+                                  setCertificationForm({
+                                    ...certificationForm,
+                                    name: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., AWS Certified Solutions Architect"
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="issuer">Issuing Organization</Label>
+                              <Label htmlFor="issuer">
+                                Issuing Organization
+                              </Label>
                               <Input
                                 id="issuer"
-                                value={certificationForm.issuer || ''}
-                                onChange={(e) => setCertificationForm({
-                                  ...certificationForm,
-                                  issuer: e.target.value
-                                })}
+                                value={certificationForm.issuer || ""}
+                                onChange={(e) =>
+                                  setCertificationForm({
+                                    ...certificationForm,
+                                    issuer: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., Amazon Web Services"
                               />
                             </div>
@@ -843,67 +927,90 @@ export default function Profile() {
                                 <Input
                                   id="issueDate"
                                   type="date"
-                                  value={certificationForm.issueDate || ''}
-                                  onChange={(e) => setCertificationForm({
-                                    ...certificationForm,
-                                    issueDate: e.target.value
-                                  })}
+                                  value={certificationForm.issueDate || ""}
+                                  onChange={(e) =>
+                                    setCertificationForm({
+                                      ...certificationForm,
+                                      issueDate: e.target.value,
+                                    })
+                                  }
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label htmlFor="expiryDate">Expiry Date (Optional)</Label>
+                                <Label htmlFor="expiryDate">
+                                  Expiry Date (Optional)
+                                </Label>
                                 <Input
                                   id="expiryDate"
                                   type="date"
-                                  value={certificationForm.expiryDate || ''}
-                                  onChange={(e) => setCertificationForm({
-                                    ...certificationForm,
-                                    expiryDate: e.target.value
-                                  })}
+                                  value={certificationForm.expiryDate || ""}
+                                  onChange={(e) =>
+                                    setCertificationForm({
+                                      ...certificationForm,
+                                      expiryDate: e.target.value,
+                                    })
+                                  }
                                 />
                               </div>
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="credentialId">Credential ID (Optional)</Label>
+                              <Label htmlFor="credentialId">
+                                Credential ID (Optional)
+                              </Label>
                               <Input
                                 id="credentialId"
-                                value={certificationForm.credentialId || ''}
-                                onChange={(e) => setCertificationForm({
-                                  ...certificationForm,
-                                  credentialId: e.target.value
-                                })}
+                                value={certificationForm.credentialId || ""}
+                                onChange={(e) =>
+                                  setCertificationForm({
+                                    ...certificationForm,
+                                    credentialId: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., AWS-SAA-2023-001"
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="certDescription">Description (Optional)</Label>
+                              <Label htmlFor="certDescription">
+                                Description (Optional)
+                              </Label>
                               <Textarea
                                 id="certDescription"
-                                value={certificationForm.description || ''}
-                                onChange={(e) => setCertificationForm({
-                                  ...certificationForm,
-                                  description: e.target.value
-                                })}
+                                value={certificationForm.description || ""}
+                                onChange={(e) =>
+                                  setCertificationForm({
+                                    ...certificationForm,
+                                    description: e.target.value,
+                                  })
+                                }
                                 placeholder="Brief description of the certification..."
                                 className="min-h-[80px]"
                               />
                             </div>
                           </div>
                           <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsCertificationDialogOpen(false)}>
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                setIsCertificationDialogOpen(false)
+                              }
+                            >
                               Cancel
                             </Button>
                             <Button onClick={saveCertification}>
-                              {editingCertification ? 'Update' : 'Add'} Certification
+                              {editingCertification ? "Update" : "Add"}{" "}
+                              Certification
                             </Button>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
                     </div>
-                    
+
                     <div className="space-y-4">
                       {user.certifications.map((cert) => (
-                        <div key={cert.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
+                        <div
+                          key={cert.id}
+                          className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                        >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-start space-x-3">
@@ -911,7 +1018,9 @@ export default function Profile() {
                                   <Award className="h-4 w-4 text-primary" />
                                 </div>
                                 <div className="flex-1">
-                                  <h5 className="font-semibold text-lg">{cert.name}</h5>
+                                  <h5 className="font-semibold text-lg">
+                                    {cert.name}
+                                  </h5>
                                   <div className="flex items-center space-x-2 text-muted-foreground mt-1">
                                     <Building className="h-4 w-4" />
                                     <span>{cert.issuer}</span>
@@ -919,18 +1028,31 @@ export default function Profile() {
                                   <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
                                     <div className="flex items-center space-x-1">
                                       <CalendarDays className="h-4 w-4" />
-                                      <span>Issued: {new Date(cert.issueDate).toLocaleDateString()}</span>
+                                      <span>
+                                        Issued:{" "}
+                                        {new Date(
+                                          cert.issueDate
+                                        ).toLocaleDateString()}
+                                      </span>
                                     </div>
                                     {cert.expiryDate && (
                                       <div className="flex items-center space-x-1">
                                         <CalendarDays className="h-4 w-4" />
-                                        <span>Expires: {new Date(cert.expiryDate).toLocaleDateString()}</span>
+                                        <span>
+                                          Expires:{" "}
+                                          {new Date(
+                                            cert.expiryDate
+                                          ).toLocaleDateString()}
+                                        </span>
                                       </div>
                                     )}
                                   </div>
                                   {cert.credentialId && (
                                     <div className="mt-2">
-                                      <Badge variant="outline" className="text-xs">
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs"
+                                      >
                                         ID: {cert.credentialId}
                                       </Badge>
                                     </div>
@@ -963,12 +1085,14 @@ export default function Profile() {
                           </div>
                         </div>
                       ))}
-                      
+
                       {user.certifications.length === 0 && (
                         <div className="text-center py-8 text-muted-foreground">
                           <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No certifications added yet.</p>
-                          <p className="text-sm">Click "Add Certification" to get started.</p>
+                          <p className="text-sm">
+                            Click "Add Certification" to get started.
+                          </p>
                         </div>
                       )}
                     </div>
@@ -995,7 +1119,7 @@ export default function Profile() {
                     <div className="relative">
                       <Input
                         id="current-password"
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         placeholder="Enter current password"
                       />
                       <Button
@@ -1022,7 +1146,9 @@ export default function Profile() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
+                    <Label htmlFor="confirm-password">
+                      Confirm New Password
+                    </Label>
                     <Input
                       id="confirm-password"
                       type="password"
@@ -1137,9 +1263,15 @@ export default function Profile() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="america/mexico_city">America/Mexico City</SelectItem>
-                        <SelectItem value="america/new_york">America/New York</SelectItem>
-                        <SelectItem value="europe/london">Europe/London</SelectItem>
+                        <SelectItem value="america/mexico_city">
+                          America/Mexico City
+                        </SelectItem>
+                        <SelectItem value="america/new_york">
+                          America/New York
+                        </SelectItem>
+                        <SelectItem value="europe/london">
+                          Europe/London
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { salaryRegex } from "./job-position.schema";
+import { PlatformTypeEnum } from "@/enums/social-link.enum";
 
 export const createCandidateFormSchema = z.object({
   identification: z
@@ -29,3 +30,23 @@ export const createCandidateFormSchema = z.object({
 });
 
 export const updateCandidateFormSchema = createCandidateFormSchema.partial();
+
+export const updateCandidateProfileFormSchema = createCandidateFormSchema
+  .partial()
+  .omit({ positionUUID: true, departmentUUID: true })
+  .extend({
+    phone: z.string().optional(),
+    location: z.string().optional(),
+    bio: z.string().optional(),
+    social_links: z
+      .array(
+        z.object({
+          key: z.nativeEnum(PlatformTypeEnum),
+          value: z.string().url(),
+        })
+      )
+      .optional(),
+    competencyUUIDs: z
+      .array(z.string().uuid("Competency must be a valid UUID"))
+      .optional(),
+  });
