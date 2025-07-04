@@ -18,7 +18,7 @@ import {
 import {
     ICreateAcademicDiscipline,
     IUpdateAcademicDiscipline,
-} from "@/providers/http/academic-discipline/interface";
+} from "@/providers/http/academic-disciplines/interface";
 import {
     createAcademicDisciplineFormSchema,
     updateAcademicDisciplineFormSchema,

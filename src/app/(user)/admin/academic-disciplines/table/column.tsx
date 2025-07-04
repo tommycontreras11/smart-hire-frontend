@@ -7,7 +7,7 @@ import { DataTableColumnHeader } from "@/components/common/table/data-table-colu
 import { DataTableRowActions } from "@/components/common/table/data-table-row-actions";
 import { commonStatusTableDefinitions } from "@/definitions/common.definition";
 import { StatusEnum } from "@/enums/common.enum";
-import { IAcademicDiscipline } from "@/providers/http/academic-discipline/interface";
+import { IAcademicDiscipline } from "@/providers/http/academic-disciplines/interface";
 
 // Pass `handleUpdate` and `handleDelete` as props to columns
 export const columns = ({

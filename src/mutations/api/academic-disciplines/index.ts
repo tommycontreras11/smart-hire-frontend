@@ -1,8 +1,8 @@
-import academicDisciplinesProvider from "@/providers/http/academic-discipline";
+import academicDisciplinesProvider from "@/providers/http/academic-disciplines";
 import {
   ICreateAcademicDiscipline,
   IUpdateAcademicDiscipline,
-} from "@/providers/http/academic-discipline/interface";
+} from "@/providers/http/academic-disciplines/interface";
 import { getMutationOptions } from "@/utils/reactQueryOptions";
 import { useMutation, useQueryClient } from "react-query";
 

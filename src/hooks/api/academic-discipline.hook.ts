@@ -1,4 +1,4 @@
-import academicDisciplinesProvider from "@/providers/http/academic-discipline";
+import academicDisciplinesProvider from "@/providers/http/academic-disciplines";
 import { useQuery } from "react-query";
 
 export function useGetAllAcademicDiscipline() {
