@@ -33,7 +33,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
-import { useGetOneCandidate } from "@/hooks/api/candidate.hook";
+import { useGetProfile } from "@/hooks/api/auth.provider.hook";
 import { useUpdateCandidate } from "@/mutations/api/candidates";
 import { IUpdateCandidateProfile } from "@/providers/http/candidates/interface";
 import { updateCandidateProfileFormSchema } from "@/schema/candidate.schema";
@@ -46,10 +46,13 @@ import {
   Calendar,
   CalendarDays,
   Camera,
+  CheckCircle,
+  Download,
   Edit,
   Edit3,
   Eye,
   EyeOff,
+  FileText,
   GraduationCap,
   Mail,
   MapPin,
@@ -59,6 +62,7 @@ import {
   Settings,
   Shield,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import { ChangeEvent, useState } from "react";
@@ -177,7 +181,9 @@ export default function Profile() {
     null
   );
 
-  const { data: user } = useGetOneCandidate(userAuth?.uuid || '');
+  const { data: user } = useGetProfile(userAuth?.uuid || "");
+
+    const [uploadingCV, setUploadingCV] = useState(false);
 
   const [educationForm, setEducationForm] = useState<Partial<Education>>({});
 
@@ -313,7 +319,7 @@ export default function Profile() {
           <CardHeader className="text-center">
             <div className="relative mx-auto">
               <Avatar className="h-32 w-32 mx-auto">
-                <AvatarImage src={user?.avatar || ""} alt={user?.name} />
+                <AvatarImage src={user?.photo || ""} alt={user?.name} />
                 <AvatarFallback className="text-2xl">
                   {user?.name
                     .split(" ")
@@ -333,9 +339,12 @@ export default function Profile() {
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-bold">{user?.name}</h2>
-              <p className="text-lg text-muted-foreground">{user?.desiredPosition.name}</p>
+              <p className="text-lg text-muted-foreground">
+                {user?.requests && user?.requests[0].jobPosition.name}
+              </p>
               <Badge variant="outline" className="bg-primary/10">
-                {user?.department?.name}
+                {user?.requests &&
+                  user?.requests[0].jobPosition.department.name}
               </Badge>
             </div>
           </CardHeader>
@@ -360,7 +369,9 @@ export default function Profile() {
               <div className="flex items-center space-x-3 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span>
-                  Started {new Date(user.startDate).toLocaleDateString()}
+                  {user?.requests && user?.requests[0]?.started_at
+                    ? `Started ${new Date(user?.requests[0]?.started_at).toLocaleDateString()}`
+                    : "Not started"}
                 </span>
               </div>
             </div>
@@ -369,7 +380,7 @@ export default function Profile() {
 
             <div>
               <h4 className="font-medium mb-2">Manager</h4>
-              <p className="text-sm text-muted-foreground">{user.manager}</p>
+              <p className="text-sm text-muted-foreground">{`${user?.requests && user?.requests[0]?.recruitment ? user?.requests[0]?.recruitment?.recruiter.name : "None"}`}</p>
             </div>
           </CardContent>
         </Card>
@@ -399,10 +410,8 @@ export default function Profile() {
                       <Label htmlFor="name">Full Name</Label>
                       <Input
                         id="name"
-                        value={user.name}
-                        onChange={(e) =>
-                          setUser({ ...user, name: e.target.value })
-                        }
+                        value={user?.name}
+                        onChange={(e) => {}}
                         disabled={!isEditing}
                       />
                     </div>
@@ -411,10 +420,8 @@ export default function Profile() {
                       <Input
                         id="email"
                         type="email"
-                        value={user.email}
-                        onChange={(e) =>
-                          setUser({ ...user, email: e.target.value })
-                        }
+                        value={user?.email}
+                        onChange={(e) => {}}
                         disabled={!isEditing}
                       />
                     </div>
@@ -422,10 +429,8 @@ export default function Profile() {
                       <Label htmlFor="phone">Phone</Label>
                       <Input
                         id="phone"
-                        value={user.phone}
-                        onChange={(e) =>
-                          setUser({ ...user, phone: e.target.value })
-                        }
+                        value={user?.phone}
+                        onChange={(e) => {}}
                         disabled={!isEditing}
                       />
                     </div>
@@ -433,10 +438,8 @@ export default function Profile() {
                       <Label htmlFor="location">Location</Label>
                       <Input
                         id="location"
-                        value={user.location}
-                        onChange={(e) =>
-                          setUser({ ...user, location: e.target.value })
-                        }
+                        value={user?.location}
+                        onChange={(e) => {}}
                         disabled={!isEditing}
                       />
                     </div>
@@ -445,10 +448,8 @@ export default function Profile() {
                     <Label htmlFor="bio">Bio</Label>
                     <Textarea
                       id="bio"
-                      value={user.bio}
-                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                        setUser({ ...user, bio: e.target.value })
-                      }
+                      value={user?.bio}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {}}
                       disabled={!isEditing}
                       className="min-h-[100px]"
                     />
@@ -464,60 +465,18 @@ export default function Profile() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="linkedin">LinkedIn</Label>
-                    <Input
-                      id="linkedin"
-                      value={user.socialLinks.linkedin}
-                      onChange={(e) =>
-                        setUser({
-                          ...user,
-                          socialLinks: {
-                            ...user.socialLinks,
-                            linkedin: e.target.value,
-                          },
-                        })
-                      }
-                      disabled={!isEditing}
-                      placeholder="https://linkedin.com/in/yourprofile"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="portfolio">Portfolio</Label>
-                    <Input
-                      id="portfolio"
-                      value={user.socialLinks.portfolio}
-                      onChange={(e) =>
-                        setUser({
-                          ...user,
-                          socialLinks: {
-                            ...user.socialLinks,
-                            portfolio: e.target.value,
-                          },
-                        })
-                      }
-                      disabled={!isEditing}
-                      placeholder="https://yourportfolio.com"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="github">GitHub</Label>
-                    <Input
-                      id="github"
-                      value={user.socialLinks.github}
-                      onChange={(e) =>
-                        setUser({
-                          ...user,
-                          socialLinks: {
-                            ...user.socialLinks,
-                            github: e.target.value,
-                          },
-                        })
-                      }
-                      disabled={!isEditing}
-                      placeholder="https://github.com/yourusername"
-                    />
-                  </div>
+                  {user?.socialLinks.map((socialLink) => (
+                    <div className="space-y-2">
+                      <Label htmlFor="linkedin">{socialLink.platform}</Label>
+                      <Input
+                        id="linkedin"
+                        value={socialLink.platform}
+                        onChange={(e) => {}}
+                        disabled={!isEditing}
+                        placeholder={socialLink.url}
+                      />
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -537,43 +496,31 @@ export default function Profile() {
                       <Label htmlFor="title">Job Title</Label>
                       <Input
                         id="title"
-                        value={user.title}
-                        onChange={(e) =>
-                          setUser({ ...user, title: e.target.value })
+                        value={
+                          user?.requests && user?.requests[0]?.jobPosition?.name
                         }
-                        disabled={!isEditing}
+                        onChange={(e) => {}}
+                        disabled={true}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="department">Department</Label>
-                      <Select
-                        value={user.department}
-                        onValueChange={(value) =>
-                          setUser({ ...user, department: value })
+                      <Input
+                        id="department"
+                        value={
+                          user?.requests &&
+                          user?.requests[0]?.jobPosition?.department?.name
                         }
-                        disabled={!isEditing}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Design">Design</SelectItem>
-                          <SelectItem value="Engineering">
-                            Engineering
-                          </SelectItem>
-                          <SelectItem value="Product">Product</SelectItem>
-                          <SelectItem value="Marketing">Marketing</SelectItem>
-                          <SelectItem value="Sales">Sales</SelectItem>
-                          <SelectItem value="HR">Human Resources</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        onChange={(e) => {}}
+                        disabled={true}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="employeeId">Employee ID</Label>
                       <Input
                         id="employeeId"
-                        value={user.employeeId}
-                        disabled
+                        value={user?.identification}
+                        disabled={!isEditing}
                         className="bg-muted"
                       />
                     </div>
@@ -581,14 +528,154 @@ export default function Profile() {
                       <Label htmlFor="manager">Manager</Label>
                       <Input
                         id="manager"
-                        value={user.manager}
-                        onChange={(e) =>
-                          setUser({ ...user, manager: e.target.value })
+                        value={
+                          user?.requests &&
+                          user?.requests[0]?.recruitment.recruiter.name
                         }
-                        disabled={!isEditing}
+                        onChange={(e) => {}}
+                        disabled={true}
                       />
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Curriculum/Resume Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileText className="mr-2 h-5 w-5" />
+                    Curriculum Vitae / Resume
+                  </CardTitle>
+                  <CardDescription>
+                    Upload and manage your CV or resume document
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {user?.curriculum ? (
+                    <div className="space-y-4">
+                      {/* Current CV Display */}
+                      <div className="border rounded-lg p-4 bg-accent/50">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start space-x-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              <FileText className="h-6 w-6 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-lg">{user.curriculum}</h4>
+                              {/*Implement this on the backend*/}
+                              {/* <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                                <div className="flex items-center space-x-1">
+                                  <CalendarDays className="h-4 w-4" />
+                                  <span>Uploaded: {new Date(user.curriculum.uploadDate).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <FileText className="h-4 w-4" />
+                                  <span>Size: {user.curriculum.fileSize}</span>
+                                </div>
+                              </div> */}
+                              <div className="mt-3">
+                                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                  <CheckCircle className="mr-1 h-3 w-3" />
+                                  Current CV
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => {}}
+                              title="Download CV"
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => {}}
+                              className="text-destructive hover:text-destructive"
+                              title="Delete CV"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Upload New CV */}
+                      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                        <div className="text-center">
+                          <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-4" />
+                          <h4 className="font-medium mb-2">Upload New CV</h4>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Replace your current CV with a new version
+                          </p>
+                          <div className="flex justify-center">
+                            <Button variant="outline" disabled={uploadingCV}>
+                              <label className="cursor-pointer flex items-center">
+                                {uploadingCV ? (
+                                  <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                                    Uploading...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Choose New File
+                                  </>
+                                )}
+                                <input
+                                  type="file"
+                                  accept=".pdf"
+                                  onChange={() => {}}
+                                  className="hidden"
+                                  disabled={uploadingCV}
+                                />
+                              </label>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* No CV Uploaded State */
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8">
+                      <div className="text-center">
+                        <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                        <h4 className="font-medium mb-2">No CV Uploaded</h4>
+                        <p className="text-sm text-muted-foreground mb-6">
+                          Upload your curriculum vitae or resume to complete your profile
+                        </p>
+                        <Button disabled={uploadingCV}>
+                          <label className="cursor-pointer flex items-center">
+                            {uploadingCV ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-2 h-4 w-4" />
+                                Upload CV
+                              </>
+                            )}
+                            <input
+                              type="file"
+                              accept=".pdf"
+                              onChange={() => {}}
+                              className="hidden"
+                              disabled={uploadingCV}
+                            />
+                          </label>
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          PDF files only, max 10MB
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -618,23 +705,24 @@ export default function Profile() {
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2">
-                      {user.skills.map((skill) => (
-                        <Badge
-                          key={skill}
-                          variant="secondary"
-                          className="text-sm"
-                        >
-                          {skill}
-                          {isEditing && (
-                            <button
-                              onClick={() => removeSkill(skill)}
-                              className="ml-2 hover:text-destructive"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          )}
-                        </Badge>
-                      ))}
+                      {user?.competencies &&
+                        user?.competencies.map((competency) => (
+                          <Badge
+                            key={competency.uuid}
+                            variant="secondary"
+                            className="text-sm"
+                          >
+                            {competency.name}
+                            {isEditing && (
+                              <button
+                                onClick={() => {}}
+                                className="ml-2 hover:text-destructive"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            )}
+                          </Badge>
+                        ))}
                     </div>
                   </div>
                 </CardContent>
@@ -781,67 +869,70 @@ export default function Profile() {
                     </div>
 
                     <div className="space-y-4">
-                      {user.education.map((edu) => (
-                        <div
-                          key={edu.id}
-                          className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-start space-x-3">
-                                <div className="p-2 bg-primary/10 rounded-lg">
-                                  <GraduationCap className="h-4 w-4 text-primary" />
-                                </div>
-                                <div className="flex-1">
-                                  <h5 className="font-semibold text-lg">
-                                    {edu.degree}
-                                  </h5>
-                                  <div className="flex items-center space-x-2 text-muted-foreground mt-1">
-                                    <Building className="h-4 w-4" />
-                                    <span>{edu.institution}</span>
+                      {user?.educations &&
+                        user.educations.map((edu) => (
+                          <div
+                            key={edu.uuid}
+                            className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-start space-x-3">
+                                  <div className="p-2 bg-primary/10 rounded-lg">
+                                    <GraduationCap className="h-4 w-4 text-primary" />
                                   </div>
-                                  <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
-                                    <div className="flex items-center space-x-1">
-                                      <CalendarDays className="h-4 w-4" />
-                                      <span>{edu.year}</span>
+                                  <div className="flex-1">
+                                    <h5 className="font-semibold text-lg">
+                                      {edu.title}
+                                    </h5>
+                                    <div className="flex items-center space-x-2 text-muted-foreground mt-1">
+                                      <Building className="h-4 w-4" />
+                                      <span>{edu.institution.name}</span>
                                     </div>
-                                    {edu.gpa && (
+                                    <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
                                       <div className="flex items-center space-x-1">
-                                        <Award className="h-4 w-4" />
-                                        <span>GPA: {edu.gpa}</span>
+                                        <CalendarDays className="h-4 w-4" />
+                                        <span>
+                                          {edu.start_date?.getFullYear()}
+                                        </span>
                                       </div>
+                                      {edu.grade && (
+                                        <div className="flex items-center space-x-1">
+                                          <Award className="h-4 w-4" />
+                                          <span>Grade: {edu.grade}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    {edu.description && (
+                                      <p className="text-sm text-muted-foreground mt-2">
+                                        {edu.description}
+                                      </p>
                                     )}
                                   </div>
-                                  {edu.description && (
-                                    <p className="text-sm text-muted-foreground mt-2">
-                                      {edu.description}
-                                    </p>
-                                  )}
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => openEducationDialog(edu)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => deleteEducation(edu.id)}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              <div className="flex space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {}}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {}}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
 
-                      {user.education.length === 0 && (
+                      {user?.educations && user?.educations.length === 0 && (
                         <div className="text-center py-8 text-muted-foreground">
                           <GraduationCap className="h-12 w-12 mx-auto mb-4 opacity-50" />
                           <p>No education records added yet.</p>
@@ -1006,95 +1097,99 @@ export default function Profile() {
                     </div>
 
                     <div className="space-y-4">
-                      {user.certifications.map((cert) => (
-                        <div
-                          key={cert.id}
-                          className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-start space-x-3">
-                                <div className="p-2 bg-primary/10 rounded-lg">
-                                  <Award className="h-4 w-4 text-primary" />
-                                </div>
-                                <div className="flex-1">
-                                  <h5 className="font-semibold text-lg">
-                                    {cert.name}
-                                  </h5>
-                                  <div className="flex items-center space-x-2 text-muted-foreground mt-1">
-                                    <Building className="h-4 w-4" />
-                                    <span>{cert.issuer}</span>
+                      {user?.certifications &&
+                        user?.certifications.map((cert) => (
+                          <div
+                            key={cert.uuid}
+                            className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-start space-x-3">
+                                  <div className="p-2 bg-primary/10 rounded-lg">
+                                    <Award className="h-4 w-4 text-primary" />
                                   </div>
-                                  <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
-                                    <div className="flex items-center space-x-1">
-                                      <CalendarDays className="h-4 w-4" />
-                                      <span>
-                                        Issued:{" "}
-                                        {new Date(
-                                          cert.issueDate
-                                        ).toLocaleDateString()}
-                                      </span>
+                                  <div className="flex-1">
+                                    <h5 className="font-semibold text-lg">
+                                      {cert.name}
+                                    </h5>
+                                    <div className="flex items-center space-x-2 text-muted-foreground mt-1">
+                                      <Building className="h-4 w-4" />
+                                      <span>{cert.institution.name}</span>
                                     </div>
-                                    {cert.expiryDate && (
-                                      <div className="flex items-center space-x-1">
-                                        <CalendarDays className="h-4 w-4" />
-                                        <span>
-                                          Expires:{" "}
-                                          {new Date(
-                                            cert.expiryDate
-                                          ).toLocaleDateString()}
-                                        </span>
+                                    <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                                      {cert.expedition_date && (
+                                        <div className="flex items-center space-x-1">
+                                          <CalendarDays className="h-4 w-4" />
+                                          <span>
+                                            Issued:{" "}
+                                            {new Date(
+                                              cert.expedition_date
+                                            ).toLocaleDateString()}
+                                          </span>
+                                        </div>
+                                      )}
+                                      {cert.expiration_date && (
+                                        <div className="flex items-center space-x-1">
+                                          <CalendarDays className="h-4 w-4" />
+                                          <span>
+                                            Expires:{" "}
+                                            {new Date(
+                                              cert.expiration_date
+                                            ).toLocaleDateString()}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    {cert.credential_id && (
+                                      <div className="mt-2">
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs"
+                                        >
+                                          ID: {cert.credential_id}
+                                        </Badge>
                                       </div>
                                     )}
+                                    {cert.description && (
+                                      <p className="text-sm text-muted-foreground mt-2">
+                                        {cert.description}
+                                      </p>
+                                    )}
                                   </div>
-                                  {cert.credentialId && (
-                                    <div className="mt-2">
-                                      <Badge
-                                        variant="outline"
-                                        className="text-xs"
-                                      >
-                                        ID: {cert.credentialId}
-                                      </Badge>
-                                    </div>
-                                  )}
-                                  {cert.description && (
-                                    <p className="text-sm text-muted-foreground mt-2">
-                                      {cert.description}
-                                    </p>
-                                  )}
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => openCertificationDialog(cert)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => deleteCertification(cert.id)}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              <div className="flex space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {}}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {}}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
 
-                      {user.certifications.length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p>No certifications added yet.</p>
-                          <p className="text-sm">
-                            Click "Add Certification" to get started.
-                          </p>
-                        </div>
-                      )}
+                      {user?.certifications &&
+                        user?.certifications.length === 0 && (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                            <p>No certifications added yet.</p>
+                            <p className="text-sm">
+                              Click "Add Certification" to get started.
+                            </p>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </CardContent>

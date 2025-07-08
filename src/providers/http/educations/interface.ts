@@ -3,9 +3,10 @@ import { ICandidate } from "../candidates/interface";
 import { IInstitution } from "../institutions/interface";
 
 export interface IEducation {
+  uuid: string;
   title?: string;
-  grade?: string;
   description?: string;
+  grade?: string;
   start_date?: Date;
   end_date?: Date;
   institution: IInstitution;

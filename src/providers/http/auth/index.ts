@@ -1,6 +1,6 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
-import { IAuth, IMeUser } from "./interface";
+import { IAuth, IMeUser, IProfile } from "./interface";
 import { ISignUp } from "@/schema/auth.schema";
 
 export class AuthProvider extends Base {
@@ -10,6 +10,10 @@ export class AuthProvider extends Base {
 
   public me(): Promise<IResponse<IMeUser>> {
     return this.get("/me");
+  }
+
+  public profile(uuid: string): Promise<IResponse<IProfile>> {
+    return this.get(`/account/${uuid}/profile`);
   }
 
   public signIn(data: IAuth): Promise<ISignInResponse> {

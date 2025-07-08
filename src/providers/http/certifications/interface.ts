@@ -2,7 +2,9 @@ import { ICompetency } from "../competencies/interface";
 import { IInstitution } from "../institutions/interface";
 
 export interface ICertification {
+  uuid: string;
   name: string;
+  description?: string;
   expedition_date?: Date;
   expiration_date?: Date;
   credential_id?: string;
