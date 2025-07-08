@@ -1,21 +1,20 @@
-import { StatusEnum } from "@/enums/common.enum";
-import { IPersonBase } from "@/interfaces/common.interface";
-import { IDepartment } from "../departments/interface";
-import { IPositionType } from "../position-types/interface";
-import { IEducation } from "../educations/interface";
-import { ICertification } from "../certifications/interface";
 import { PlatformTypeEnum } from "@/enums/social-link.enum";
+import { IPersonBase } from "@/interfaces/common.interface";
+import { ICertification, ICreateCertification } from "../certifications/interface";
+import { IDepartment } from "../departments/interface";
+import { ICreateEducation, IEducation } from "../educations/interface";
+import { IPositionType } from "../position-types/interface";
 
 export interface ICandidate extends IPersonBase {
   phone?: string;
   location?: string
+  bio?: string
   desired_salary: string;
   desiredPosition: IPositionType;
   department: IDepartment;
   workExperience: string;
   educations?: IEducation[]
   certifications?: ICertification[]
-  status: StatusEnum;
 }
 
 export interface ICreateCandidate {  
@@ -39,14 +38,17 @@ export interface ISocialLinkCandidate {
   value: string;
 }
 
-export interface IUpdateCandidateProfile {
-  identification?: string;
-  email?: string;
-  name?: string;
-  password?: string;
-  desired_salary?: string;
-  phone?: string;
-  location?: string
-  social_links?: ISocialLinkCandidate[]
+interface ProfessionalDTO {
+  education?: ICreateEducation 
+  certification?: ICreateCertification;
   competencyUUIDs?: string[];
+}
+
+interface PersonalDTO extends Partial<Omit<ICandidate, "uuid" | "desiredPosition" | "department" | "workExperience" | "educations" | "certifications">> {
+  social_links?: ISocialLinkCandidate[];
+}
+
+export interface IUpdateCandidateProfile {
+  personal?: PersonalDTO;
+  professional?: ProfessionalDTO
 }

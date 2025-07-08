@@ -18,7 +18,7 @@ export interface ICreateEducation
   extends Partial<
     Omit<
       IEducation,
-      "uuid" | "institution" | "candidate" | "academicDiscipline"
+      "institution" | "candidate" | "academicDiscipline"
     >
   > {
   institutionUUID: string;

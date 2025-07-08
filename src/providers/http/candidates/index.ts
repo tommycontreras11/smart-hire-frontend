@@ -1,6 +1,6 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
-import { ICandidate, ICreateCandidate, IUpdateCandidate } from "./interface";
+import { ICandidate, ICreateCandidate, IUpdateCandidate, IUpdateCandidateProfile } from "./interface";
 
 export class CandidatesProvider extends Base {
   constructor() {
@@ -21,6 +21,10 @@ export class CandidatesProvider extends Base {
 
   public update(uuid: string, data: IUpdateCandidate) {
     return this.patch(`/${uuid}`, data);
+  }
+
+  public updateProfile(uuid: string, data: IUpdateCandidateProfile) {
+    return this.patch(`/${uuid}/profile`, data);
   }
 
   public destroy(uuid: string) {

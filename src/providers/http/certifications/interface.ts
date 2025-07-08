@@ -14,8 +14,10 @@ export interface ICertification {
 }
 
 export interface ICreateCertification
-  extends Partial<Omit<ICertification, "institution">> {
+  extends Partial<Omit<ICertification, "institution" | "competencies">> {
+  name: string;
   institutionUUID: string;
+  competencyUUIDs?: string[]
 }
 
 export interface IUpdateCertification extends Partial<ICreateCertification> {}

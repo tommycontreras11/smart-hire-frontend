@@ -2,6 +2,7 @@ import candidatesProvider from "@/providers/http/candidates";
 import {
   ICreateCandidate,
   IUpdateCandidate,
+  IUpdateCandidateProfile,
 } from "@/providers/http/candidates/interface";
 import { getMutationOptions } from "@/utils/reactQueryOptions";
 import { useMutation, useQueryClient } from "react-query";
@@ -23,6 +24,20 @@ export function useUpdateCandidate(onSuccessCallback: (data: any) => void) {
   return useMutation(
     ({ uuid, data }: { uuid: string; data: IUpdateCandidate }) =>
       candidatesProvider.update(uuid, data),
+    getMutationOptions(queryClient, "candidates", "candidate", {
+      onSuccess: onSuccessCallback,
+    })
+  );
+}
+
+export function useUpdateCandidateProfile(
+  onSuccessCallback: (data: any) => void
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({ uuid, data }: { uuid: string; data: IUpdateCandidateProfile }) =>
+      candidatesProvider.updateProfile(uuid, data),
     getMutationOptions(queryClient, "candidates", "candidate", {
       onSuccess: onSuccessCallback,
     })

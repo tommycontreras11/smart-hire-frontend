@@ -183,7 +183,7 @@ export default function Profile() {
 
   const { data: user } = useGetProfile(userAuth?.uuid || "");
 
-    const [uploadingCV, setUploadingCV] = useState(false);
+  const [uploadingCV, setUploadingCV] = useState(false);
 
   const [educationForm, setEducationForm] = useState<Partial<Education>>({});
 
@@ -199,15 +199,41 @@ export default function Profile() {
   const form = useForm<IUpdateCandidateProfile>({
     resolver: zodResolver(updateCandidateProfileFormSchema),
     defaultValues: {
-      identification: "",
-      email: "",
-      name: "",
-      password: "",
-      phone: "",
-      location: "",
-      desired_salary: "",
-      social_links: [],
-      competencyUUIDs: [],
+      personal: {
+        identification: "",
+        email: "",
+        name: "",
+        password: "",
+        phone: "",
+        bio: "",
+        location: "",
+        desired_salary: "",
+        social_links: [],
+      },
+      professional: {
+        education: {
+          uuid: "",
+          title: "",
+          description: "",
+          grade: "",
+          start_date: undefined,
+          end_date: undefined,
+          institutionUUID: "",
+          academicDisciplineUUID: ""
+        },
+        certification: {
+          uuid: "",
+          name: "",
+          description: "",
+          expedition_date: undefined,
+          expiration_date: undefined,
+          credential_id: "",
+          credential_link: "",
+          institutionUUID: "",
+          competencyUUIDs: [],
+        },
+        competencyUUIDs: [],
+      }
     },
   });
 
@@ -562,7 +588,9 @@ export default function Profile() {
                               <FileText className="h-6 w-6 text-primary" />
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-lg">{user.curriculum}</h4>
+                              <h4 className="font-semibold text-lg">
+                                {user.curriculum}
+                              </h4>
                               {/*Implement this on the backend*/}
                               {/* <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
                                 <div className="flex items-center space-x-1">
@@ -575,7 +603,10 @@ export default function Profile() {
                                 </div>
                               </div> */}
                               <div className="mt-3">
-                                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                <Badge
+                                  variant="outline"
+                                  className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                >
                                   <CheckCircle className="mr-1 h-3 w-3" />
                                   Current CV
                                 </Badge>
@@ -646,7 +677,8 @@ export default function Profile() {
                         <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                         <h4 className="font-medium mb-2">No CV Uploaded</h4>
                         <p className="text-sm text-muted-foreground mb-6">
-                          Upload your curriculum vitae or resume to complete your profile
+                          Upload your curriculum vitae or resume to complete
+                          your profile
                         </p>
                         <Button disabled={uploadingCV}>
                           <label className="cursor-pointer flex items-center">
