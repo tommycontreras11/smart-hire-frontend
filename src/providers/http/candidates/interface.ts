@@ -46,6 +46,7 @@ interface ProfessionalDTO {
 
 interface PersonalDTO extends Partial<Omit<ICandidate, "uuid" | "desiredPosition" | "department" | "workExperience" | "educations" | "certifications">> {
   social_links?: ISocialLinkCandidate[];
+  file?: File
 }
 
 export interface IUpdateCandidateProfile {

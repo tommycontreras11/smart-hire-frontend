@@ -1,5 +1,6 @@
 "use client";
 
+import { PdfViewerModal } from "@/components/common/candidates/pdf-viewer.modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +30,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -39,7 +51,10 @@ import { PlatformTypeEnum } from "@/enums/social-link.enum";
 import { useGetProfile } from "@/hooks/api/auth.provider.hook";
 import { useGetAllCompetency } from "@/hooks/api/competency.hook";
 import { cn } from "@/lib/utils";
-import { useUpdateCandidate } from "@/mutations/api/candidates";
+import {
+  useUpdateCandidate,
+  useUpdateCandidateProfile,
+} from "@/mutations/api/candidates";
 import { IUpdateCandidateProfile } from "@/providers/http/candidates/interface";
 import { updateCandidateProfileFormSchema } from "@/schema/candidate.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -193,11 +208,18 @@ export default function Profile() {
 
   const [socialLink, setSociaLink] = useState({
     url: "",
-    type: PlatformTypeEnum
-  })
+    type: PlatformTypeEnum,
+  });
 
-const [selectedSkills, setSelectedSkills] = useState<{ uuid: string; name: string }[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<
+    { uuid: string; name: string }[]
+  >([]);
   const [skillsOpen, setSkillsOpen] = useState(false);
+
+  const [selectedCV, setSelectedCV] = useState<{
+    url: string;
+    name: string;
+  } | null>(null);
 
   const [isAddingPlatform, setIsAddingPlatform] = useState(false);
 
@@ -229,6 +251,7 @@ const [selectedSkills, setSelectedSkills] = useState<{ uuid: string; name: strin
         location: "",
         desired_salary: "",
         social_links: [],
+        file: undefined,
       },
       professional: {
         education: {
@@ -257,16 +280,52 @@ const [selectedSkills, setSelectedSkills] = useState<{ uuid: string; name: strin
     },
   });
 
-  const { mutate: updateCandidate } = useUpdateCandidate(() => {});
-  const { data: competencies } = useGetAllCompetency()
+  const { mutate: updateCandidate } = useUpdateCandidateProfile(() => {});
+  const { data: competencies } = useGetAllCompetency();
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Here you would typically save to your backend
-    console.log("Saving user data:", user);
+  const handleSave = (data: Partial<IUpdateCandidateProfile>) => {
+    console.log(data.personal?.file);
+    // const formData = new FormData()
+    // setIsEditing(false);
+
+    // if(data.personal?.file) formData.append('file', data.personal?.file)
+    // updateCandidate({ uuid: userAuth!.uuid, data: formData });
   };
 
   const addSkill = () => {};
+
+  // CV Upload handler
+  const handleCVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (file.type !== "application/pdf") {
+      alert("Please upload a PDF file only.");
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size must be less than 10MB.");
+      return;
+    }
+
+    setUploadingCV(true);
+
+    try {
+      const formData = new FormData();
+      setIsEditing(false);
+
+      formData.append("file", file);
+      console.log("file: ", formData.get("file"));
+      updateCandidate({ uuid: userAuth!.uuid, data: formData });
+    } catch (error) {
+      alert("Error uploading file. Please try again.");
+    } finally {
+      setUploadingCV(false);
+    }
+  };
 
   // Education functions
   const openEducationDialog = (education?: Education) => {
@@ -332,15 +391,15 @@ const [selectedSkills, setSelectedSkills] = useState<{ uuid: string; name: strin
   const getPlatformLabel = (type: PlatformTypeEnum) => {
     switch (type) {
       case PlatformTypeEnum.GITHUB:
-        return 'GitHub';
+        return "GitHub";
       case PlatformTypeEnum.PORTFOLIO:
-        return 'Portfolio';
+        return "Portfolio";
       default:
         return type;
     }
   };
 
-    const getPlatformIcon = (type: PlatformTypeEnum) => {
+  const getPlatformIcon = (type: PlatformTypeEnum) => {
     switch (type) {
       case PlatformTypeEnum.GITHUB:
         return <Github className="h-4 w-4" />;
@@ -351,19 +410,24 @@ const [selectedSkills, setSelectedSkills] = useState<{ uuid: string; name: strin
     }
   };
 
-const toggleSkill = (skill: { uuid: string; name: string }) => {
-  setSelectedSkills(prev =>
-    prev.some(s => s.uuid === skill.uuid)
-      ? prev.filter(s => s.uuid !== skill.uuid)
-      : [...prev, skill]
-  );
-};
-
-  const removeSkill = (uuid: string) => {
-    setSelectedSkills(prev => prev.filter(skill => skill.uuid !== uuid));
+  const toggleSkill = (skill: { uuid: string; name: string }) => {
+    setSelectedSkills((prev) =>
+      prev.some((s) => s.uuid === skill.uuid)
+        ? prev.filter((s) => s.uuid !== skill.uuid)
+        : [...prev, skill]
+    );
   };
 
-  const filteredSkills = competencies && competencies.filter(skill => !selectedSkills.some((selected) => skill.uuid === selected.uuid));
+  const removeSkill = (uuid: string) => {
+    setSelectedSkills((prev) => prev.filter((skill) => skill.uuid !== uuid));
+  };
+
+  const filteredSkills =
+    competencies &&
+    competencies.filter(
+      (skill) =>
+        !selectedSkills.some((selected) => skill.uuid === selected.uuid)
+    );
 
   return (
     <main className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -380,7 +444,7 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
               <Button variant="outline" onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSave}>
+              <Button onClick={() => handleSave}>
                 <Save className="mr-2 h-4 w-4" />
                 Save Changes
               </Button>
@@ -553,13 +617,18 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                   {user?.socialLinks && user?.socialLinks.length > 0 && (
                     <div className="space-y-3">
                       {user?.socialLinks.map((platform) => (
-                        <div key={platform.type} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                        <div
+                          key={platform.type}
+                          className="flex items-center justify-between p-4 border rounded-lg bg-muted/30"
+                        >
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/10 rounded-lg">
                               {getPlatformIcon(platform.type)}
                             </div>
                             <div>
-                              <div className="font-medium">{getPlatformLabel(platform.type)}</div>
+                              <div className="font-medium">
+                                {getPlatformLabel(platform.type)}
+                              </div>
                               <div className="text-sm text-muted-foreground truncate max-w-[300px]">
                                 {platform.url}
                               </div>
@@ -569,7 +638,9 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => window.open(platform.url, '_blank')}
+                              onClick={() =>
+                                window.open(platform.url, "_blank")
+                              }
                             >
                               <ExternalLink className="h-4 w-4" />
                             </Button>
@@ -601,10 +672,7 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="platform-type">Platform Type</Label>
-                          <Select
-                            value={""}
-                            onValueChange={(value) => {}}
-                          >
+                          <Select value={""} onValueChange={(value) => {}}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select platform type" />
                             </SelectTrigger>
@@ -636,16 +704,13 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button
-                          onClick={() => {}}
-                          disabled={true}
-                        >
+                        <Button onClick={() => {}} disabled={true}>
                           Add Platform
                         </Button>
                         <Button
                           variant="outline"
                           onClick={() => {
-                            setIsAddingPlatform(false)
+                            setIsAddingPlatform(false);
                           }}
                         >
                           Cancel
@@ -739,7 +804,7 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                             </div>
                             <div className="flex-1">
                               <h4 className="font-semibold text-lg">
-                                {user.curriculum}
+                                Curriculum
                               </h4>
                               {/*Implement this on the backend*/}
                               {/* <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
@@ -767,19 +832,18 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => {}}
-                              title="Download CV"
+                              onClick={() => user.curriculum && setSelectedCV({ url: user.curriculum, name: user.name })}
+                              title="View CV"
                             >
-                              <Download className="h-4 w-4" />
+                              <FileText className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="outline"
                               size="icon"
                               onClick={() => {}}
-                              className="text-destructive hover:text-destructive"
-                              title="Delete CV"
+                              title="Download CV"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Download className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -810,7 +874,7 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                                 <input
                                   type="file"
                                   accept=".pdf"
-                                  onChange={() => {}}
+                                  onChange={handleCVUpload}
                                   className="hidden"
                                   disabled={uploadingCV}
                                 />
@@ -846,7 +910,7 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                             <input
                               type="file"
                               accept=".pdf"
-                              onChange={() => {}}
+                              onChange={handleCVUpload}
                               className="hidden"
                               disabled={uploadingCV}
                             />
@@ -861,7 +925,7 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                 </CardContent>
               </Card>
 
-<Card>
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Award className="mr-2 h-5 w-5" />
@@ -876,7 +940,11 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                   {selectedSkills && selectedSkills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {selectedSkills.map((skill) => (
-                        <Badge key={skill.uuid} variant="secondary" className="px-3 py-1">
+                        <Badge
+                          key={skill.uuid}
+                          variant="secondary"
+                          className="px-3 py-1"
+                        >
                           {skill.name}
                           <button
                             onClick={() => removeSkill(skill.uuid)}
@@ -888,7 +956,7 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                       ))}
                     </div>
                   )}
-                  
+
                   {/* Skills Multi-Select */}
                   <Popover open={skillsOpen} onOpenChange={setSkillsOpen}>
                     <PopoverTrigger asChild>
@@ -908,24 +976,32 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
                         <CommandList>
                           <CommandEmpty>No skills found.</CommandEmpty>
                           <CommandGroup>
-                            {filteredSkills && filteredSkills.map((skill) => (
-                              <CommandItem
-                                key={skill.uuid}
-                                value={skill.uuid}
-                                onSelect={() => {
-                                  toggleSkill({ uuid: skill.uuid, name: skill.name });
-                                  console.log(skill)
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    selectedSkills.some((s) => s.uuid === skill.uuid) ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {skill.name}
-                              </CommandItem>
-                            ))}
+                            {filteredSkills &&
+                              filteredSkills.map((skill) => (
+                                <CommandItem
+                                  key={skill.uuid}
+                                  value={skill.uuid}
+                                  onSelect={() => {
+                                    toggleSkill({
+                                      uuid: skill.uuid,
+                                      name: skill.name,
+                                    });
+                                    console.log(skill);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedSkills.some(
+                                        (s) => s.uuid === skill.uuid
+                                      )
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {skill.name}
+                                </CommandItem>
+                              ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
@@ -1591,6 +1667,15 @@ const toggleSkill = (skill: { uuid: string; name: string }) => {
           </Tabs>
         </div>
       </div>
+
+      {selectedCV && (
+        <PdfViewerModal
+          open={!!selectedCV}
+          onOpenChange={(open) => !open && setSelectedCV(null)}
+          pdfUrl={selectedCV.url}
+          candidateName={selectedCV.name}
+        />
+      )}
     </main>
   );
 }

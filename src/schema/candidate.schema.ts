@@ -56,6 +56,7 @@ export const updateCandidateProfileFormSchema = z.object({
           })
         )
         .optional(),
+        file: z.instanceof(File).optional(),
     })
     .optional(), 
 
