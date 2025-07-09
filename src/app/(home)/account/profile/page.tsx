@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -33,7 +35,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
+import { PlatformTypeEnum } from "@/enums/social-link.enum";
 import { useGetProfile } from "@/hooks/api/auth.provider.hook";
+import { useGetAllCompetency } from "@/hooks/api/competency.hook";
+import { cn } from "@/lib/utils";
 import { useUpdateCandidate } from "@/mutations/api/candidates";
 import { IUpdateCandidateProfile } from "@/providers/http/candidates/interface";
 import { updateCandidateProfileFormSchema } from "@/schema/candidate.schema";
@@ -46,13 +51,18 @@ import {
   Calendar,
   CalendarDays,
   Camera,
+  Check,
   CheckCircle,
+  ChevronsUpDown,
   Download,
   Edit,
   Edit3,
+  ExternalLink,
   Eye,
   EyeOff,
   FileText,
+  Github,
+  Globe,
   GraduationCap,
   Mail,
   MapPin,
@@ -181,6 +191,16 @@ export default function Profile() {
     null
   );
 
+  const [socialLink, setSociaLink] = useState({
+    url: "",
+    type: PlatformTypeEnum
+  })
+
+const [selectedSkills, setSelectedSkills] = useState<{ uuid: string; name: string }[]>([]);
+  const [skillsOpen, setSkillsOpen] = useState(false);
+
+  const [isAddingPlatform, setIsAddingPlatform] = useState(false);
+
   const { data: user } = useGetProfile(userAuth?.uuid || "");
 
   const [uploadingCV, setUploadingCV] = useState(false);
@@ -219,7 +239,7 @@ export default function Profile() {
           start_date: undefined,
           end_date: undefined,
           institutionUUID: "",
-          academicDisciplineUUID: ""
+          academicDisciplineUUID: "",
         },
         certification: {
           uuid: "",
@@ -233,11 +253,12 @@ export default function Profile() {
           competencyUUIDs: [],
         },
         competencyUUIDs: [],
-      }
+      },
     },
   });
 
   const { mutate: updateCandidate } = useUpdateCandidate(() => {});
+  const { data: competencies } = useGetAllCompetency()
 
   const handleSave = () => {
     setIsEditing(false);
@@ -246,8 +267,6 @@ export default function Profile() {
   };
 
   const addSkill = () => {};
-
-  const removeSkill = (skillToRemove: string) => {};
 
   // Education functions
   const openEducationDialog = (education?: Education) => {
@@ -309,6 +328,42 @@ export default function Profile() {
   };
 
   const deleteCertification = (id: string) => {};
+
+  const getPlatformLabel = (type: PlatformTypeEnum) => {
+    switch (type) {
+      case PlatformTypeEnum.GITHUB:
+        return 'GitHub';
+      case PlatformTypeEnum.PORTFOLIO:
+        return 'Portfolio';
+      default:
+        return type;
+    }
+  };
+
+    const getPlatformIcon = (type: PlatformTypeEnum) => {
+    switch (type) {
+      case PlatformTypeEnum.GITHUB:
+        return <Github className="h-4 w-4" />;
+      case PlatformTypeEnum.PORTFOLIO:
+        return <Globe className="h-4 w-4" />;
+      default:
+        return <Globe className="h-4 w-4" />;
+    }
+  };
+
+const toggleSkill = (skill: { uuid: string; name: string }) => {
+  setSelectedSkills(prev =>
+    prev.some(s => s.uuid === skill.uuid)
+      ? prev.filter(s => s.uuid !== skill.uuid)
+      : [...prev, skill]
+  );
+};
+
+  const removeSkill = (uuid: string) => {
+    setSelectedSkills(prev => prev.filter(skill => skill.uuid !== uuid));
+  };
+
+  const filteredSkills = competencies && competencies.filter(skill => !selectedSkills.some((selected) => skill.uuid === selected.uuid));
 
   return (
     <main className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -483,26 +538,121 @@ export default function Profile() {
                 </CardContent>
               </Card>
 
+              {/* Platforms Section */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Social Links</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="h-5 w-5" />
+                    Professional Platforms
+                  </CardTitle>
                   <CardDescription>
-                    Add your professional social media profiles
+                    Manage your professional online presence
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {user?.socialLinks.map((socialLink) => (
-                    <div className="space-y-2">
-                      <Label htmlFor="linkedin">{socialLink.platform}</Label>
-                      <Input
-                        id="linkedin"
-                        value={socialLink.platform}
-                        onChange={(e) => {}}
-                        disabled={!isEditing}
-                        placeholder={socialLink.url}
-                      />
+                  {user?.socialLinks && user?.socialLinks.length > 0 && (
+                    <div className="space-y-3">
+                      {user?.socialLinks.map((platform) => (
+                        <div key={platform.type} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              {getPlatformIcon(platform.type)}
+                            </div>
+                            <div>
+                              <div className="font-medium">{getPlatformLabel(platform.type)}</div>
+                              <div className="text-sm text-muted-foreground truncate max-w-[300px]">
+                                {platform.url}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => window.open(platform.url, '_blank')}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {}}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+
+                  {!isAddingPlatform ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsAddingPlatform(true)}
+                      className="w-full"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Platform
+                    </Button>
+                  ) : (
+                    <div className="space-y-4 p-4 border rounded-lg bg-muted/20">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="platform-type">Platform Type</Label>
+                          <Select
+                            value={""}
+                            onValueChange={(value) => {}}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select platform type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={PlatformTypeEnum.GITHUB}>
+                                <div className="flex items-center gap-2">
+                                  <Github className="h-4 w-4" />
+                                  GitHub
+                                </div>
+                              </SelectItem>
+                              <SelectItem value={PlatformTypeEnum.PORTFOLIO}>
+                                <div className="flex items-center gap-2">
+                                  <Globe className="h-4 w-4" />
+                                  Portfolio
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="platform-url">URL</Label>
+                          <Input
+                            id="platform-url"
+                            type="url"
+                            placeholder="https://..."
+                            value={""}
+                            onChange={(e) => {}}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => {}}
+                          disabled={true}
+                        >
+                          Add Platform
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setIsAddingPlatform(false)
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -711,7 +861,7 @@ export default function Profile() {
                 </CardContent>
               </Card>
 
-              <Card>
+<Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Award className="mr-2 h-5 w-5" />
@@ -721,42 +871,66 @@ export default function Profile() {
                     Manage your professional skills and expertise
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {isEditing && (
-                      <div className="flex space-x-2">
-                        <Input
-                          placeholder="Add a new skill"
-                          value={newSkill}
-                          onChange={(e) => setNewSkill(e.target.value)}
-                          onKeyPress={(e) => e.key === "Enter" && addSkill()}
-                        />
-                        <Button onClick={addSkill} size="icon">
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                      {user?.competencies &&
-                        user?.competencies.map((competency) => (
-                          <Badge
-                            key={competency.uuid}
-                            variant="secondary"
-                            className="text-sm"
+                <CardContent className="space-y-4">
+                  {/* Selected Skills Display */}
+                  {selectedSkills && selectedSkills.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {selectedSkills.map((skill) => (
+                        <Badge key={skill.uuid} variant="secondary" className="px-3 py-1">
+                          {skill.name}
+                          <button
+                            onClick={() => removeSkill(skill.uuid)}
+                            className="ml-2 hover:text-destructive"
                           >
-                            {competency.name}
-                            {isEditing && (
-                              <button
-                                onClick={() => {}}
-                                className="ml-2 hover:text-destructive"
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            )}
-                          </Badge>
-                        ))}
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
                     </div>
-                  </div>
+                  )}
+                  
+                  {/* Skills Multi-Select */}
+                  <Popover open={skillsOpen} onOpenChange={setSkillsOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={skillsOpen}
+                        className="w-full justify-between"
+                      >
+                        Add skills...
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search skills..." />
+                        <CommandList>
+                          <CommandEmpty>No skills found.</CommandEmpty>
+                          <CommandGroup>
+                            {filteredSkills && filteredSkills.map((skill) => (
+                              <CommandItem
+                                key={skill.uuid}
+                                value={skill.uuid}
+                                onSelect={() => {
+                                  toggleSkill({ uuid: skill.uuid, name: skill.name });
+                                  console.log(skill)
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    selectedSkills.some((s) => s.uuid === skill.uuid) ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {skill.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </CardContent>
               </Card>
 
