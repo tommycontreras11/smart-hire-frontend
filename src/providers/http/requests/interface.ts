@@ -12,7 +12,6 @@ export interface IRequest {
 }
 
 export interface ICreateRequest {
-  file: File;
   candidateUUID?: string;
   jobPositionUUID?: string;
 }

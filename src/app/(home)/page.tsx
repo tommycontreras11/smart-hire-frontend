@@ -1,9 +1,5 @@
 "use client";
 
-import {
-  CreateUpdateForm,
-  IFormField,
-} from "@/components/common/modal/create-update";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,10 +18,8 @@ import { useGetAllJobPosition } from "@/hooks/api/job-position.hook";
 import { useGetAllRequest } from "@/hooks/api/request.hook";
 import { useCreateRequest } from "@/mutations/api/requests";
 import { ICreateRequest } from "@/providers/http/requests/interface";
-import { createRequestFormSchema } from "@/schema/request.schema";
 import { debounceWithParameters } from "@/utils/job-position";
 import { capitalizeFirstLetter } from "@/utils/string";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import {
   Briefcase,
@@ -36,25 +30,10 @@ import {
   Search,
 } from "lucide-react";
 import { ChangeEvent, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function Home() {
   const { user, isLoggedIn } = useAuth();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [uuid, setUUID] = useState<string | null>("");
-
-  const [requestFields, setRequestFields] = useState<IFormField[]>([
-    { name: "file", label: "Curriculum", type: "file" },
-  ]);
-
-  const form = useForm<ICreateRequest>({
-    resolver: zodResolver(createRequestFormSchema),
-    defaultValues: {
-      file: undefined,
-    },
-  });
 
   const isCandidate = useMemo(() => {
     return user?.role === UserRoleEnum.CANDIDATE;
@@ -81,9 +60,6 @@ export default function Home() {
   const { mutate: createRequest } = useCreateRequest(() => {
     refetchRequests();
     refetchJobPositions();
-    setIsModalOpen(false);
-    setUUID(null);
-    form.reset();
   });
 
   const jobPositionContractType = Object.values(
@@ -94,22 +70,9 @@ export default function Home() {
   }));
 
   const handleSubmit = (data: Partial<ICreateRequest>) => {
-    if (!uuid || !user) return;
+    if (!data.jobPositionUUID || !user) return;
 
-    const formData = new FormData();
-
-    requestFields.forEach((field) => {
-      const value = data?.[field.name as keyof ICreateRequest];
-      if (value !== undefined && value !== null) {
-        formData.append(field.name, value.toString());
-      }
-    });
-
-    if (data.file) formData.append("file", data.file);
-    formData.append("candidateUUID", user!.uuid as string);
-    formData.append("jobPositionUUID", uuid as string);
-
-    createRequest(formData);
+    createRequest({ candidateUUID: user!.uuid, jobPositionUUID: data.jobPositionUUID });
   };
 
   return (
@@ -273,10 +236,7 @@ export default function Home() {
                                 return;
                               }
 
-                              //handleSubmit({ jobPositionUUID: job.uuid, candidateUUID: user.uuid });
-
-                              setIsModalOpen(true);
-                              setUUID(job.uuid);
+                              handleSubmit({ jobPositionUUID: job.uuid });
                             }}
                           >
                             Apply
@@ -292,14 +252,6 @@ export default function Home() {
               );
             })}
         </div>
-        <CreateUpdateForm<ICreateRequest>
-          title="Upload Resume"
-          fields={requestFields}
-          form={form}
-          onSubmit={handleSubmit}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
       </section>
     </>
   );

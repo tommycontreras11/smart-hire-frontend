@@ -1,6 +1,11 @@
 import { config } from "@/lib/config";
 import Base from "@/providers/base";
-import { IAcceptJob, IRequest, IUpdateRequest } from "./interface";
+import {
+  IAcceptJob,
+  ICreateRequest,
+  IRequest,
+  IUpdateRequest,
+} from "./interface";
 
 export class RequestsProvider extends Base {
   constructor() {
@@ -15,17 +20,8 @@ export class RequestsProvider extends Base {
     return this.get(`/${uuid}`);
   }
 
-  create(data: FormData) {
-    return this.post(
-      "/",
-      data,
-      {},
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+  create(data: ICreateRequest) {
+    return this.post("/", data);
   }
 
   acceptJob(data: IAcceptJob) {
