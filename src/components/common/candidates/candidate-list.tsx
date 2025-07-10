@@ -27,6 +27,7 @@ import {
   useSendInterviewEmail,
 } from "@/mutations/api/emails";
 import { useUpdateRequest } from "@/mutations/api/requests";
+import { IRecruitmentProcess } from "@/providers/http/job-positions/interface";
 import { IUpdateRequest } from "@/providers/http/requests/interface";
 import { updateRequestFormSchema } from "@/schema/request.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,8 +43,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CreateUpdateForm, IFormField } from "../modal/create-update";
 import { PdfViewerModal } from "./pdf-viewer.modal";
-import { ICandidate } from "@/providers/http/candidates/interface";
-import { IRecruitmentProcess } from "@/providers/http/job-positions/interface";
 
 interface CandidateListProps {
   searchTerm: string;

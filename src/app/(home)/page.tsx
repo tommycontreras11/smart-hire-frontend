@@ -33,11 +33,12 @@ import { ChangeEvent, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export default function Home() {
-  const { user, isLoggedIn } = useAuth();
+  const { user } = useAuth();
 
   const isCandidate = useMemo(() => {
     return user?.role === UserRoleEnum.CANDIDATE;
   }, [user]);
+
   const [jobOrSkillFilter, setJobOrSkillFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [contractTypeFilter, setContractTypeFilter] = useState("");
@@ -47,15 +48,13 @@ export default function Home() {
   }, 500);
 
   const { data: requests, refetch: refetchRequests } = useGetAllRequest();
-
+  const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry();
   const { data: jobPositions, refetch: refetchJobPositions } =
     useGetAllJobPosition({
       jobOrSkill: jobOrSkillFilter,
       location: locationFilter,
       contractType: contractTypeFilter,
     });
-
-  const { data: countries, isLoading: isLoadingCountries } = useGetAllCountry();
 
   const { mutate: createRequest } = useCreateRequest(() => {
     refetchRequests();
@@ -70,9 +69,20 @@ export default function Home() {
   }));
 
   const handleSubmit = (data: Partial<ICreateRequest>) => {
-    if (!data.jobPositionUUID || !user) return;
+    if (!isCandidate || !user) {
+      toast.success("Error", {
+        description: "You must be logged in as a candidate to apply for a job",
+        duration: 3000,
+      });
+      return;
+    }
 
-    createRequest({ candidateUUID: user!.uuid, jobPositionUUID: data.jobPositionUUID });
+    if (!data.jobPositionUUID) return;
+
+    createRequest({
+      candidateUUID: user.uuid,
+      jobPositionUUID: data.jobPositionUUID,
+    });
   };
 
   return (
@@ -226,18 +236,9 @@ export default function Home() {
                           <Button
                             className="flex-1"
                             size="lg"
-                            onClick={() => {
-                              if (!isCandidate || !user) {
-                                toast.success("Error", {
-                                  description:
-                                    "You must be logged in as a candidate to apply for a job",
-                                  duration: 3000,
-                                });
-                                return;
-                              }
-
-                              handleSubmit({ jobPositionUUID: job.uuid });
-                            }}
+                            onClick={() =>
+                              handleSubmit({ jobPositionUUID: job.uuid })
+                            }
                           >
                             Apply
                           </Button>
