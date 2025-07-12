@@ -485,11 +485,11 @@ export default function Profile() {
             <div className="space-y-2">
               <h2 className="text-2xl font-bold">{user?.name}</h2>
               <p className="text-lg text-muted-foreground">
-                {user?.requests && user?.requests[0].jobPosition.name}
+                {user?.requests && user?.requests[0]?.jobPosition?.name  && user?.requests[0].jobPosition.name}
               </p>
               <Badge variant="outline" className="bg-primary/10">
                 {user?.requests &&
-                  user?.requests[0].jobPosition.department.name}
+                  user?.requests[0]?.jobPosition?.department?.name}
               </Badge>
             </div>
           </CardHeader>
