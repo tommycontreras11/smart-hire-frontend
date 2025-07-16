@@ -88,6 +88,7 @@ import {
   Shield,
   Trash2,
   Upload,
+  Users,
   X,
 } from "lucide-react";
 import { ChangeEvent, useState } from "react";
@@ -193,6 +194,20 @@ const mockUser = {
   },
 };
 
+interface JobExperience {
+  id: string;
+  title: string;
+  company: string;
+  department: string;
+  location: string;
+  employeeId: string;
+  manager: string;
+  startDate: string;
+  endDate?: string;
+  isCurrent: boolean;
+  description: string;
+}
+
 export default function Profile() {
   const { user: userAuth } = useAuth();
 
@@ -237,6 +252,41 @@ export default function Profile() {
   const [certificationForm, setCertificationForm] = useState<
     Partial<Certification>
   >({});
+
+  const [jobDialogOpen, setJobDialogOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState<JobExperience | null>(null);
+  const [jobFormData, setJobFormData] = useState<Partial<JobExperience>>({});
+
+  // Job Experience State
+  const [jobExperiences, setJobExperiences] = useState<JobExperience[]>([
+    {
+      id: "1",
+      title: "Senior Software Engineer",
+      company: "TechCorp Inc.",
+      department: "Engineering",
+      location: "San Francisco, CA",
+      employeeId: "EMP001",
+      manager: "John Smith",
+      startDate: "2022-01-15",
+      isCurrent: true,
+      description:
+        "Leading development of scalable web applications using React and Node.js. Managing a team of 5 developers and implementing best practices for code quality and deployment.",
+    },
+    {
+      id: "2",
+      title: "Full Stack Developer",
+      company: "StartupXYZ",
+      department: "Product",
+      location: "Remote",
+      employeeId: "DEV123",
+      manager: "Sarah Johnson",
+      startDate: "2020-03-01",
+      endDate: "2021-12-31",
+      isCurrent: false,
+      description:
+        "Developed and maintained full-stack applications using MERN stack. Collaborated with design team to implement responsive user interfaces.",
+    },
+  ]);
 
   const form = useForm<IUpdateCandidateProfile>({
     resolver: zodResolver(updateCandidateProfileFormSchema),
@@ -429,6 +479,17 @@ export default function Profile() {
         !selectedSkills.some((selected) => skill.uuid === selected.uuid)
     );
 
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  // Job Experience Functions
+  const handleAddJob = () => {
+    setEditingJob(null);
+    setJobFormData({});
+    setJobDialogOpen(true);
+  };
+
   return (
     <main className="flex-1 space-y-6 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -485,7 +546,9 @@ export default function Profile() {
             <div className="space-y-2">
               <h2 className="text-2xl font-bold">{user?.name}</h2>
               <p className="text-lg text-muted-foreground">
-                {user?.requests && user?.requests[0]?.jobPosition?.name  && user?.requests[0].jobPosition.name}
+                {user?.requests &&
+                  user?.requests[0]?.jobPosition?.name &&
+                  user?.requests[0].jobPosition.name}
               </p>
               <Badge variant="outline" className="bg-primary/10">
                 {user?.requests &&
@@ -832,7 +895,13 @@ export default function Profile() {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => user.curriculum && setSelectedCV({ url: user.curriculum, name: user.name })}
+                              onClick={() =>
+                                user.curriculum &&
+                                setSelectedCV({
+                                  url: user.curriculum,
+                                  name: user.name,
+                                })
+                              }
                               title="View CV"
                             >
                               <FileText className="h-4 w-4" />
@@ -925,6 +994,119 @@ export default function Profile() {
                 </CardContent>
               </Card>
 
+              {/* Job Information */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Briefcase className="h-5 w-5" />
+                      Work Experience
+                    </CardTitle>
+                    <CardDescription>
+                      Your employment history and current positions
+                    </CardDescription>
+                  </div>
+                  <Button onClick={handleAddJob} size="sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Job
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {jobExperiences.length > 0 ? (
+                    <div className="space-y-4">
+                      {jobExperiences.map((job) => (
+                        <div
+                          key={job.id}
+                          className="border rounded-lg p-4 space-y-3"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-semibold">{job.title}</h4>
+                                {job.isCurrent && (
+                                  <Badge
+                                    variant="default"
+                                    className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                  >
+                                    Current
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Building className="h-4 w-4" />
+                                <span>{job.company}</span>
+                                {job.department && (
+                                  <>
+                                    <span>•</span>
+                                    <span>{job.department}</span>
+                                  </>
+                                )}
+                              </div>
+                              {job.location && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <MapPin className="h-4 w-4" />
+                                  <span>{job.location}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Calendar className="h-4 w-4" />
+                                <span>
+                                  {formatDate(job.startDate)} -{" "}
+                                  {job.isCurrent
+                                    ? "Present"
+                                    : job.endDate
+                                      ? formatDate(job.endDate)
+                                      : "Present"}
+                                </span>
+                              </div>
+                              {job.manager && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Users className="h-4 w-4" />
+                                  <span>Manager: {job.manager}</span>
+                                </div>
+                              )}
+                              {job.employeeId && (
+                                <Badge variant="outline" className="w-fit">
+                                  ID: {job.employeeId}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {}}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {}}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          {job.description && (
+                            <p className="text-sm text-muted-foreground">
+                              {job.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No work experience added yet</p>
+                      <p className="text-sm">Click "Add Job" to get started</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Skills Card */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -1023,6 +1205,172 @@ export default function Profile() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Job Experience Dialog */}
+                  <Dialog open={jobDialogOpen} onOpenChange={setJobDialogOpen}>
+                    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {editingJob
+                            ? "Edit Job Experience"
+                            : "Add Job Experience"}
+                        </DialogTitle>
+                        <DialogDescription>
+                          {editingJob
+                            ? "Update your job information"
+                            : "Add a new job to your work experience"}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="job-title">Job Title *</Label>
+                            <Input
+                              id="job-title"
+                              value={jobFormData.title || ""}
+                              onChange={(e) =>
+                                setJobFormData((prev) => ({
+                                  ...prev,
+                                  title: e.target.value,
+                                }))
+                              }
+                              placeholder="e.g. Senior Software Engineer"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="job-company">Company *</Label>
+                            <Input
+                              id="job-company"
+                              value={jobFormData.company || ""}
+                              onChange={(e) =>
+                                setJobFormData((prev) => ({
+                                  ...prev,
+                                  company: e.target.value,
+                                }))
+                              }
+                              placeholder="e.g. TechCorp Inc."
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="job-department">Department</Label>
+                            <Input
+                              id="job-department"
+                              value={jobFormData.department || ""}
+                              onChange={(e) =>
+                                setJobFormData((prev) => ({
+                                  ...prev,
+                                  department: e.target.value,
+                                }))
+                              }
+                              placeholder="e.g. Engineering"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="job-location">Location</Label>
+                            <Input
+                              id="job-location"
+                              value={jobFormData.location || ""}
+                              onChange={(e) =>
+                                setJobFormData((prev) => ({
+                                  ...prev,
+                                  location: e.target.value,
+                                }))
+                              }
+                              placeholder="e.g. San Francisco, CA"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="job-start-date">Start Date *</Label>
+                            <Input
+                              id="job-start-date"
+                              type="date"
+                              value={jobFormData.startDate || ""}
+                              onChange={(e) =>
+                                setJobFormData((prev) => ({
+                                  ...prev,
+                                  startDate: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="job-end-date">End Date</Label>
+                            <Input
+                              id="job-end-date"
+                              type="date"
+                              value={jobFormData.endDate || ""}
+                              onChange={(e) =>
+                                setJobFormData((prev) => ({
+                                  ...prev,
+                                  endDate: e.target.value,
+                                }))
+                              }
+                              disabled={jobFormData.isCurrent}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            id="job-current"
+                            checked={jobFormData.isCurrent || false}
+                            onCheckedChange={(checked) =>
+                              setJobFormData((prev) => ({
+                                ...prev,
+                                isCurrent: checked,
+                                endDate: checked ? undefined : prev.endDate,
+                              }))
+                            }
+                          />
+                          <Label htmlFor="job-current">
+                            This is my current job
+                          </Label>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="job-description">
+                            Job Description
+                          </Label>
+                          <Textarea
+                            id="job-description"
+                            value={jobFormData.description || ""}
+                            onChange={(e) =>
+                              setJobFormData((prev) => ({
+                                ...prev,
+                                description: e.target.value,
+                              }))
+                            }
+                            placeholder="Describe your role, responsibilities, and achievements..."
+                            rows={4}
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button
+                          variant="outline"
+                          onClick={() => setJobDialogOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => {}}
+                          disabled={
+                            !jobFormData.title ||
+                            !jobFormData.company ||
+                            !jobFormData.startDate
+                          }
+                        >
+                          {editingJob ? "Update Job" : "Add Job"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
                   {/* Education Section */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
