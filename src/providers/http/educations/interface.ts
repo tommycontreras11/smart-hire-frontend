@@ -1,5 +1,6 @@
 import { IAcademicDiscipline } from "../academic-disciplines/interface";
 import { ICandidate } from "../candidates/interface";
+import { ICompetency } from "../competencies/interface";
 import { IInstitution } from "../institutions/interface";
 
 export interface IEducation {
@@ -12,6 +13,7 @@ export interface IEducation {
   institution: IInstitution;
   candidate: ICandidate;
   academicDiscipline?: IAcademicDiscipline;
+  competencies?: ICompetency[];
 }
 
 export interface ICreateEducation

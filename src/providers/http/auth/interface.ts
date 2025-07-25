@@ -6,6 +6,7 @@ import { IJobPosition } from "../job-positions/interface";
 import { ICreateRecruiter, IRecruiter } from "../recruiters/interface";
 import { ISocialLink } from "../social-links/interface";
 import { ICompetency } from "../competencies/interface";
+import { IWorkExperience } from "../work-experiences/interface";
 
 export interface IAuth {
   email: string;
@@ -52,6 +53,7 @@ export interface IProfile {
   requests?: IRequest[]
   socialLinks: ISocialLink[]
   competencies?: ICompetency[]
+  workExperiences?: IWorkExperience[]
   photo?: string
   curriculum?: string
   status: StatusEnum
