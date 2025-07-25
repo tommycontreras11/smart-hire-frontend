@@ -12,9 +12,22 @@ export interface IWorkExperience {
   location?: string;
   work_type?: WorkContractTypeEnum;
   work_location?: WorkLocationTypeEnum;
-  current_position: string;
-  position: IPositionType
-  institution: IInstitution
-  jobSource?: IJobSource
-  competencies?: ICompetency[]
+  current_position: boolean;
+  position: IPositionType;
+  institution: IInstitution;
+  jobSource?: IJobSource;
+  competencies?: ICompetency[];
+}
+
+export interface IUpdateWorkExperience
+  extends Partial<
+    Omit<
+      IWorkExperience,
+      "uuid" | "position" | "institution" | "jobSource" | "competencies"
+    >
+  > {
+  positionUUID: string;
+  institutionUUID?: string;
+  jobSourceUUID?: string;
+  competencyUUIDs?: string[];
 }
