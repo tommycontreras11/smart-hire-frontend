@@ -43,8 +43,8 @@ export default function JobPosition() {
     { name: "minimum_salary", label: "Minimum Salary", type: "number" },
     { name: "maximum_salary", label: "Maximum Salary", type: "number" },
     {
-      name: "contract_type",
-      label: "Contract Type",
+      name: "work_type",
+      label: "Work Type",
       type: "select",
       options: Object.values(JobPositionContractTypeEnum).map((level) => ({
         label: level,
@@ -61,7 +61,7 @@ export default function JobPosition() {
       description: "",
       minimum_salary: "0",
       maximum_salary: "0",
-      contract_type: "",
+      work_type: "",
       due_date: new Date(),
       countryUUID: "",
       languageUUID: "",
@@ -243,7 +243,7 @@ export default function JobPosition() {
           property: "maximum_salary",
           value: jobPosition.maximum_salary.toString(),
         },
-        { property: "contract_type", value: jobPosition.contract_type },
+        { property: "work_type", value: jobPosition.work_type },
         { property: "due_date", value: jobPosition.due_date },
         { property: "countryUUID", value: jobPosition.country.uuid },
         { property: "languageUUID", value: jobPosition.language.uuid },

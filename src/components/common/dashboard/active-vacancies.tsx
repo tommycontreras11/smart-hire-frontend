@@ -32,6 +32,7 @@ import { CreateUpdateForm, IFormField } from "../modal/create-update";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRoleEnum } from "@/enums/common.enum";
 import { capitalizeFirstLetter } from "@/utils/string";
+import { WorkLocationTypeEnum } from "@/enums/work.enum";
 
 function getDaysRemaining(deadline: string): number {
   const today = new Date();
@@ -62,14 +63,23 @@ export function ActiveVacancies({
     { name: "minimum_salary", label: "Minimum Salary", type: "number" },
     { name: "maximum_salary", label: "Maximum Salary", type: "number" },
     {
-      name: "contract_type",
-      label: "Contract Type",
+      name: "work_type",
+      label: "Work Type",
       type: "select",
       options: Object.values(JobPositionContractTypeEnum).map((level) => ({
         label: capitalizeFirstLetter(level).replace("_", " "),
         value: level,
       })),
     },
+    {
+      name: "work_location",
+      label: "Work Location",
+      type: "select",
+      options: Object.values(WorkLocationTypeEnum).map((location) => ({
+        label: capitalizeFirstLetter(location).replace("_", " "),
+        value: location,
+      }))
+    },    
     { name: "due_date", label: "Due Date", type: "date" },
   ]);
 
@@ -80,7 +90,8 @@ export function ActiveVacancies({
       description: "",
       minimum_salary: "0",
       maximum_salary: "0",
-      contract_type: "",
+      work_type: "",
+      work_location: "",
       due_date: new Date(),
       countryUUID: "",
       languageUUID: "",

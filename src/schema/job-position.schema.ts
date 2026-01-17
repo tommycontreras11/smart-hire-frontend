@@ -1,3 +1,4 @@
+import { WorkLocationTypeEnum } from "@/enums/common.enum";
 import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
 import { z } from "zod";
 
@@ -30,10 +31,16 @@ export const baseJobPositionSchema = z
         message: "Maximum salary must be greater than 0",
       }),
 
-    contract_type: z.enum(
+    work_type: z.enum(
       Object.values(JobPositionContractTypeEnum) as [string, ...string[]],
       {
         required_error: "Contract type is required",
+      }
+    ),
+    work_location: z.enum(
+      Object.values(WorkLocationTypeEnum) as [string, ...string[]],
+      {
+        required_error: "Work location is required",
       }
     ),
     due_date: z.date().refine((date) => date > new Date(), {

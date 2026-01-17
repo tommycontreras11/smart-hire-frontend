@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/contexts/auth-context";
-import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
 import { UserRoleEnum } from "@/enums/user.enum";
+import { WorkContractTypeEnum } from "@/enums/work.enum";
 import { useGetAllCountry } from "@/hooks/api/country.hook";
 import { useGetAllJobPosition } from "@/hooks/api/job-position.hook";
 import { useGetAllRequest } from "@/hooks/api/request.hook";
@@ -41,7 +41,7 @@ export default function Home() {
 
   const [jobOrSkillFilter, setJobOrSkillFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const [contractTypeFilter, setContractTypeFilter] = useState("");
+  const [workTypeFilter, setWorkTypeFilter] = useState("");
 
   const handleSearchTermChange = debounceWithParameters((jobOrSkillFilter) => {
     setJobOrSkillFilter(jobOrSkillFilter);
@@ -53,7 +53,7 @@ export default function Home() {
     useGetAllJobPosition({
       jobOrSkill: jobOrSkillFilter,
       location: locationFilter,
-      contractType: contractTypeFilter,
+      workType: workTypeFilter,
     });
 
   const { mutate: createRequest } = useCreateRequest(() => {
@@ -61,8 +61,8 @@ export default function Home() {
     refetchJobPositions();
   });
 
-  const jobPositionContractType = Object.values(
-    JobPositionContractTypeEnum
+  const workContractType = Object.values(
+    WorkContractTypeEnum
   ).map((type) => ({
     value: type,
     label: capitalizeFirstLetter(type.replace("_", " ")),
@@ -145,14 +145,14 @@ export default function Home() {
                 </SelectContent>
               </Select>
               <Select
-                value={contractTypeFilter}
-                onValueChange={setContractTypeFilter}
+                value={workTypeFilter}
+                onValueChange={setWorkTypeFilter}
               >
                 <SelectTrigger className="w-full sm:w-[200px] bg-white">
-                  <SelectValue placeholder="Contract Type" />
+                  <SelectValue placeholder="Work Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {jobPositionContractType.map((type) => (
+                  {workContractType.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label.replace("_", " ")}
                     </SelectItem>
@@ -204,7 +204,7 @@ export default function Home() {
                             <Briefcase className="h-4 w-4" />
                             <span>
                               {capitalizeFirstLetter(
-                                job.contract_type.replace("_", " ")
+                                job.work_type.replace("_", " ")
                               )}
                             </span>
                           </div>

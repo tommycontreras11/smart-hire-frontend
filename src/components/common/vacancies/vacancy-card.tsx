@@ -74,7 +74,7 @@ export function VacancyCard({ vacancy, handleUpdate, handleDelete }: VacancyCard
               {vacancy.country.name}
             </Badge>
             <Badge variant="outline" className="bg-primary/10">
-              {vacancy.contract_type}
+              {vacancy.work_type}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2 mt-2">

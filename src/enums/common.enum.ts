@@ -8,3 +8,9 @@ export enum UserRoleEnum {
   EMPLOYEE = "EMPLOYEE",
   CANDIDATE = "CANDIDATE",
 }
+
+export enum WorkLocationTypeEnum {
+  ON_SITE = "ON_SITE",
+  HYBRID = "HYBRID",
+  REMOTE = "REMOTE",
+}

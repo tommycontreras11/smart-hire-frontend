@@ -6,6 +6,7 @@ import { ICompetency } from "../competencies/interface";
 import { IDepartment } from "../departments/interface";
 import { IPositionType } from "../position-types/interface";
 import { StatusRequestFilterEnum } from "@/enums/request.enum";
+import { WorkLocationTypeEnum } from "@/enums/work.enum";
 
 export interface IJobPosition {
   uuid: string;
@@ -13,7 +14,8 @@ export interface IJobPosition {
   description: string;
   minimum_salary: string;
   maximum_salary: string;
-  contract_type: string;
+  work_type: string;
+  work_location: WorkLocationTypeEnum;
   due_date: Date;
   country: ICountry;
   language: ILanguage;
@@ -30,7 +32,7 @@ export interface IJobPosition {
 export interface IJobPositionFilter {
   jobOrSkill?: string | undefined;
   location?: string | undefined;
-  contractType?: string | undefined;
+  workType?: string | undefined;
 }
 
 export interface IRecruitmentProcess {
@@ -53,7 +55,8 @@ export interface ICreateJobPosition {
   description: string;
   minimum_salary: string;
   maximum_salary: string;
-  contract_type: string;
+  work_type: string;
+  work_location: string;
   due_date: Date;
   recruiterUUID?: string;
   countryUUID: string;

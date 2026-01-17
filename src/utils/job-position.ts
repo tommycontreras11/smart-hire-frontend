@@ -14,10 +14,10 @@ export const appendFilterString = (filters?: IJobPositionFilter) => {
       filters.location
     }`);
 
-  filters?.contractType &&
+  filters?.workType &&
     (filtersString += `${appendSignFilterString(
       filters?.location
-    )}contractType=${filters.contractType}`);
+    )}workType=${filters.workType}`);
 
   return filtersString;
 };

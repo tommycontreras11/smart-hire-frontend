@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
-import { StatusEnum, UserRoleEnum } from "@/enums/common.enum";
+import { StatusEnum, UserRoleEnum, WorkLocationTypeEnum } from "@/enums/common.enum";
 import { JobPositionContractTypeEnum } from "@/enums/job-position.enum";
 import { useGetAllCompetency } from "@/hooks/api/competency.hook";
 import { useGetAllCountry } from "@/hooks/api/country.hook";
@@ -57,13 +57,22 @@ export default function VacanciesPage() {
     { name: "minimum_salary", label: "Minimum Salary", type: "number" },
     { name: "maximum_salary", label: "Maximum Salary", type: "number" },
     {
-      name: "contract_type",
-      label: "Contract Type",
+      name: "work_type",
+      label: "Work Type",
       type: "select",
       options: Object.values(JobPositionContractTypeEnum).map((level) => ({
         label: capitalizeFirstLetter(level).replace("_", " "),
         value: level,
       })),
+    },
+    {
+      name: "work_location",
+      label: "Work Location",
+      type: "select",
+      options: Object.values(WorkLocationTypeEnum).map((location) => ({
+        label: capitalizeFirstLetter(location).replace("_", " "),
+        value: location,
+      }))
     },
     { name: "due_date", label: "Due Date", type: "date" },
   ]);
@@ -77,7 +86,8 @@ export default function VacanciesPage() {
       description: "",
       minimum_salary: "0",
       maximum_salary: "0",
-      contract_type: "",
+      work_type: "",
+      work_location: "",
       due_date: new Date(),
       countryUUID: "",
       languageUUID: "",
@@ -121,7 +131,6 @@ export default function VacanciesPage() {
 
     if (isEditable && isModalOpen) {
       // Status shouldn't appear on create mode
-      console.log(jobPosition.status)
       setJobPositionFields((prev) => {
         if(!prev.find((field) => field.name === "status")) {
           return [
@@ -152,7 +161,8 @@ export default function VacanciesPage() {
           property: "maximum_salary",
           value: jobPosition.maximum_salary.toString(),
         },
-        { property: "contract_type", value: jobPosition.contract_type },
+        { property: "work_type", value: jobPosition.work_type },
+        { property: "work_location", value: jobPosition.work_location },
         { property: "due_date", value: jobPosition.due_date },
         { property: "countryUUID", value: jobPosition.country.uuid },
         { property: "languageUUID", value: jobPosition.language.uuid },

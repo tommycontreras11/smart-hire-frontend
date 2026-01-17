@@ -48,9 +48,9 @@ export const columns = ({
     )
   },
   {
-    accessorKey: "contract_type",
+    accessorKey: "work_type",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={"Contract Type"} />
+      <DataTableColumnHeader column={column} title={"Work Type"} />
     )
   },
   {
